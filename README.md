@@ -134,8 +134,8 @@ SUBSYSTEM=="drm", KERNEL=="card[0-9]*", KERNELS=="0000:3a:00.0", SYMLINK+="dri/a
 
 (`KWIN_DRM_DEVICES` is colon-separated, so `/dev/dri/by-path/pci-…` paths cannot be used.)
 With this, displays connected to the XG Mobile dock's own outputs do not work; the laptop's
-panel and ports wired to the iGPU do. Also close ROG Control Center, games and anything else that
-uses the NVIDIA GPU before switching. KWin still opens the NVIDIA card through glvnd's NVIDIA
+panel and ports wired to the iGPU do (on the GV601RE the dock's outputs do not work with the NVIDIA
+driver anyway). Close games and other apps that use the NVIDIA GPU before switching. KWin still opens the NVIDIA card through glvnd's NVIDIA
 EGL driver, so also load only Mesa's EGL in KWin (user drop-in, affects only the compositor):
 
 ```ini
