@@ -543,17 +543,20 @@ class GpuTray(QSystemTrayIcon):
             self.radio_section(
                 "GPU access (live, cardwire)", s.cw_modes, s.cw_mode, lambda x: cw_label(x, s), self.switch_live
             )
-            if s.asus_egpu:
-                self.radio_section(
-                    "Hardware", hw_modes(s), s.hw_pending or s.hw_mode, hw_item, self.switch_hw, xg_disabled,
-                )
         elif s.supergfx and s.supported:
+            # Modes the Hardware section already covers are left out on ASUS laptops.
+            modes = [x for x in s.supported if x not in hw_modes(s)]
+            if modes:
+                self.radio_section(
+                    f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})", modes, s.mode,
+                    lambda x: mode_label(x, s), self.switch_supergfx,
+                )
+        # The hardware switch needs only asus-armoury - neither cardwire nor supergfxd.
+        if s.asus_egpu:
             self.radio_section(
-                f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})", s.supported, s.mode,
-                lambda x: mode_label(x, s), self.switch_supergfx,
-                lambda x: xg_disabled(x) if s.asus_egpu else "",
+                "Hardware", hw_modes(s), s.hw_pending or s.hw_mode, hw_item, self.switch_hw, xg_disabled,
             )
-        else:
+        if not s.cardwire and not s.supergfx and not s.asus_egpu:
             m.addSeparator()
             m.addAction("Switching unavailable (install cardwire)").setEnabled(False)
 
