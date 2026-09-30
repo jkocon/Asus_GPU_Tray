@@ -6,6 +6,7 @@ set -euo pipefail
 systemctl disable asus-gpu-switch-apply.service 2>/dev/null || true
 rm -f /etc/systemd/system/asus-gpu-switch@.service \
       /etc/systemd/system/asus-gpu-switch-apply.service \
+      /etc/systemd/system/asus-gpu-live@.service \
       /etc/polkit-1/rules.d/50-asus-gpu-tray.rules \
       /etc/xdg/autostart/asus-gpu-tray.desktop \
       /usr/local/share/applications/asus-gpu-tray.desktop \

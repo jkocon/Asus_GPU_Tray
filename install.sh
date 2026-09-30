@@ -16,8 +16,8 @@ install -Dm644 "$SRC/icons/asus-gpu-tray.svg" /usr/local/share/icons/hicolor/sca
 gtk-update-icon-cache -qtf /usr/local/share/icons/hicolor 2>/dev/null || true
 
 if [[ -e /sys/class/firmware-attributes/asus-armoury/attributes/egpu_enable ]]; then
-    install -Dm755 -t "$LIB" "$SRC/scripts/asus-gpu-switch-reboot" "$SRC/scripts/asus-gpu-switch-apply"
-    install -Dm644 -t /etc/systemd/system "$SRC/systemd/asus-gpu-switch@.service" "$SRC/systemd/asus-gpu-switch-apply.service"
+    install -Dm755 -t "$LIB" "$SRC/scripts/asus-gpu-switch-reboot" "$SRC/scripts/asus-gpu-switch-apply" "$SRC/scripts/asus-gpu-switch-live"
+    install -Dm644 -t /etc/systemd/system "$SRC/systemd/asus-gpu-switch@.service" "$SRC/systemd/asus-gpu-switch-apply.service" "$SRC/systemd/asus-gpu-live@.service"
     install -Dm644 -t /etc/polkit-1/rules.d "$SRC/polkit/50-asus-gpu-tray.rules"
     systemctl daemon-reload
     systemctl enable asus-gpu-switch-apply.service

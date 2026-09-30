@@ -32,6 +32,9 @@ PCI_IDS = "/usr/share/hwdata/pci.ids"
 # Reboot backend (switch at boot, before the NVIDIA driver loads); the polkit rule allows only these modes.
 REBOOT_UNIT = Path("/etc/systemd/system/asus-gpu-switch@.service")
 REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
+# Experimental live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
+LIVE_UNIT = Path("/etc/systemd/system/asus-gpu-live@.service")
+LIVE_RESULT = Path("/var/lib/asus-gpu-tray/live-result")
 POLL_MS = 3000
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
@@ -69,6 +72,7 @@ class GpuState:
     has_mux: bool
     hw_pending: str  # hardware mode scheduled for the next boot
     reboot_backend: bool
+    live_backend: bool
 
     @property
     def igpu(self) -> Gpu | None:
@@ -271,6 +275,7 @@ def read_state() -> GpuState:
         has_mux=(ATTR / "gpu_mux_mode").exists(),
         hw_pending=read(Path("/var/lib/asus-gpu-tray/pending")),
         reboot_backend=REBOOT_UNIT.exists() and asus_egpu,
+        live_backend=LIVE_UNIT.exists() and asus_egpu,
     )
 
 
@@ -417,6 +422,9 @@ class GpuTray(QSystemTrayIcon):
     def __init__(self) -> None:
         super().__init__()
         self.state: GpuState | None = None
+        self.live_proc: subprocess.Popen | None = None
+        self.live_timer = QTimer(self)
+        self.live_timer.timeout.connect(self.check_live_switch)
         self.menu = QMenu()
         self.setContextMenu(self.menu)
         self.activated.connect(self.on_activated)
@@ -490,6 +498,8 @@ class GpuTray(QSystemTrayIcon):
                     "Hardware (reboot)", hw_modes(s), s.hw_pending or s.hw_mode,
                     lambda x: hw_label(x, s), self.switch_hw, xg_disabled,
                 )
+            if s.asus_egpu and s.live_backend:
+                self.add_live_menu(s)
         elif s.supergfx and s.supported:
             self.radio_section(
                 f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})", s.supported, s.mode,
@@ -503,6 +513,49 @@ class GpuTray(QSystemTrayIcon):
         m.addSeparator()
         m.addAction("Refresh", self.force_refresh)
         m.addAction("Quit", QApplication.quit)
+
+    def add_live_menu(self, s: GpuState) -> None:
+        sub = self.menu.addMenu("Experimental: switch without reboot")
+        if self.live_proc:
+            sub.addAction("Switching in progress…").setEnabled(False)
+            return
+        for mode in ("Hybrid", "AsusEgpu"):
+            a = sub.addAction(f"{hw_label(mode, s)} – live", lambda mode=mode: self.switch_hw_live(mode))
+            a.setEnabled(mode != s.hw_mode and not s.hw_pending and (mode != "AsusEgpu" or s.egpu_connected))
+
+    def switch_hw_live(self, mode: str) -> None:
+        s = self.state or read_state()
+        text = (
+            f"EXPERIMENTAL: switch to {hw_label(mode, s)} without a reboot?\n\n"
+            "The NVIDIA card is unplugged in software and the driver moves to the other card. "
+            "If anything still uses the card, the switch is aborted. If the NVIDIA driver misbehaves, "
+            "the whole system can freeze and need a hard reset.\n\n"
+            "Save your work and close apps that use the NVIDIA GPU (games, ROG Control Center)."
+        )
+        if QMessageBox.warning(
+            None, "Experimental GPU switch", text,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No,
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        self.live_proc = subprocess.Popen(
+            ["systemctl", "start", f"asus-gpu-live@{mode}.service"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
+        )
+        self.live_timer.start(500)
+        self.force_refresh()
+
+    def check_live_switch(self) -> None:
+        if not self.live_proc or self.live_proc.poll() is None:
+            return
+        self.live_timer.stop()
+        rc, err = self.live_proc.returncode, self.live_proc.stderr.read()
+        self.live_proc = None
+        message = read(LIVE_RESULT) or err.strip() or f"systemctl exited with {rc}"
+        if rc == 0:
+            self.showMessage("GPU switched", message, self.icon(), 6000)
+        else:
+            QMessageBox.warning(None, "Experimental GPU switch", message)
+        self.force_refresh()
 
     def force_refresh(self) -> None:
         self.state = None

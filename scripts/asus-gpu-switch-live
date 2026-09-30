@@ -1,0 +1,139 @@
+#!/bin/bash
+# EXPERIMENTAL. Run as root by asus-gpu-live@<mode>.service.
+# Switches between the built-in dGPU (Hybrid) and the XG Mobile (AsusEgpu) without a reboot:
+# stop services that hold the NVIDIA card, check nobody else holds it, unbind and remove the
+# NVIDIA PCI functions, flip egpu_enable, rescan PCI and let the (still loaded) driver bind to
+# the new card.
+#
+# The NVIDIA driver waits forever in its PCI remove callback while any process still has the
+# card open, which hangs the system. So the script refuses to touch the hardware while anything
+# holds /dev/nvidia* or the card's DRM nodes - the compositor included (see README:
+# KWIN_DRM_DEVICES). Progress is written to /var/lib/asus-gpu-tray/live-progress with a sync
+# after every step, so after a hard hang the last step shows where it stopped.
+set -u
+
+target="${1:-}"
+attr=/sys/class/firmware-attributes/asus-armoury/attributes
+state=/var/lib/asus-gpu-tray
+progress=$state/live-progress
+result=$state/live-result
+conf=/etc/supergfxd.conf
+services=(cardwired.service nvidia-powerd.service supergfxd.service)
+stopped=()
+
+mkdir -p "$state"
+: > "$progress"
+step() {
+    echo "$*"
+    echo "$(date +%T) $*" >> "$progress"
+    sync
+}
+finish() {  # finish <exit code> <message for the tray>
+    local s
+    for s in "${stopped[@]}"; do systemctl start "$s"; done
+    if [[ " ${stopped[*]} " == *" cardwired.service "* ]]; then
+        sleep 1
+        cardwire debug refresh-gpu >/dev/null 2>&1
+    fi
+    echo "$2" > "$result"
+    chmod 644 "$result" "$progress"
+    step "$2"
+    exit "$1"
+}
+
+case "$target" in
+    Hybrid) want_egpu=0 ;;
+    AsusEgpu) want_egpu=1 ;;
+    *) echo "Unknown mode: '$target'" > "$result"; exit 2 ;;
+esac
+[[ -e $attr/egpu_enable/current_value ]] || finish 1 "No asus-armoury egpu_enable attribute"
+if [[ $want_egpu == 1 && $(<"$attr/egpu_connected/current_value") != 1 ]]; then
+    finish 3 "XG Mobile is not connected and locked"
+fi
+[[ $(<"$attr/egpu_enable/current_value") == "$want_egpu" ]] && finish 0 "Already in $target"
+[[ -f $state/pending ]] && finish 1 "A reboot-based switch is already scheduled"
+
+if command -v cardwire >/dev/null && ! cardwire get 2>/dev/null | grep -q 'Current Mode: Hybrid'; then
+    finish 1 "Switch cardwire to Hybrid first (a blocked GPU is hidden from sysfs)"
+fi
+
+step "Live switch to $target: stopping services"
+for s in "${services[@]}"; do
+    if systemctl -q is-active "$s"; then
+        systemctl stop "$s" && stopped+=("$s")
+    fi
+done
+
+nvidia_devices() {
+    local d
+    for d in /sys/bus/pci/devices/*; do
+        [[ $(cat "$d/vendor" 2>/dev/null) == 0x10de ]] && echo "$d"
+    done
+}
+devices=$(nvidia_devices)
+
+# Device nodes that keep the NVIDIA driver busy: /dev/nvidia* and the cards' DRM nodes.
+nodes=(/dev/nvidia*)
+for d in $devices; do
+    for n in "$d"/drm/card* "$d"/drm/renderD*; do
+        [[ -e $n ]] && nodes+=("/dev/dri/$(basename "$n")")
+    done
+done
+holders=""
+for p in /proc/[0-9]*; do
+    [[ $p == /proc/$$ ]] && continue
+    for fd in "$p"/fd/*; do
+        link=$(readlink "$fd" 2>/dev/null) || continue
+        for n in "${nodes[@]}"; do
+            if [[ $link == "$n" ]]; then
+                holders+="$(cat "$p/comm" 2>/dev/null) ($(basename "$p")), "
+                continue 3
+            fi
+        done
+    done
+done
+[[ -n $holders ]] && finish 4 "Aborted, the NVIDIA card is still in use by: ${holders%, }"
+
+step "Nobody holds the card; unbinding drivers"
+for d in $devices; do
+    [[ -e $d/driver ]] || continue
+    step "unbind $(basename "$d") from $(basename "$(readlink "$d/driver")")"
+    echo "$(basename "$d")" > "$d/driver/unbind" || finish 5 "Unbind of $(basename "$d") failed"
+done
+for d in $devices; do
+    step "remove $(basename "$d")"
+    echo 1 > "$d/remove"
+done
+
+step "egpu_enable -> $want_egpu"
+echo "$want_egpu" > "$attr/egpu_enable/current_value"
+if [[ $want_egpu == 0 && -e $attr/dgpu_disable/current_value ]]; then
+    echo 0 > "$attr/dgpu_disable/current_value"
+fi
+sleep 2
+step "Rescanning PCI"
+echo 1 > /sys/bus/pci/rescan
+
+bound=""
+for ((i = 0; i < 40; i++)); do
+    for d in $(nvidia_devices); do
+        [[ $(basename "$(readlink "$d/driver" 2>/dev/null)") == nvidia ]] && bound=$d
+    done
+    [[ -n $bound ]] && break
+    sleep 0.5
+done
+
+if [[ -f $conf ]]; then
+    python3 - "$conf" "$target" <<'PY'
+import json, sys
+path, mode = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    cfg = json.load(f)
+cfg.update(mode=mode, pending_mode=None, pending_action=None)
+with open(path, "w") as f:
+    json.dump(cfg, f, indent=2)
+PY
+fi
+
+[[ -n $bound ]] || finish 6 "Switched egpu_enable to $want_egpu, but no NVIDIA card got the driver - reboot"
+finish 0 "Switched to $target without a reboot ($(basename "$bound"))"
