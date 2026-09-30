@@ -93,9 +93,16 @@ It must run before cardwired: once cardwire blocks a GPU, the script could no lo
   and the system boots in the old mode. The blacklist is removed either way.
 - Switch back to the built-in dGPU **before** undocking the XG Mobile.
 
-### Experimental: switching without a reboot
+### Experimental: switching without a reboot (does not work on the GV601RE)
 
-The **Experimental: switch without reboot** submenu switches between the built-in dGPU and the
+> **Result on the ROG Flow X16 GV601RE:** the software part works (with KWin restricted as below,
+> nothing holds the card and it is unplugged cleanly), but the machine resets the moment
+> `egpu_enable` is written, both directions, also after an FLR of the GPU. The next boot reports
+> `Previous system reset reason [0x08000800]: an uncorrected error caused a data fabric sync flood
+> event`, so the ASUS firmware's lane switch is not safe on a running system. The submenu is hidden
+> unless the tray runs with `ASUS_GPU_TRAY_EXPERIMENTAL=1`. Results from other models are welcome.
+
+The hidden **Experimental: switch without reboot** submenu switches between the built-in dGPU and the
 XG Mobile live (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`):
 
 1. stops cardwired, nvidia-powerd and supergfxd (they keep the card open);
@@ -123,7 +130,16 @@ SUBSYSTEM=="drm", KERNEL=="card[0-9]*", KERNELS=="0000:3a:00.0", SYMLINK+="dri/a
 (`KWIN_DRM_DEVICES` is colon-separated, so `/dev/dri/by-path/pci-…` paths cannot be used.)
 With this, displays connected to the XG Mobile dock's own outputs do not work; the laptop's
 panel and ports wired to the iGPU do. Also close ROG Control Center, games and anything else that
-uses the NVIDIA GPU before switching. Save your work first: this is experimental.
+uses the NVIDIA GPU before switching. KWin still opens the NVIDIA card through glvnd's NVIDIA
+EGL driver, so also load only Mesa's EGL in KWin (user drop-in, affects only the compositor):
+
+```ini
+# ~/.config/systemd/user/plasma-kwin_wayland.service.d/asus-gpu-tray.conf
+[Service]
+Environment=__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+```
+
+Save your work first: this is experimental.
 
 ## Requirements
 

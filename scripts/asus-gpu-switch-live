@@ -1,5 +1,9 @@
 #!/bin/bash
 # EXPERIMENTAL. Run as root by asus-gpu-live@<mode>.service.
+# Result on a ROG Flow X16 GV601RE (nvidia-open 615): unbinding and removing the card works, but
+# the machine resets as soon as egpu_enable is written ("an uncorrected error caused a data fabric
+# sync flood event"), also after an FLR of the GPU. Kept for other models; hidden in the tray
+# unless ASUS_GPU_TRAY_EXPERIMENTAL=1.
 # Switches between the built-in dGPU (Hybrid) and the XG Mobile (AsusEgpu) without a reboot:
 # stop services that hold the NVIDIA card, check nobody else holds it, unbind and remove the
 # NVIDIA PCI functions, flip egpu_enable, rescan PCI and let the (still loaded) driver bind to

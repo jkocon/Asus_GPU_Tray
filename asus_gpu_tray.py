@@ -35,6 +35,9 @@ REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
 # Experimental live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
 LIVE_UNIT = Path("/etc/systemd/system/asus-gpu-live@.service")
 LIVE_RESULT = Path("/var/lib/asus-gpu-tray/live-result")
+# Hidden by default: on a ROG Flow X16 GV601RE the firmware switch itself resets the machine
+# (AMD "data fabric sync flood") even with the card cleanly unplugged. See README.
+EXPERIMENTAL = os.environ.get("ASUS_GPU_TRAY_EXPERIMENTAL") == "1"
 POLL_MS = 3000
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
@@ -275,7 +278,7 @@ def read_state() -> GpuState:
         has_mux=(ATTR / "gpu_mux_mode").exists(),
         hw_pending=read(Path("/var/lib/asus-gpu-tray/pending")),
         reboot_backend=REBOOT_UNIT.exists() and asus_egpu,
-        live_backend=LIVE_UNIT.exists() and asus_egpu,
+        live_backend=EXPERIMENTAL and LIVE_UNIT.exists() and asus_egpu,
     )
 
 
