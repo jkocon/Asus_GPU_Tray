@@ -1,5 +1,5 @@
 // Lets a local, active user in the wheel group start asus-gpu-switch@<mode>.service
-// (reboot-based switch) and asus-gpu-live@<mode>.service (experimental live switch)
+// (reboot-based switch) and asus-gpu-live@<mode>.service (live switch)
 // without a password (used by asus_gpu_tray.py).
 polkit.addRule(function(action, subject) {
     if (action.id == "org.freedesktop.systemd1.manage-units" &&

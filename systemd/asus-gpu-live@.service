@@ -1,5 +1,5 @@
 [Unit]
-Description=EXPERIMENTAL: switch GPU hardware mode %i without a reboot
+Description=Switch GPU hardware mode %i without a reboot
 
 [Service]
 Type=oneshot

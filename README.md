@@ -4,8 +4,8 @@ A system tray icon for Linux that shows which GPU is currently rendering and swi
 
 - **live** GPU access modes (Integrated / Hybrid / Smart) through [cardwire](https://github.com/OpenGamingCollective/cardwire),
   with no reboot or logout;
-- **hardware** modes on ASUS laptops (built-in dGPU / **XG Mobile** eGPU dock / MUX), which cardwire
-  does not handle, applied safely during the next boot.
+- **hardware** modes on ASUS laptops, which cardwire does not handle: built-in dGPU ⇄ **XG Mobile**
+  eGPU dock **live, without a reboot** (~40 s), and the MUX (dGPU-only) mode during the next boot.
 
 It detects the installed graphics cards by itself and only offers what your hardware supports.
 
@@ -24,8 +24,10 @@ RTX 3070) running CachyOS with KDE Plasma.
 - **GPU access (live, cardwire):** Integrated blocks the dGPU/eGPU for new apps, Hybrid allows all
   GPUs, Smart allows the dGPU only for approved apps. Uses `cardwire set <mode>`, takes effect
   immediately; already running apps keep their GPU until restarted.
-- **Hardware (reboot, ASUS only):** built-in dGPU, XG Mobile, dGPU-only MUX. XG Mobile is greyed out
-  until the dock is connected and locked.
+- **Hardware (ASUS only):** built-in dGPU and XG Mobile switch live, without a reboot; the dGPU-only
+  MUX mode is marked "– reboot". XG Mobile is greyed out until the dock is connected and locked.
+  If a live switch cannot run (for example a game still uses the card), the tray offers to switch
+  with a reboot instead.
 - Falls back to supergfxd modes when cardwire is not installed, and works as a read-only GPU viewer
   without either.
 - Never wakes a runtime-suspended dGPU: it reads only kernel-cached sysfs files and cardwire's device
@@ -59,9 +61,15 @@ taken from `cardwire list --json` instead.
 
 ## Hardware switching (ASUS)
 
-supergfxd's live switching unloads the NVIDIA driver on logout. With nvidia-open 615 this
+There are two paths: built-in dGPU ⇄ XG Mobile switches **live** (see
+[Live switching](#live-switching-built-in-dgpu--xg-mobile)); the MUX mode, and the fallback when a
+live switch cannot run, are applied **during the next boot**.
+
+### Switching with a reboot
+
+supergfxd's own live switching unloads the NVIDIA driver on logout. With nvidia-open 615 this
 **froze the system** on `rmmod nvidia` (last log line: `nvidia-modeset: Unloading`), in every
-direction. So hardware changes are applied during boot, before the NVIDIA driver is loaded:
+direction. So the reboot path applies the change during boot, before the NVIDIA driver is loaded:
 
 ```
 menu click
@@ -93,10 +101,10 @@ It must run before cardwired: once cardwire blocks a GPU, the script could no lo
   and the system boots in the old mode. The blacklist is removed either way.
 - Switch back to the built-in dGPU **before** undocking the XG Mobile.
 
-### Experimental: switching without a reboot
+### Live switching (built-in dGPU ⇄ XG Mobile)
 
-The **Experimental: switch without reboot** submenu switches between the built-in dGPU and the
-XG Mobile live, in about 40 seconds (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`).
+Choosing the built-in dGPU or the XG Mobile in the **Hardware** section switches live, in about
+40 seconds (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`).
 Tested in both directions on the ROG Flow X16 GV601RE:
 
 1. closes ROG Control Center (the tray starts it again afterwards, with the same arguments) and
@@ -144,7 +152,7 @@ EGL driver, so also load only Mesa's EGL in KWin (user drop-in, affects only the
 Environment=__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
 ```
 
-Save your work first: this is experimental.
+If the switch is aborted, nothing is changed and the tray offers to switch with a reboot instead.
 
 ## Requirements
 
@@ -163,7 +171,8 @@ cd Asus_GPU_Tray
 sudo ./install.sh
 ```
 
-Install cardwire separately, following its
+For live XG Mobile switching on KDE Plasma, also do the one-time KWin setup described in
+[Live switching](#live-switching-built-in-dgpu--xg-mobile). Install cardwire separately, following its
 [installation guide](https://opengamingcollective.github.io/cardwire/getting-started/installation.html).
 
 The tray starts on the next login. To start it now: `python3 /usr/local/lib/asus-gpu-tray/asus_gpu_tray.py &`.

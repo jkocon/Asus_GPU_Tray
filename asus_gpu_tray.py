@@ -32,7 +32,8 @@ PCI_IDS = "/usr/share/hwdata/pci.ids"
 # Reboot backend (switch at boot, before the NVIDIA driver loads); the polkit rule allows only these modes.
 REBOOT_UNIT = Path("/etc/systemd/system/asus-gpu-switch@.service")
 REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
-# Experimental live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
+# Live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
+LIVE_MODES = ("Hybrid", "AsusEgpu")
 LIVE_UNIT = Path("/etc/systemd/system/asus-gpu-live@.service")
 LIVE_RESULT = Path("/var/lib/asus-gpu-tray/live-result")
 # User apps that keep the NVIDIA card open; closed before a live switch and started again after,
@@ -411,6 +412,11 @@ def dump(s: GpuState) -> None:
             print(f"  supergfxd mode {m}: {mode_label(m, s)}")
 
 
+def can_switch_live(s: GpuState, mode: str) -> bool:
+    """Built-in dGPU <-> XG Mobile can switch live; anything involving the MUX needs a reboot."""
+    return s.live_backend and not s.hw_pending and mode in LIVE_MODES and s.hw_mode in LIVE_MODES
+
+
 def hw_modes(s: GpuState) -> tuple[str, ...]:
     if not s.asus_egpu:
         return ()
@@ -459,6 +465,7 @@ class GpuTray(QSystemTrayIcon):
         super().__init__()
         self.state: GpuState | None = None
         self.live_proc: subprocess.Popen | None = None
+        self.live_mode = ""
         self.restart_after_live: list[list[str]] = []
         self.live_timer = QTimer(self)
         self.live_timer.timeout.connect(self.check_live_switch)
@@ -524,7 +531,13 @@ class GpuTray(QSystemTrayIcon):
             m.addAction(f"After reboot: {hw_label(s.hw_pending, s)}").setEnabled(False)
 
         def xg_disabled(mode: str) -> str:
+            if self.live_proc:
+                return "switching…"
             return "connect and lock the dock" if mode == "AsusEgpu" and not s.egpu_connected else ""
+
+        def hw_item(mode: str) -> str:
+            current = mode == (s.hw_pending or s.hw_mode)
+            return hw_label(mode, s) + ("" if current or can_switch_live(s, mode) else " – reboot")
 
         if s.cardwire:
             self.radio_section(
@@ -532,11 +545,8 @@ class GpuTray(QSystemTrayIcon):
             )
             if s.asus_egpu:
                 self.radio_section(
-                    "Hardware (reboot)", hw_modes(s), s.hw_pending or s.hw_mode,
-                    lambda x: hw_label(x, s), self.switch_hw, xg_disabled,
+                    "Hardware", hw_modes(s), s.hw_pending or s.hw_mode, hw_item, self.switch_hw, xg_disabled,
                 )
-            if s.asus_egpu and s.live_backend:
-                self.add_live_menu(s)
         elif s.supergfx and s.supported:
             self.radio_section(
                 f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})", s.supported, s.mode,
@@ -551,33 +561,20 @@ class GpuTray(QSystemTrayIcon):
         m.addAction("Refresh", self.force_refresh)
         m.addAction("Quit", QApplication.quit)
 
-    def add_live_menu(self, s: GpuState) -> None:
-        sub = self.menu.addMenu("Experimental: switch without reboot")
-        if self.live_proc:
-            sub.addAction("Switching in progress…").setEnabled(False)
-            return
-        for mode in ("Hybrid", "AsusEgpu"):
-            a = sub.addAction(f"{hw_label(mode, s)} – live", lambda mode=mode: self.switch_hw_live(mode))
-            a.setEnabled(mode != s.hw_mode and not s.hw_pending and (mode != "AsusEgpu" or s.egpu_connected))
-
     def switch_hw_live(self, mode: str) -> None:
         s = self.state or read_state()
         text = (
-            f"EXPERIMENTAL: switch to {hw_label(mode, s)} without a reboot?\n\n"
-            "The NVIDIA card is unplugged in software and the driver moves to the other card. "
-            "It takes about 40 seconds. If anything still uses the card, the switch is aborted. "
-            "If the firmware or the NVIDIA driver misbehaves, the system can freeze or reset.\n\n"
-            "Save your work and close games and other apps that use the NVIDIA GPU."
+            f"Switch to: {hw_label(mode, s)}?\n\n"
+            "No reboot needed; it takes about 40 seconds. Close games and other apps that use "
+            "the NVIDIA GPU first."
         )
         apps = user_processes(RESTARTABLE_APPS)
         if apps:
             text += "\n\nROG Control Center will be closed and started again afterwards."
-        if QMessageBox.warning(
-            None, "Experimental GPU switch", text,
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No,
-        ) != QMessageBox.StandardButton.Yes:
-            return
+        if QMessageBox.question(None, "Change GPU mode", text) != QMessageBox.StandardButton.Yes:
+            return self.force_refresh()
         stop_processes(apps)
+        self.live_mode = mode
         self.restart_after_live = [
             cmd + [a for a in RESTARTABLE_APPS.get(Path(cmd[0]).name, []) if a not in cmd] for _, cmd in apps
         ]
@@ -603,8 +600,14 @@ class GpuTray(QSystemTrayIcon):
         message = read(LIVE_RESULT) or err.strip() or f"systemctl exited with {rc}"
         if rc == 0:
             self.showMessage("GPU switched", message, self.icon(), 6000)
+        elif self.state and self.state.reboot_backend:
+            answer = QMessageBox.question(
+                None, "Change GPU mode", f"{message}\n\nSwitch with a reboot instead?"
+            )
+            if answer == QMessageBox.StandardButton.Yes and self.confirm_reboot(hw_label(self.live_mode, self.state)):
+                self.start_reboot_switch(self.live_mode)
         else:
-            QMessageBox.warning(None, "Experimental GPU switch", message)
+            QMessageBox.warning(None, "Change GPU mode", message)
         self.force_refresh()
 
     def force_refresh(self) -> None:
@@ -648,6 +651,10 @@ class GpuTray(QSystemTrayIcon):
         if mode == "AsusEgpu" and read_attr("egpu_connected") != "1":
             QMessageBox.warning(None, "XG Mobile", "XG Mobile is not connected and locked.")
             return self.force_refresh()
+        if self.live_proc:
+            return self.force_refresh()
+        if can_switch_live(s, mode):
+            return self.switch_hw_live(mode)
         if not s.reboot_backend:
             QMessageBox.warning(
                 None, "Change GPU mode", "The reboot-based switch backend is not installed. Run install.sh as root."
@@ -664,6 +671,8 @@ class GpuTray(QSystemTrayIcon):
         if mode == "AsusEgpu" and s.asus_egpu and read_attr("egpu_connected") != "1":
             QMessageBox.warning(None, "XG Mobile", "XG Mobile is not connected and locked.")
             return self.force_refresh()
+        if s.asus_egpu and can_switch_live(s, mode) and not self.live_proc:
+            return self.switch_hw_live(mode)
         if s.reboot_backend and mode in REBOOT_MODES:
             if self.confirm_reboot(mode_label(mode, s)):
                 self.start_reboot_switch(mode)

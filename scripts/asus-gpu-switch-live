@@ -1,5 +1,5 @@
 #!/bin/bash
-# EXPERIMENTAL. Run as root by asus-gpu-live@<mode>.service.
+# Run as root by asus-gpu-live@<mode>.service.
 # Works on a ROG Flow X16 GV601RE (nvidia-open 615) in both directions, ~40 s, most of it inside
 # the firmware call. Without masking Surprise Down and disabling the link first, the firmware's
 # lane switch reset the machine ("an uncorrected error caused a data fabric sync flood event").
