@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Asus GPU Tray
+Comment=Tray icon showing the active GPU and switching supergfxd modes
+Exec=/usr/bin/python3 /usr/local/lib/asus-gpu-tray/asus_gpu_tray.py
+Icon=asus-gpu-tray
+NoDisplay=true
+X-KDE-autostart-after=panel

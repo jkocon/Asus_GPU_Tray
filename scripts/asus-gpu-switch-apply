@@ -1,0 +1,74 @@
+#!/bin/bash
+# Run at boot by asus-gpu-switch-apply.service (before supergfxd).
+# Applies the mode scheduled by asus-gpu-switch-reboot: re-routes the eGPU/dGPU in
+# firmware while the NVIDIA driver is not loaded, and sets the mode in supergfxd's config.
+set -u
+
+attr=/sys/class/firmware-attributes/asus-armoury/attributes
+pending=/var/lib/asus-gpu-tray/pending
+blacklist=/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
+conf=/etc/supergfxd.conf
+
+[[ -f $pending ]] || exit 0
+target=$(<"$pending")
+rm -f "$pending"
+# The NVIDIA blacklist must go away whatever the outcome.
+trap 'rm -f "$blacklist"' EXIT
+
+for ((i = 0; i < 100; i++)); do
+    [[ -e $attr/egpu_enable/current_value ]] && break
+    sleep 0.2
+done
+if [[ ! -e $attr/egpu_enable/current_value ]]; then
+    echo "No asus-armoury attributes - skipping mode change"
+    exit 1
+fi
+
+nvidia_devices() {
+    local d
+    for d in /sys/bus/pci/devices/*; do
+        [[ $(<"$d/vendor") == 0x10de ]] && echo "$d"
+    done
+}
+
+want_egpu=0
+if [[ $target == AsusEgpu ]]; then
+    if [[ $(<"$attr/egpu_connected/current_value") == 1 ]]; then
+        want_egpu=1
+    else
+        echo "XG Mobile disconnected - setting Hybrid instead of AsusEgpu"
+        target=Hybrid
+    fi
+fi
+
+if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" ]]; then
+    for d in $(nvidia_devices); do
+        # snd_hda_intel on the HDMI audio function can be unbound safely - only nvidia is dangerous
+        if [[ $(basename "$(readlink "$d/driver")") == nvidia ]]; then
+            echo "$(basename "$d") already has the driver loaded - aborting to avoid a system hang"
+            exit 1
+        fi
+    done
+    for d in $(nvidia_devices); do
+        echo 1 > "$d/remove"
+    done
+    echo "egpu_enable -> $want_egpu"
+    echo "$want_egpu" > "$attr/egpu_enable/current_value"
+    if [[ $want_egpu == 0 && -e $attr/dgpu_disable/current_value ]]; then
+        echo 0 > "$attr/dgpu_disable/current_value"
+    fi
+    sleep 2
+    echo 1 > /sys/bus/pci/rescan
+    sleep 1
+fi
+
+python3 - "$conf" "$target" <<'PY'
+import json, sys
+path, mode = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    cfg = json.load(f)
+cfg.update(mode=mode, pending_mode=None, pending_action=None)
+with open(path, "w") as f:
+    json.dump(cfg, f, indent=2)
+PY
+echo "Mode set to $target"

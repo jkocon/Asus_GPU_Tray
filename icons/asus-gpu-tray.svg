@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+ <!-- Asus GPU Tray app icon: an XG Mobile plug with a piece of cable. The glow is made of
+      semi-transparent strokes because the Qt/KDE SVG renderer does not support filters. -->
+ <defs>
+  <radialGradient id="bgGlow" cx="0.62" cy="0.5" r="0.7">
+   <stop offset="0" stop-color="#3a1747"/>
+   <stop offset="0.55" stop-color="#150d24"/>
+   <stop offset="1" stop-color="#07070d"/>
+  </radialGradient>
+  <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0" stop-color="#2a3563"/>
+   <stop offset="1" stop-color="#141a33"/>
+  </linearGradient>
+  <linearGradient id="cable" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0" stop-color="#d9deea"/>
+   <stop offset="1" stop-color="#7d8598"/>
+  </linearGradient>
+ </defs>
+
+ <rect x="2" y="2" width="124" height="124" rx="24" fill="url(#bgGlow)"/>
+
+ <!-- cable + strain relief -->
+ <rect x="4" y="59" width="30" height="10" rx="3" fill="url(#cable)"/>
+ <rect x="28" y="54" width="12" height="20" rx="2" fill="#5b6275" stroke="#aab2c6" stroke-width="1.5"/>
+
+ <!-- housing glow -->
+ <path d="M40,46 L52,30 H114 V98 H52 L40,82 Z" fill="none" stroke="#b86bff" stroke-opacity="0.18"
+       stroke-width="14" stroke-linejoin="round"/>
+ <path d="M40,46 L52,30 H114 V98 H52 L40,82 Z" fill="none" stroke="#9fb4ff" stroke-opacity="0.35"
+       stroke-width="7" stroke-linejoin="round"/>
+ <!-- obudowa wtyczki -->
+ <path d="M40,46 L52,30 H114 V98 H52 L40,82 Z" fill="url(#body)" stroke="#e3e9ff" stroke-width="2.5"
+       stroke-linejoin="round"/>
+ <!-- zaczepy po prawej -->
+ <rect x="96" y="25" width="12" height="5" rx="1" fill="#141a33" stroke="#e3e9ff" stroke-width="1.5"/>
+ <rect x="96" y="98" width="12" height="5" rx="1" fill="#141a33" stroke="#e3e9ff" stroke-width="1.5"/>
+ <line x1="114" y1="40" x2="120" y2="40" stroke="#e3e9ff" stroke-width="2" stroke-linecap="round"/>
+ <line x1="114" y1="88" x2="120" y2="88" stroke="#e3e9ff" stroke-width="2" stroke-linecap="round"/>
+
+ <!-- red arrows -->
+ <g fill="none" stroke="#ff2d55" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M57,56 L64,64 L57,72"/>
+  <path d="M66,56 L73,64 L66,72"/>
+ </g>
+ <!-- suwak blokady -->
+ <ellipse cx="89" cy="64" rx="11" ry="8.5" fill="none" stroke="#ff2d55" stroke-opacity="0.35" stroke-width="7"/>
+ <ellipse cx="89" cy="64" rx="11" ry="8.5" fill="#1a1020" stroke="#ff2d55" stroke-width="3"/>
+ <ellipse cx="89" cy="64" rx="6" ry="4" fill="#ffffff"/>
+ <!-- dioda -->
+ <circle cx="106" cy="64" r="2" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,48 @@
+#!/bin/bash
+# Run as root by asus-gpu-switch@<mode>.service.
+# Schedules a mode change for the next boot and reboots immediately.
+# The change itself is done by asus-gpu-switch-apply early during boot, before the
+# NVIDIA driver loads. Live switching through supergfxd (log out + rmmod nvidia)
+# froze the system with nvidia-open.
+set -eu
+
+target="${1:-}"
+attr=/sys/class/firmware-attributes/asus-armoury/attributes
+state=/var/lib/asus-gpu-tray
+
+case "$target" in
+    Integrated|Hybrid|AsusEgpu|AsusMuxDgpu) ;;
+    *) echo "Unknown mode: '$target'"; exit 2 ;;
+esac
+
+if [[ $target == AsusEgpu && $(cat "$attr/egpu_connected/current_value" 2>/dev/null) != 1 ]]; then
+    echo "XG Mobile is not connected/locked - aborting"
+    exit 3
+fi
+
+mkdir -p "$state"
+echo "$target" > "$state/pending"
+
+# Block udev autoloading of NVIDIA for one boot, so asus-gpu-switch-apply can safely
+# re-route the dGPU/eGPU. supergfxd loads the driver explicitly anyway.
+cat > /etc/modprobe.d/zz-asus-gpu-tray-switch.conf <<CONF
+# Temporary - removed by asus-gpu-switch-apply on the next boot
+blacklist nvidia
+blacklist nvidia_drm
+blacklist nvidia_modeset
+blacklist nvidia_uvm
+CONF
+
+# MUX is a firmware setting applied only after a reboot, so writing it now is safe.
+if [[ -e $attr/gpu_mux_mode/current_value ]]; then
+    mux=$(cat "$attr/gpu_mux_mode/current_value")
+    if [[ $target == AsusMuxDgpu && $mux != 0 ]]; then
+        echo 0 > "$attr/gpu_mux_mode/current_value"
+    elif [[ $target != AsusMuxDgpu && $mux == 0 ]]; then
+        echo 1 > "$attr/gpu_mux_mode/current_value"
+    fi
+fi
+
+sync
+echo "Scheduled mode $target, rebooting"
+systemctl reboot

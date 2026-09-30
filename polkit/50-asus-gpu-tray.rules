@@ -1,0 +1,10 @@
+// Lets a local, active user in the wheel group start
+// asus-gpu-switch@<mode>.service without a password (used by asus_gpu_tray.py).
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("verb") == "start" &&
+        /^asus-gpu-switch@(Integrated|Hybrid|AsusEgpu|AsusMuxDgpu)\.service$/.test(action.lookup("unit")) &&
+        subject.isInGroup("wheel") && subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});

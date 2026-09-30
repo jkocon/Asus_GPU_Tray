@@ -1,0 +1,15 @@
+[Unit]
+Description=Apply scheduled GPU mode change (before supergfxd)
+DefaultDependencies=no
+After=local-fs.target systemd-udevd.service
+Before=supergfxd.service display-manager.service plasmalogin.service shutdown.target
+Conflicts=shutdown.target
+ConditionPathExists=/var/lib/asus-gpu-tray/pending
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/asus-gpu-tray/asus-gpu-switch-apply
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target
