@@ -93,6 +93,38 @@ It must run before cardwired: once cardwire blocks a GPU, the script could no lo
   and the system boots in the old mode. The blacklist is removed either way.
 - Switch back to the built-in dGPU **before** undocking the XG Mobile.
 
+### Experimental: switching without a reboot
+
+The **Experimental: switch without reboot** submenu switches between the built-in dGPU and the
+XG Mobile live (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`):
+
+1. stops cardwired, nvidia-powerd and supergfxd (they keep the card open);
+2. **aborts without touching the hardware** if any process still holds `/dev/nvidia*` or the
+   NVIDIA card's DRM nodes - the NVIDIA driver waits forever in its PCI remove callback while the
+   card is open, which is what froze the system with supergfxd's live switching;
+3. unbinds and removes the NVIDIA PCI functions, flips `egpu_enable`, rescans PCI and lets the
+   still-loaded driver bind to the new card;
+4. updates supergfxd's config and restarts the stopped services.
+
+Every step is synced to `/var/lib/asus-gpu-tray/live-progress`, so after a hard hang it shows
+where it stopped.
+
+The compositor must not use the NVIDIA card, otherwise the switch always aborts. For KDE Plasma,
+give the iGPU a stable device name with a udev rule and restrict KWin to it (log in again after):
+
+```bash
+# /etc/udev/rules.d/70-asus-igpu-card.rules  (use your iGPU's PCI address)
+SUBSYSTEM=="drm", KERNEL=="card[0-9]*", KERNELS=="0000:3a:00.0", SYMLINK+="dri/asus-igpu-card"
+
+# ~/.config/plasma-workspace/env/asus-gpu-tray-kwin.sh
+[ -e /dev/dri/asus-igpu-card ] && export KWIN_DRM_DEVICES=/dev/dri/asus-igpu-card
+```
+
+(`KWIN_DRM_DEVICES` is colon-separated, so `/dev/dri/by-path/pci-…` paths cannot be used.)
+With this, displays connected to the XG Mobile dock's own outputs do not work; the laptop's
+panel and ports wired to the iGPU do. Also close ROG Control Center, games and anything else that
+uses the NVIDIA GPU before switching. Save your work first: this is experimental.
+
 ## Requirements
 
 - Python 3.10+ with PyQt6 (`python-pyqt6` on Arch)
