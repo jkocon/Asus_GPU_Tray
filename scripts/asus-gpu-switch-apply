@@ -1,7 +1,8 @@
 #!/bin/bash
 # Run at boot by asus-gpu-switch-apply.service (before supergfxd).
 # Applies the mode scheduled by asus-gpu-switch-reboot: re-routes the eGPU/dGPU in
-# firmware while the NVIDIA driver is not loaded, and sets the mode in supergfxd's config.
+# firmware while the NVIDIA driver is not loaded, and sets the mode in supergfxd's config
+# when supergfxd is installed. Without supergfxd the NVIDIA driver is loaded through udev.
 set -u
 
 attr=/sys/class/firmware-attributes/asus-armoury/attributes
@@ -12,8 +13,15 @@ conf=/etc/supergfxd.conf
 [[ -f $pending ]] || exit 0
 target=$(<"$pending")
 rm -f "$pending"
-# The NVIDIA blacklist must go away whatever the outcome.
-trap 'rm -f "$blacklist"' EXIT
+# The NVIDIA blacklist must go away whatever the outcome. supergfxd loads the driver itself;
+# without it, replay udev "add" events so the driver loads for the (new) NVIDIA card.
+cleanup() {
+    rm -f "$blacklist"
+    if ! systemctl -q is-enabled supergfxd.service 2>/dev/null; then
+        udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x10de
+    fi
+}
+trap cleanup EXIT
 
 for ((i = 0; i < 100; i++)); do
     [[ -e $attr/egpu_enable/current_value ]] && break
@@ -62,6 +70,7 @@ if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" ]]; then
     sleep 1
 fi
 
+[[ -f $conf ]] || { echo "Hardware mode set to $target (no supergfxd config)"; exit 0; }
 python3 - "$conf" "$target" <<'PY'
 import json, sys
 path, mode = sys.argv[1], sys.argv[2]

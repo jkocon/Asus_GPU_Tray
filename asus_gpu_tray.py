@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Asus GPU Tray: a system tray icon that shows which GPU is rendering and switches
-supergfxd graphics modes. Detects graphics cards (iGPU / dGPU / eGPU) from sysfs,
-reads the list of modes from supergfxd and shows only what the hardware supports.
-XG Mobile and MUX options appear only on ASUS laptops with asus-armoury.
-Without supergfxd it works as a read-only GPU viewer.
+"""Asus GPU Tray: a system tray icon that shows which GPU is rendering and switches GPU modes.
+
+- Live GPU access modes (Integrated / Hybrid / Smart) through cardwire - no reboot, no logout.
+- Hardware modes on ASUS laptops (built-in dGPU / XG Mobile / MUX) through asus-armoury,
+  applied during the next boot before the NVIDIA driver loads.
+- supergfxd is used as a fallback when cardwire is not installed.
+- Without any of them it works as a read-only GPU viewer.
 
   asus_gpu_tray.py          system tray icon
   asus_gpu_tray.py --dump   print the detected state and exit"""
 
 import fcntl
+import json
 import os
 import shutil
 import subprocess
@@ -31,6 +34,7 @@ REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
 POLL_MS = 3000
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
+CARDWIRE_MODES = ("integrated", "hybrid", "smart")  # order in the menu
 
 
 @dataclass(frozen=True)
@@ -41,19 +45,26 @@ class Gpu:
     driver: str
     kind: str  # igpu / dgpu / egpu
     power: str  # runtime_status from sysfs
+    blocked: bool  # hidden from new apps by cardwire
 
 
 @dataclass(frozen=True)
 class GpuState:
     gpus: tuple[Gpu, ...]
+    cardwire: bool
+    cw_mode: str  # lower case, e.g. "hybrid"
+    cw_modes: tuple[str, ...]
     supergfx: bool
-    mode: str
+    mode: str  # supergfxd mode
     supported: tuple[str, ...]
     dgpu_vendor: str
     pending: str
     pending_action: str
     asus_egpu: bool  # egpu_connected attribute exists (ASUS XG Mobile)
     egpu_connected: bool
+    hw_mode: str  # "Hybrid" (built-in dGPU) / "AsusEgpu" / "AsusMuxDgpu" / "" when not ASUS
+    has_mux: bool
+    hw_pending: str  # hardware mode scheduled for the next boot
     reboot_backend: bool
 
     @property
@@ -133,10 +144,29 @@ def is_external(dev: Path) -> bool:
     return any(read(p / "external_facing") == "1" for p in real.parents if p.name.count(":") == 2)
 
 
-def detect_gpus() -> tuple[Gpu, ...]:
+def cardwire_devices() -> dict[str, dict] | None:
+    """PCI address -> cardwire's device info, or None when cardwire is not available."""
+    if not shutil.which("cardwire"):
+        return None
+    try:
+        devices = json.loads(run("cardwire", "list", "--json") or "null")
+        return {d["pci"]: d for d in devices.values()}
+    except (ValueError, AttributeError, KeyError, TypeError):
+        return None
+
+
+def cardwire_short_name(name: str) -> str:
+    # "NVIDIA GeForce RTX 3070 Laptop GPU" -> "RTX 3070"
+    for word in ("NVIDIA ", "GeForce ", "AMD ", "Intel(R) ", "Intel ", " Laptop GPU", " Mobile"):
+        name = name.replace(word, "")
+    return name.strip()
+
+
+def detect_gpus(cw: dict[str, dict]) -> tuple[Gpu, ...]:
     # Only kernel-cached sysfs files - lspci reads config space and wakes a suspended dGPU.
     xg_active = read_attr("egpu_enable") == "1"
     gpus = []
+    seen = set()
     for dev in sorted(PCI.iterdir()):
         if not read(dev / "class").startswith("0x03"):
             continue
@@ -157,12 +187,40 @@ def detect_gpus() -> tuple[Gpu, ...]:
                 driver=driver.resolve().name if driver.exists() else "",
                 kind=kind,
                 power=read(dev / "power" / "runtime_status"),
+                blocked=bool(cw.get(dev.name, {}).get("blocked")),
             )
         )
-    return tuple(gpus)
+        seen.add(dev.name)
+    # cardwire hides a blocked GPU's sysfs files from everyone, so take it from cardwire itself.
+    for addr, d in sorted(cw.items()):
+        if addr in seen or not d.get("blocked"):
+            continue
+        vendor = {"Nvidia": "NVIDIA"}.get(d.get("vendor", ""), d.get("vendor", "?"))
+        if not d.get("discrete"):
+            kind = "igpu"
+        elif is_external(PCI / addr) or (xg_active and vendor == "NVIDIA"):
+            kind = "egpu"
+        else:
+            kind = "dgpu"
+        gpus.append(Gpu(addr, vendor, cardwire_short_name(d.get("name", addr)), d.get("driver", ""), kind, "", True))
+    return tuple(sorted(gpus, key=lambda g: g.addr))
+
+
+def parse_cardwire_get(out: str) -> tuple[str, tuple[str, ...]]:
+    # "Current Mode: Hybrid\nAvailable Mode: integrated, hybrid, smart"
+    mode, modes = "", ()
+    for line in out.splitlines():
+        key, _, value = line.partition(":")
+        if key.strip() == "Current Mode":
+            mode = value.strip().lower()
+        elif key.strip() == "Available Mode":
+            modes = tuple(m.strip().lower() for m in value.split(",") if m.strip())
+    return mode, tuple(m for m in CARDWIRE_MODES if m in modes) + tuple(m for m in modes if m not in CARDWIRE_MODES)
 
 
 def read_state() -> GpuState:
+    cw = cardwire_devices()
+    cw_mode, cw_modes = parse_cardwire_get(run("cardwire", "get")) if cw is not None else ("", ())
     supergfx = shutil.which("supergfxctl") is not None
     mode = supported = dgpu_vendor = pending = action = ""
     if supergfx:
@@ -172,8 +230,19 @@ def read_state() -> GpuState:
         pending = run("supergfxctl", "-P")
         action = run("supergfxctl", "-p")
     asus_egpu = (ATTR / "egpu_connected").exists()
+    hw_mode = ""
+    if asus_egpu:
+        if read_attr("egpu_enable") == "1":
+            hw_mode = "AsusEgpu"
+        elif read_attr("gpu_mux_mode") == "0":
+            hw_mode = "AsusMuxDgpu"
+        else:
+            hw_mode = "Hybrid"
     return GpuState(
-        gpus=detect_gpus(),
+        gpus=detect_gpus(cw or {}),
+        cardwire=bool(cw_mode),
+        cw_mode=cw_mode,
+        cw_modes=cw_modes,
         supergfx=supergfx and bool(mode),
         mode=mode or "?",
         supported=tuple(m.strip() for m in supported.strip("[]").split(",") if m.strip()),
@@ -182,6 +251,9 @@ def read_state() -> GpuState:
         pending_action="" if action in ("", "Nothing", "None") else action,
         asus_egpu=asus_egpu,
         egpu_connected=read_attr("egpu_connected") == "1",
+        hw_mode=hw_mode,
+        has_mux=(ATTR / "gpu_mux_mode").exists(),
+        hw_pending=read(Path("/var/lib/asus-gpu-tray/pending")),
         reboot_backend=REBOOT_UNIT.exists() and asus_egpu,
     )
 
@@ -193,6 +265,7 @@ def dgpu_name(s: GpuState) -> str:
 
 
 def mode_label(mode: str, s: GpuState) -> str:
+    """Label for a supergfxd / hardware mode."""
     ig = s.igpu.name if s.igpu else "iGPU"
     dg = dgpu_name(s)
     label = {
@@ -206,18 +279,38 @@ def mode_label(mode: str, s: GpuState) -> str:
     return label[0].upper() + label[1:]
 
 
+def hw_label(mode: str, s: GpuState) -> str:
+    """Label for a hardware mode switched with a reboot (ASUS)."""
+    if mode == "Hybrid":
+        return f"Built-in dGPU ({s.dgpu.name})" if s.dgpu else "Built-in dGPU"
+    if mode == "AsusMuxDgpu":
+        return f"{s.dgpu.name if s.dgpu else 'Built-in dGPU'} only (MUX)"
+    return mode_label(mode, s)
+
+
+def cw_label(mode: str, s: GpuState) -> str:
+    ext = s.egpu or s.dgpu
+    name = ext.name if ext else "dGPU"
+    return {
+        "integrated": f"Integrated – block {name}",
+        "hybrid": "Hybrid – all GPUs available",
+        "smart": f"Smart – {name} only for approved apps",
+    }.get(mode, mode.capitalize())
+
+
 def working_gpu(s: GpuState) -> Gpu | None:
     """The card currently rendering (shown by the icon)."""
-    ext = s.egpu or s.dgpu
-    if s.mode in ("AsusEgpu", "AsusMuxDgpu") and ext:
-        return s.egpu if s.mode == "AsusEgpu" and s.egpu else ext
     for g in (s.egpu, s.dgpu):
-        if g and g.driver and g.power == "active":
+        if g and g.driver and not g.blocked and g.power == "active":
             return g
+    if s.hw_mode == "AsusMuxDgpu" or s.mode == "AsusMuxDgpu":
+        return s.dgpu or s.igpu  # with the MUX the dGPU drives the panel
     return s.igpu or (s.gpus[0] if s.gpus else None)
 
 
-def power_label(g: Gpu) -> str:
+def state_label(g: Gpu) -> str:
+    if g.blocked:
+        return f"{g.power}, blocked" if g.power else "blocked"
     return g.power or "no runtime PM"
 
 
@@ -228,12 +321,12 @@ def describe(s: GpuState) -> str:
     others = [x for x in s.gpus if x is not g]
     text = f"{g.name} ({KIND_LABEL[g.kind]})"
     if others:
-        text += " · " + ", ".join(f"{x.name} {power_label(x)}" for x in others)
+        text += " · " + ", ".join(f"{x.name} {state_label(x)}" for x in others)
     return text
 
 
 def gpu_line(g: Gpu) -> str:
-    return f"{KIND_LABEL[g.kind]}: {g.name} – {g.driver or 'no driver'}, {power_label(g)}"
+    return f"{KIND_LABEL[g.kind]}: {g.name} – {g.driver or 'no driver'}, {state_label(g)}"
 
 
 def xg_line(s: GpuState) -> str:
@@ -243,13 +336,28 @@ def xg_line(s: GpuState) -> str:
 def dump(s: GpuState) -> None:
     for g in s.gpus:
         print(f"{g.addr}  {gpu_line(g)}  [{g.vendor}]")
+    if s.cardwire:
+        print(f"cardwire: mode {s.cw_mode}; available {list(s.cw_modes)}")
+    else:
+        print("cardwire: no")
     print(f"supergfxd: {'yes' if s.supergfx else 'no'}; mode {s.mode}; supported {list(s.supported)}")
     if s.asus_egpu:
-        print(xg_line(s))
-    print(f"switch backend: {'reboot (asus-gpu-switch@)' if s.reboot_backend else 'supergfxctl -m'}")
+        print(f"{xg_line(s)}; hardware mode {s.hw_mode}" + (f"; pending {s.hw_pending}" if s.hw_pending else ""))
+        print(f"hardware switch backend: {'reboot (asus-gpu-switch@)' if s.reboot_backend else 'not installed'}")
     print(f"rendering: {describe(s)}")
-    for m in s.supported:
-        print(f"  mode {m}: {mode_label(m, s)}")
+    for m in s.cw_modes:
+        print(f"  live mode {m}: {cw_label(m, s)}")
+    for m in hw_modes(s):
+        print(f"  hardware mode {m}: {hw_label(m, s)}")
+    if not s.cardwire:
+        for m in s.supported:
+            print(f"  supergfxd mode {m}: {mode_label(m, s)}")
+
+
+def hw_modes(s: GpuState) -> tuple[str, ...]:
+    if not s.asus_egpu:
+        return ()
+    return ("Hybrid", "AsusEgpu") + (("AsusMuxDgpu",) if s.has_mux else ())
 
 
 # --- GUI ---------------------------------------------------------------------
@@ -259,7 +367,7 @@ NVIDIA_SVG = next((p for p in (HERE / "nvidia.svg", HERE / "icons" / "nvidia.svg
 BADGE = {"AMD": ("AMD", "#ed1c24"), "Intel": ("Intel", "#0071c5")}
 
 
-def make_icon(g: Gpu | None) -> QIcon:
+def make_icon(g: Gpu | None, xg: bool) -> QIcon:
     size = 64
     pix = QPixmap(size, size)
     pix.fill(Qt.GlobalColor.transparent)
@@ -280,8 +388,8 @@ def make_icon(g: Gpu | None) -> QIcon:
         p.setFont(font)
         p.setPen(QColor("white"))
         p.drawText(QRectF(0, 0, size, size), Qt.AlignmentFlag.AlignCenter, label)
-    if g and g.kind == "egpu":
-        # purple dot = external card
+    if xg:
+        # purple dot = an external GPU is attached (XG Mobile mode / Thunderbolt eGPU)
         p.setBrush(QColor("#9b59b6"))
         p.setPen(QColor("white"))
         p.drawEllipse(QRectF(size - 26, 0, 26, 26))
@@ -312,16 +420,35 @@ class GpuTray(QSystemTrayIcon):
         if s == self.state:
             return
         self.state = s
-        self.setIcon(make_icon(working_gpu(s)))
+        self.setIcon(make_icon(working_gpu(s), s.egpu is not None))
         tip = [f"GPU: {describe(s)}"]
-        if s.supergfx:
+        if s.cardwire:
+            tip.append(f"cardwire mode: {s.cw_mode.capitalize()}")
+        elif s.supergfx:
             tip.append(f"supergfxd mode: {s.mode}")
         if s.asus_egpu:
             tip.append(xg_line(s))
-        if s.pending:
+        if s.hw_pending:
+            tip.append(f"After reboot: {hw_label(s.hw_pending, s)}")
+        elif s.pending:
             tip.append(f"Pending: {s.pending}" + (f" ({s.pending_action})" if s.pending_action else ""))
         self.setToolTip("\n".join(tip))
         self.build_menu(s)
+
+    def radio_section(self, title: str, modes, current: str, label, handler, disabled=lambda m: "") -> None:
+        m = self.menu
+        m.addSection(title)
+        group = QActionGroup(m)
+        for mode in modes:
+            a = QAction(label(mode), m, checkable=True)
+            a.setChecked(mode == current)
+            reason = disabled(mode)
+            if reason:
+                a.setText(f"{label(mode)} – {reason}")
+                a.setEnabled(False)
+            a.triggered.connect(lambda _=False, mode=mode: handler(mode))
+            group.addAction(a)
+            m.addAction(a)
 
     def build_menu(self, s: GpuState) -> None:
         m = self.menu
@@ -332,24 +459,30 @@ class GpuTray(QSystemTrayIcon):
             m.addAction("No graphics card detected").setEnabled(False)
         if s.asus_egpu:
             m.addAction(xg_line(s)).setEnabled(False)
-        if s.pending:
-            m.addAction(f"Pending change: {s.pending}").setEnabled(False)
+        if s.hw_pending:
+            m.addAction(f"After reboot: {hw_label(s.hw_pending, s)}").setEnabled(False)
 
-        if s.supergfx and s.supported:
-            m.addSection(f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})")
-            group = QActionGroup(m)
-            for mode in s.supported:
-                a = QAction(mode_label(mode, s), m, checkable=True)
-                a.setChecked(mode == s.mode)
-                if mode == "AsusEgpu" and s.asus_egpu and not s.egpu_connected:
-                    a.setText(f"{mode_label(mode, s)} – connect and lock the dock")
-                    a.setEnabled(False)
-                a.triggered.connect(lambda _=False, mode=mode: self.switch(mode))
-                group.addAction(a)
-                m.addAction(a)
-        elif not s.supergfx:
+        def xg_disabled(mode: str) -> str:
+            return "connect and lock the dock" if mode == "AsusEgpu" and not s.egpu_connected else ""
+
+        if s.cardwire:
+            self.radio_section(
+                "GPU access (live, cardwire)", s.cw_modes, s.cw_mode, lambda x: cw_label(x, s), self.switch_live
+            )
+            if s.asus_egpu:
+                self.radio_section(
+                    "Hardware (reboot)", hw_modes(s), s.hw_pending or s.hw_mode,
+                    lambda x: hw_label(x, s), self.switch_hw, xg_disabled,
+                )
+        elif s.supergfx and s.supported:
+            self.radio_section(
+                f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})", s.supported, s.mode,
+                lambda x: mode_label(x, s), self.switch_supergfx,
+                lambda x: xg_disabled(x) if s.asus_egpu else "",
+            )
+        else:
             m.addSeparator()
-            m.addAction("Switching unavailable (supergfxd not running)").setEnabled(False)
+            m.addAction("Switching unavailable (install cardwire)").setEnabled(False)
 
         m.addSeparator()
         m.addAction("Refresh", self.force_refresh)
@@ -359,37 +492,78 @@ class GpuTray(QSystemTrayIcon):
         self.state = None
         self.refresh()
 
-    def switch(self, mode: str) -> None:
+    def switch_live(self, mode: str) -> None:
+        s = self.state or read_state()
+        if mode == s.cw_mode:
+            return self.force_refresh()  # clicked the current mode - just restore the check mark
+        res = subprocess.run(["cardwire", "set", mode], capture_output=True, text=True)
+        if res.returncode != 0:
+            QMessageBox.critical(None, "Change GPU mode", f"cardwire failed:\n{res.stderr or res.stdout}")
+        else:
+            note = "" if mode == "hybrid" else "\nApps already running keep their GPU until restarted."
+            self.showMessage("GPU mode", f"{cw_label(mode, s)}{note}", self.icon(), 4000)
+        self.force_refresh()
+
+    def confirm_reboot(self, title: str, extra: str = "") -> bool:
+        s = self.state
+        text = (
+            f"Switch to: {title}?\n\nThe computer will reboot right away and the change is applied "
+            "during boot. Save your work."
+        )
+        if s and s.hw_mode == "AsusEgpu":
+            text += "\n\nDisconnect the XG Mobile only once the new mode is active."
+        answer = QMessageBox.question(None, "Change GPU mode", text + extra)
+        return answer == QMessageBox.StandardButton.Yes
+
+    def start_reboot_switch(self, mode: str) -> None:
+        res = subprocess.run(
+            ["systemctl", "start", f"asus-gpu-switch@{mode}.service"], capture_output=True, text=True
+        )
+        if res.returncode != 0:
+            QMessageBox.critical(None, "Change GPU mode", f"Switching failed:\n{res.stderr or res.stdout}")
+
+    def switch_hw(self, mode: str) -> None:
+        s = self.state or read_state()
+        if mode == (s.hw_pending or s.hw_mode):
+            return self.force_refresh()
+        if mode == "AsusEgpu" and read_attr("egpu_connected") != "1":
+            QMessageBox.warning(None, "XG Mobile", "XG Mobile is not connected and locked.")
+            return self.force_refresh()
+        if not s.reboot_backend:
+            QMessageBox.warning(
+                None, "Change GPU mode", "The reboot-based switch backend is not installed. Run install.sh as root."
+            )
+            return self.force_refresh()
+        if self.confirm_reboot(hw_label(mode, s)):
+            self.start_reboot_switch(mode)
+        self.force_refresh()
+
+    def switch_supergfx(self, mode: str) -> None:
         s = self.state or read_state()
         if mode == s.mode:
-            self.force_refresh()  # clicked the current mode - just restore the check mark
-            return
+            return self.force_refresh()
         if mode == "AsusEgpu" and s.asus_egpu and read_attr("egpu_connected") != "1":
             QMessageBox.warning(None, "XG Mobile", "XG Mobile is not connected and locked.")
             return self.force_refresh()
-        reboot = s.reboot_backend and mode in REBOOT_MODES
-        if reboot:
-            how = "The computer will reboot right away and the mode will change during boot. Save your work."
-        else:
-            how = "supergfxd will perform the change. It may require logging out or rebooting."
-            if s.asus_egpu:
-                how += (
-                    "\n\nWarning: live switching unloads the NVIDIA driver and has frozen ASUS laptops "
-                    "with nvidia-open. Run install.sh to get the safer reboot-based switching."
-                )
-        if s.mode == "AsusEgpu":
-            how += "\n\nDisconnect the XG Mobile only once the new mode is active."
-        answer = QMessageBox.question(None, "Change GPU mode", f"Switch to: {mode_label(mode, s)}?\n\n{how}")
-        if answer != QMessageBox.StandardButton.Yes:
+        if s.reboot_backend and mode in REBOOT_MODES:
+            if self.confirm_reboot(mode_label(mode, s)):
+                self.start_reboot_switch(mode)
             return self.force_refresh()
-        cmd = ["systemctl", "start", f"asus-gpu-switch@{mode}.service"] if reboot else ["supergfxctl", "-m", mode]
-        res = subprocess.run(cmd, capture_output=True, text=True)
-        if res.returncode != 0:
-            QMessageBox.critical(None, "Change GPU mode", f"Switching failed:\n{res.stderr or res.stdout}")
-        elif not reboot:
-            action = run("supergfxctl", "-p")
-            if action and action not in ("Nothing", "None"):
-                QMessageBox.information(None, "Change GPU mode", f"supergfxd is waiting for: {action}")
+        how = "supergfxd will perform the change. It may require logging out or rebooting."
+        if s.asus_egpu:
+            how += (
+                "\n\nWarning: live switching unloads the NVIDIA driver and has frozen ASUS laptops "
+                "with nvidia-open. Run install.sh to get the safer reboot-based switching."
+            )
+        answer = QMessageBox.question(None, "Change GPU mode", f"Switch to: {mode_label(mode, s)}?\n\n{how}")
+        if answer == QMessageBox.StandardButton.Yes:
+            res = subprocess.run(["supergfxctl", "-m", mode], capture_output=True, text=True)
+            if res.returncode != 0:
+                QMessageBox.critical(None, "Change GPU mode", f"Switching failed:\n{res.stderr or res.stdout}")
+            else:
+                action = run("supergfxctl", "-p")
+                if action and action not in ("Nothing", "None"):
+                    QMessageBox.information(None, "Change GPU mode", f"supergfxd is waiting for: {action}")
         self.force_refresh()
 
 
