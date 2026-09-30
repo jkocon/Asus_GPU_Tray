@@ -211,6 +211,17 @@ cat /sys/class/firmware-attributes/asus-armoury/attributes/{egpu_connected,egpu_
 Cancel a scheduled hardware change manually (before rebooting):
 `sudo rm /var/lib/asus-gpu-tray/pending /etc/modprobe.d/zz-asus-gpu-tray-switch.conf`.
 
+## Known issues
+
+- **Extra power cycle after a reboot switch from XG Mobile to the built-in dGPU** (seen once on the
+  GV601RE with supergfxd disabled). The first boot showed a black screen and the laptop restarted by
+  itself before Linux started; the second boot came up fine and the switch was applied. Linux logged
+  a normal software reboot (`reset reason: software wrote 0xE to reset control register 0xCF9`), so
+  the extra restart happened in the firmware during POST. Cause unknown.
+- **Black screen for ~35 s while a reboot switch is applied.** The firmware call behind
+  `egpu_enable` takes about 29 s, and the display manager waits for `asus-gpu-switch-apply` so it
+  cannot grab the NVIDIA card mid-switch. Nothing is shown during the wait yet.
+
 ## Limitations
 
 - The classification heuristics have only been tested on the ROG Flow X16 GV601RE.
