@@ -32,13 +32,15 @@ problems were tracked down.
 
 ## Tested hardware
 
-| | |
-|---|---|
-| Laptop | ASUS ROG Flow X16 GV601RE (Radeon 680M iGPU + RTX 3050 Ti) |
-| Dock | XG Mobile with RTX 3070 |
-| Software | CachyOS, kernel 7.2, nvidia-open 615, KDE Plasma 6 (Wayland), cardwire 0.12 |
+| Laptop | GPUs | What was tested | Software |
+|---|---|---|---|
+| ASUS ROG Flow X16 (2022) GV601RE | Radeon 680M + RTX 3050 Ti | live and reboot switch, both directions; cardwire modes | CachyOS, kernel 7.2, nvidia-open 615, KDE Plasma 6 (Wayland), cardwire 0.12 |
+| ASUS ROG Flow X13 (2021) GV301QE | Radeon Vega (Ryzen 5000) + RTX 3050 Ti | live switch, both directions (~35 s) | CachyOS, kernel 7.2, nvidia-open 615, KDE Plasma 6 (Wayland), supergfxd 5.2 running, no cardwire |
 
-Other ROG laptops with XG Mobile support (Flow X13, Flow Z13, …) should work if the kernel exposes
+Dock: XG Mobile with RTX 3070 (the same unit on both laptops). On both, the NVIDIA GPU sits behind
+root port `00:01.1`.
+
+Other ROG laptops with XG Mobile support (Flow Z13, …) should work if the kernel exposes
 the `asus-armoury` firmware attributes. On any Linux laptop the tray shows your GPUs and the
 cardwire modes. Please report your results. The output of `python3 asus_gpu_tray.py --dump` helps
 most.
@@ -175,7 +177,7 @@ To cancel a scheduled reboot switch before rebooting, run
 
 ## Limitations
 
-- The live switch has been tested on one laptop and one dock only. It handles exactly one NVIDIA
+- The live switch has been tested on two laptops (GV601RE, GV301QE) and one dock only. It handles exactly one NVIDIA
   GPU (dGPU or XG Mobile) behind one PCIe port.
 - If NVIDIA modules are loaded from the initramfs (early KMS), the boot-time switch finds the driver
   already bound and refuses to run. The live switch is not affected.
