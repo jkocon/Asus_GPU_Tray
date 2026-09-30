@@ -35,6 +35,8 @@ REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
 # Experimental live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
 LIVE_UNIT = Path("/etc/systemd/system/asus-gpu-live@.service")
 LIVE_RESULT = Path("/var/lib/asus-gpu-tray/live-result")
+# User apps that keep the NVIDIA card open; closed before a live switch and started again after.
+RESTARTABLE_APPS = ("rog-control-center",)
 POLL_MS = 3000
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
@@ -329,6 +331,39 @@ def working_gpu(s: GpuState) -> Gpu | None:
     return s.igpu or (s.gpus[0] if s.gpus else None)
 
 
+def user_processes(names: tuple[str, ...]) -> list[tuple[int, list[str]]]:
+    """(pid, command line) of this user's processes whose executable name is in names."""
+    found = []
+    for proc in Path("/proc").iterdir():
+        if not proc.name.isdigit():
+            continue
+        try:
+            if proc.stat().st_uid != os.getuid():
+                continue
+            cmd = [a for a in (proc / "cmdline").read_bytes().decode(errors="replace").split("\0") if a]
+        except OSError:
+            continue
+        if cmd and Path(cmd[0]).name in names:
+            found.append((int(proc.name), cmd))
+    return found
+
+
+def stop_processes(procs: list[tuple[int, list[str]]], timeout_s: float = 5) -> None:
+    for pid, _ in procs:
+        try:
+            os.kill(pid, 15)
+        except ProcessLookupError:
+            pass
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline and any(Path(f"/proc/{pid}").exists() for pid, _ in procs):
+        time.sleep(0.1)
+    for pid, _ in procs:
+        try:
+            os.kill(pid, 9)
+        except ProcessLookupError:
+            pass
+
+
 def state_label(g: Gpu) -> str:
     if g.blocked:
         return f"{g.power}, blocked" if g.power else "blocked"
@@ -423,6 +458,7 @@ class GpuTray(QSystemTrayIcon):
         super().__init__()
         self.state: GpuState | None = None
         self.live_proc: subprocess.Popen | None = None
+        self.restart_after_live: list[list[str]] = []
         self.live_timer = QTimer(self)
         self.live_timer.timeout.connect(self.check_live_switch)
         self.menu = QMenu()
@@ -530,13 +566,18 @@ class GpuTray(QSystemTrayIcon):
             "The NVIDIA card is unplugged in software and the driver moves to the other card. "
             "It takes about 40 seconds. If anything still uses the card, the switch is aborted. "
             "If the firmware or the NVIDIA driver misbehaves, the system can freeze or reset.\n\n"
-            "Save your work and close apps that use the NVIDIA GPU (games, ROG Control Center)."
+            "Save your work and close games and other apps that use the NVIDIA GPU."
         )
+        apps = user_processes(RESTARTABLE_APPS)
+        if apps:
+            text += "\n\nROG Control Center will be closed and started again afterwards."
         if QMessageBox.warning(
             None, "Experimental GPU switch", text,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No,
         ) != QMessageBox.StandardButton.Yes:
             return
+        stop_processes(apps)
+        self.restart_after_live = [cmd for _, cmd in apps]
         self.live_proc = subprocess.Popen(
             ["systemctl", "start", f"asus-gpu-live@{mode}.service"],
             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
@@ -550,6 +591,12 @@ class GpuTray(QSystemTrayIcon):
         self.live_timer.stop()
         rc, err = self.live_proc.returncode, self.live_proc.stderr.read()
         self.live_proc = None
+        for cmd in self.restart_after_live:
+            try:
+                subprocess.Popen(cmd, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except OSError:
+                pass
+        self.restart_after_live = []
         message = read(LIVE_RESULT) or err.strip() or f"systemctl exited with {rc}"
         if rc == 0:
             self.showMessage("GPU switched", message, self.icon(), 6000)

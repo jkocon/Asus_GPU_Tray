@@ -99,7 +99,8 @@ The **Experimental: switch without reboot** submenu switches between the built-i
 XG Mobile live, in about 40 seconds (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`).
 Tested in both directions on the ROG Flow X16 GV601RE:
 
-1. stops cardwired, nvidia-powerd and supergfxd (they keep the card open);
+1. closes ROG Control Center (the tray starts it again afterwards, with the same arguments) and
+   stops cardwired, nvidia-powerd and supergfxd - they all keep the card open;
 2. **aborts without touching the hardware** if any process still holds `/dev/nvidia*` or the
    NVIDIA card's DRM nodes - the NVIDIA driver waits forever in its PCI remove callback while the
    card is open, which is what froze the system with supergfxd's live switching;
