@@ -1,18 +1,30 @@
 #!/bin/bash
 # Run as root by asus-gpu-live@<mode>.service.
-# Works on a ROG Flow X16 GV601RE (nvidia-open 615) in both directions, ~40 s, most of it inside
-# the firmware call. Without masking Surprise Down and disabling the link first, the firmware's
-# lane switch reset the machine ("an uncorrected error caused a data fabric sync flood event").
-# Switches between the built-in dGPU (Hybrid) and the XG Mobile (AsusEgpu) without a reboot:
-# stop services that hold the NVIDIA card, check nobody else holds it, unbind and remove the
-# NVIDIA PCI functions, flip egpu_enable, rescan PCI and let the (still loaded) driver bind to
-# the new card.
 #
-# The NVIDIA driver waits forever in its PCI remove callback while any process still has the
-# card open, which hangs the system. So the script refuses to touch the hardware while anything
-# holds /dev/nvidia* or the card's DRM nodes - the compositor included (see README:
-# KWIN_DRM_DEVICES). Progress is written to /var/lib/asus-gpu-tray/live-progress with a sync
-# after every step, so after a hard hang the last step shows where it stopped.
+# Switches between the built-in dGPU (Hybrid) and the XG Mobile (AsusEgpu) without a reboot:
+# stop services that hold the NVIDIA card, make sure nothing else holds it, unbind the NVIDIA PCI
+# functions, reset them from the root port, remove them, flip egpu_enable, rescan PCI and let the
+# (still loaded) driver bind to the new card. About 40 s on a ROG Flow X16 GV601RE, most of it
+# inside the firmware call.
+#
+# What makes it work:
+# - The NVIDIA driver waits forever in its PCI remove callback while any process has the card
+#   open, which hangs the system. So the device nodes are made inaccessible (chmod 000) and the
+#   script refuses to touch the hardware while anything still holds /dev/nvidia* or the card's
+#   DRM nodes - the compositor included (see README: KWin setup).
+# - Flipping egpu_enable while the card is still in the state the driver left it in resets the
+#   whole machine ("an uncorrected error caused a data fabric sync flood event"), also after an
+#   FLR. It worked every time after a secondary bus reset from the root port followed by a link
+#   down/up cycle (Link Disable, which pciehp undoes within a second: "Link Down", "Card
+#   present"). Which of the two is essential was not isolated, so both are done and the switch is
+#   aborted before the firmware call if the bus reset fails. At boot the card has not been
+#   touched by the driver yet, which is why the boot-time switch needs neither.
+# - Masking Surprise Down (below) was part of that sequence too, but the GV601RE's root port has
+#   no Surprise Down reporting (LnkCap "Surprise-"), so the write has no effect there. It is kept
+#   for ports that do report it.
+#
+# Progress is written to /var/lib/asus-gpu-tray/live-progress with a sync after every step, so
+# after a hard hang the last step shows where it stopped.
 set -u
 
 target="${1:-}"
@@ -20,19 +32,72 @@ attr=/sys/class/firmware-attributes/asus-armoury/attributes
 state=/var/lib/asus-gpu-tray
 progress=$state/live-progress
 result=$state/live-result
+lock=/run/asus-gpu-tray.lock  # root-only; /run/lock is world-writable on some distros
 conf=/etc/supergfxd.conf
-services=(cardwired.service nvidia-powerd.service supergfxd.service)
+services=(cardwired.service nvidia-powerd.service nvidia-persistenced.service supergfxd.service)
 stopped=()
+declare -A node_modes=()  # device node -> "<octal mode> <major:minor>" before chmod 000
+devices=""
+root=""
+uemsk=""
+link_down=0
+detached=0
 
 mkdir -p "$state"
 : > "$progress"
+
 step() {
     echo "$*"
     echo "$(date +%T) $*" >> "$progress"
     sync
 }
+
+wait_link() {  # up to 20 s; the XG Mobile cable needs ~8 s
+    local i
+    for ((i = 0; i < 80; i++)); do
+        (( 0x$(setpci -s "$root" CAP_EXP+0x12.w) & 0x2000 )) && return 0  # Data Link Layer Link Active
+        sleep 0.25
+    done
+    return 1
+}
+
+link_up() {
+    step "enable link on $root"
+    setpci -s "$root" CAP_EXP+0x10.w=0000:0010
+    wait_link || step "link on $root did not come up"
+    if [[ -n $uemsk ]]; then
+        setpci -s "$root" ECAP_AER+0x04.l=ffffffff  # clear what the link change logged
+        setpci -s "$root" ECAP_AER+0x08.l="$uemsk"
+    fi
+    link_down=0
+}
+
+reattach() {  # bring back functions that were removed or left without a driver
+    local d
+    step "Rescanning PCI"
+    echo 1 > /sys/bus/pci/rescan
+    for d in $devices; do
+        [[ -e $d && ! -e $d/driver ]] && basename "$d" > /sys/bus/pci/drivers_probe
+    done
+    detached=0
+}
+
+restore_nodes() {
+    local n saved
+    for n in "${!node_modes[@]}"; do
+        saved=${node_modes[$n]}
+        # DRM nodes are recreated for the new card; only restore nodes that are still the same device.
+        [[ -c $n && $(stat -c '%t:%T' "$n") == "${saved#* }" ]] && chmod "${saved%% *}" "$n"
+    done
+    node_modes=()
+}
+
 finish() {  # finish <exit code> <message for the tray>
     local s
+    trap - TERM INT HUP
+    (( link_down )) && link_up
+    (( detached )) && reattach
+    restore_nodes
     for s in "${stopped[@]}"; do systemctl start "$s"; done
     if [[ " ${stopped[*]} " == *" cardwired.service "* ]]; then
         sleep 1
@@ -43,27 +108,7 @@ finish() {  # finish <exit code> <message for the tray>
     step "$2"
     exit "$1"
 }
-
-case "$target" in
-    Hybrid) want_egpu=0 ;;
-    AsusEgpu) want_egpu=1 ;;
-    *) echo "Unknown mode: '$target'" > "$result"; exit 2 ;;
-esac
-[[ -e $attr/egpu_enable/current_value ]] || finish 1 "No asus-armoury egpu_enable attribute"
-if [[ $want_egpu == 1 && $(<"$attr/egpu_connected/current_value") != 1 ]]; then
-    finish 3 "XG Mobile is not connected and locked"
-fi
-[[ $(<"$attr/egpu_enable/current_value") == "$want_egpu" ]] && finish 0 "Already in $target"
-[[ -f $state/pending ]] && finish 1 "A reboot-based switch is already scheduled"
-
-# Stopping cardwired also lifts its blocks, so a GPU blocked in Integrated/Smart mode shows up in
-# sysfs again; cardwired restores its mode when it starts again in finish().
-step "Live switch to $target: stopping services"
-for s in "${services[@]}"; do
-    if systemctl -q is-active "$s"; then
-        systemctl stop "$s" && stopped+=("$s")
-    fi
-done
+trap 'finish 7 "Interrupted - the hardware was put back as far as possible; reboot if the GPU is missing"' TERM INT HUP
 
 nvidia_devices() {
     local d
@@ -71,15 +116,61 @@ nvidia_devices() {
         [[ $(cat "$d/vendor" 2>/dev/null) == 0x10de ]] && echo "$d"
     done
 }
-devices=$(nvidia_devices)
 
-# Device nodes that keep the NVIDIA driver busy: /dev/nvidia* and the cards' DRM nodes.
-nodes=(/dev/nvidia*)
+# --- checks that change nothing ------------------------------------------------------------------
+case "$target" in
+    Hybrid) want_egpu=0 ;;
+    AsusEgpu) want_egpu=1 ;;
+    *) finish 2 "Unknown mode: '$target'" ;;
+esac
+exec 9> "$lock"
+flock -n 9 || finish 1 "Another GPU switch is already running"
+[[ -e $attr/egpu_enable/current_value ]] || finish 1 "No asus-armoury egpu_enable attribute"
+if [[ $want_egpu == 1 && $(cat "$attr/egpu_connected/current_value" 2>/dev/null) != 1 ]]; then
+    finish 3 "XG Mobile is not connected and locked"
+fi
+[[ $(<"$attr/egpu_enable/current_value") == "$want_egpu" ]] && finish 0 "Already in $target"
+[[ -f $state/pending ]] && finish 1 "A reboot-based switch is already scheduled"
+[[ $(cat "$attr/gpu_mux_mode/current_value" 2>/dev/null) == 0 ]] &&
+    finish 1 "MUX mode is active (the dGPU drives the panel) - switch with a reboot"
+command -v setpci >/dev/null || finish 1 "setpci (pciutils) is required for switching without a reboot"
+
+# Stopping cardwired also lifts its blocks, so a GPU blocked in Integrated/Smart mode shows up in
+# sysfs again; cardwired restores its mode when finish() starts it again.
+step "Live switch to $target: stopping services"
+for s in "${services[@]}"; do
+    if systemctl -q is-active "$s"; then
+        systemctl stop "$s" && stopped+=("$s")
+    fi
+done
+
+devices=$(nvidia_devices)
+[[ -n $devices ]] || finish 1 "No NVIDIA card found"
+parents=$(for d in $devices; do dirname "$(readlink -f "$d")"; done | sort -u)
+[[ $(wc -l <<< "$parents") == 1 ]] || finish 1 "NVIDIA functions sit behind different ports - not supported"
+root=$(basename "$parents")
+[[ $root =~ ^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$ ]] || finish 1 "Could not find the PCIe port of the NVIDIA card"
+[[ -w /sys/bus/pci/devices/$root/reset_subordinate ]] ||
+    finish 1 "The kernel cannot reset the bus below $root (no reset_subordinate) - switch with a reboot"
+[[ $(setpci -s "$root" CAP_EXP+0x10.w 2>/dev/null) =~ ^[0-9a-f]{4}$ ]] ||
+    finish 1 "Port $root has no PCIe capability that can be controlled - switch with a reboot"
+uemsk=$(setpci -s "$root" ECAP_AER+0x08.l 2>/dev/null)
+[[ $uemsk =~ ^[0-9a-f]{8}$ ]] || uemsk=""  # no AER on this port: skip the mask
+
+# --- keep new processes away from the card, then make sure nobody holds it -------------------------
+nodes=()
+for n in /dev/nvidia* /dev/nvidia-caps/*; do [[ -c $n ]] && nodes+=("$n"); done
 for d in $devices; do
     for n in "$d"/drm/card* "$d"/drm/renderD*; do
         [[ -e $n ]] && nodes+=("/dev/dri/$(basename "$n")")
     done
 done
+for n in "${nodes[@]}"; do
+    [[ -c $n ]] || continue
+    node_modes[$n]="$(stat -c '%a %t:%T' "$n")"
+    chmod 000 "$n"
+done
+
 holders=""
 for p in /proc/[0-9]*; do
     [[ $p == /proc/$$ ]] && continue
@@ -95,51 +186,44 @@ for p in /proc/[0-9]*; do
 done
 [[ -n $holders ]] && finish 4 "Aborted, the NVIDIA card is still in use by: ${holders%, }"
 
+# --- unplug the card ----------------------------------------------------------------------------
 step "Nobody holds the card; unbinding drivers"
+detached=1
 for d in $devices; do
     [[ -e $d/driver ]] || continue
     step "unbind $(basename "$d") from $(basename "$(readlink "$d/driver")")"
-    echo "$(basename "$d")" > "$d/driver/unbind" || finish 5 "Unbind of $(basename "$d") failed"
+    basename "$d" > "$d/driver/unbind" || finish 5 "Unbind of $(basename "$d") failed"
 done
-# The root port reports a lost link as a fatal "Surprise Down" error (it has no surprise-removal
-# support), and on AMD a fatal error means an immediate "data fabric sync flood" reset. So reset
-# the card from the port, mask Surprise Down and take the link down on purpose before the firmware
-# moves the lanes, then bring it back up.
-root=$(basename "$(dirname "$(readlink -f "$(echo "$devices" | head -n1)")")")
-[[ $root == [0-9a-f]*:*:*.* ]] || finish 1 "Could not find the root port of the NVIDIA card"
 step "secondary bus reset below $root"
-echo 1 > "/sys/bus/pci/devices/$root/reset_subordinate" || step "reset_subordinate failed, continuing"
+echo 1 > "/sys/bus/pci/devices/$root/reset_subordinate" ||
+    finish 8 "The bus reset below $root failed - aborted before the firmware switch"
 sleep 1
 for d in $devices; do
     step "remove $(basename "$d")"
     echo 1 > "$d/remove"
 done
 
-uemsk=$(setpci -s "$root" ECAP_AER+0x08.l)
-step "mask Surprise Down on $root (UEMsk $uemsk), disable link"
-setpci -s "$root" ECAP_AER+0x08.l=00000020:00000020
+link_down=1
+masked="no AER on the port"
+if [[ -n $uemsk ]]; then
+    setpci -s "$root" ECAP_AER+0x08.l=00000020:00000020
+    (( 0x$(setpci -s "$root" ECAP_AER+0x08.l) & 0x20 )) && masked="Surprise Down masked" || masked="Surprise Down mask not supported"
+fi
 setpci -s "$root" CAP_EXP+0x10.w=0010:0010
+step "link down/up cycle on $root ($masked)"
 sleep 0.5
 
+# --- the firmware switch ------------------------------------------------------------------------
 step "egpu_enable -> $want_egpu"
-echo "$want_egpu" > "$attr/egpu_enable/current_value"
+echo "$want_egpu" > "$attr/egpu_enable/current_value" || step "writing egpu_enable failed"
 if [[ $want_egpu == 0 && -e $attr/dgpu_disable/current_value ]]; then
-    echo 0 > "$attr/dgpu_disable/current_value"
+    echo 0 > "$attr/dgpu_disable/current_value"  # as in the tested sequence, also when already 0
 fi
+now_egpu=$(<"$attr/egpu_enable/current_value")
 sleep 2
 
-step "enable link on $root"
-setpci -s "$root" CAP_EXP+0x10.w=0000:0010
-for ((i = 0; i < 80; i++)); do  # up to 20 s; the XG Mobile cable link needs ~8 s
-    (( 0x$(setpci -s "$root" CAP_EXP+0x12.w) & 0x2000 )) && break  # Data Link Layer Link Active
-    sleep 0.25
-done
-step "link status $(setpci -s "$root" CAP_EXP+0x12.w), clearing AER status, restoring UEMsk"
-setpci -s "$root" ECAP_AER+0x04.l=ffffffff
-setpci -s "$root" ECAP_AER+0x08.l="$uemsk"
-sleep 1
-step "Rescanning PCI"
-echo 1 > /sys/bus/pci/rescan
+link_up
+reattach
 
 bound=""
 for ((i = 0; i < 40; i++)); do
@@ -150,6 +234,7 @@ for ((i = 0; i < 40; i++)); do
     sleep 0.5
 done
 
+[[ $now_egpu == "$want_egpu" ]] || finish 6 "The firmware did not switch (egpu_enable is still $now_egpu)"
 if [[ -f $conf ]]; then
     python3 - "$conf" "$target" <<'PY'
 import json, sys
@@ -161,6 +246,5 @@ with open(path, "w") as f:
     json.dump(cfg, f, indent=2)
 PY
 fi
-
 [[ -n $bound ]] || finish 6 "Switched egpu_enable to $want_egpu, but no NVIDIA card got the driver - reboot"
 finish 0 "Switched to $target without a reboot ($(basename "$bound"))"

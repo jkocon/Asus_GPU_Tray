@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Asus GPU Tray
-Comment=Tray icon showing the active GPU and switching supergfxd modes
+Comment=Shows the active GPU and switches GPU modes and the ASUS XG Mobile
 Exec=/usr/bin/python3 /usr/local/lib/asus-gpu-tray/asus_gpu_tray.py
 Icon=asus-gpu-tray
 NoDisplay=true

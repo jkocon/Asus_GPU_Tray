@@ -1,15 +1,21 @@
 [Unit]
-Description=Apply scheduled GPU mode change (before supergfxd)
+Description=Apply scheduled GPU hardware mode change (before the NVIDIA driver loads)
 DefaultDependencies=no
 After=local-fs.target systemd-udevd.service
-Before=supergfxd.service cardwired.service display-manager.service plasmalogin.service shutdown.target
+# Everything that may load or open the NVIDIA driver waits: nvidia-modprobe (used by NVML/CUDA
+# clients such as nvidia-powerd) loads the module explicitly, past the one-boot blacklist.
+Before=supergfxd.service cardwired.service nvidia-powerd.service nvidia-persistenced.service
+Before=display-manager.service plasmalogin.service shutdown.target
 Conflicts=shutdown.target
-ConditionPathExists=/var/lib/asus-gpu-tray/pending
+# Also runs when only the blacklist is left behind, so the NVIDIA driver is never blocked for good.
+ConditionPathExists=|/var/lib/asus-gpu-tray/pending
+ConditionPathExists=|/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/lib/asus-gpu-tray/asus-gpu-switch-apply
-TimeoutStartSec=60
+# The firmware call behind egpu_enable takes ~30 s, plus up to 20 s waiting for asus-armoury.
+TimeoutStartSec=180
 
 [Install]
 WantedBy=multi-user.target

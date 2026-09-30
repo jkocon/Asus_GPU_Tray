@@ -1,8 +1,8 @@
 #!/bin/bash
-# Run at boot by asus-gpu-switch-apply.service (before supergfxd).
-# Applies the mode scheduled by asus-gpu-switch-reboot: re-routes the eGPU/dGPU in
-# firmware while the NVIDIA driver is not loaded, and sets the mode in supergfxd's config
-# when supergfxd is installed. Without supergfxd the NVIDIA driver is loaded through udev.
+# Run at boot by asus-gpu-switch-apply.service, before anything can load the NVIDIA driver.
+# Applies the mode scheduled by asus-gpu-switch-reboot: re-routes the eGPU/dGPU in firmware
+# while the NVIDIA driver is not loaded, and sets the mode in supergfxd's config when
+# supergfxd is installed. Without supergfxd the NVIDIA driver is loaded through udev.
 set -u
 
 attr=/sys/class/firmware-attributes/asus-armoury/attributes
@@ -10,11 +10,9 @@ pending=/var/lib/asus-gpu-tray/pending
 blacklist=/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
 conf=/etc/supergfxd.conf
 
-[[ -f $pending ]] || exit 0
-target=$(<"$pending")
-rm -f "$pending"
-# The NVIDIA blacklist must go away whatever the outcome. supergfxd loads the driver itself;
-# without it, replay udev "add" events so the driver loads for the (new) NVIDIA card.
+# The NVIDIA blacklist must go away whatever the outcome - also when only the blacklist is left
+# (pending removed by hand). supergfxd loads the driver itself; without it, replay udev "add"
+# events so the driver loads for the (new) NVIDIA card.
 cleanup() {
     rm -f "$blacklist"
     if ! systemctl -q is-enabled supergfxd.service 2>/dev/null; then
@@ -22,6 +20,14 @@ cleanup() {
     fi
 }
 trap cleanup EXIT
+
+[[ -f $pending ]] || exit 0
+target=$(<"$pending")
+rm -f "$pending"
+case "$target" in
+    Integrated|Hybrid|AsusEgpu|AsusMuxDgpu) ;;
+    *) echo "Ignoring unknown scheduled mode '$target'"; exit 1 ;;
+esac
 
 for ((i = 0; i < 100; i++)); do
     [[ -e $attr/egpu_enable/current_value ]] && break

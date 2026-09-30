@@ -1,12 +1,14 @@
-// Lets a local, active user in the wheel group start asus-gpu-switch@<mode>.service
-// (reboot-based switch) and asus-gpu-live@<mode>.service (live switch)
-// without a password (used by asus_gpu_tray.py).
+// Asus GPU Tray: lets a local, active administrator (group wheel or sudo) start the GPU switch
+// units without a password. Only these unit names and modes are allowed:
+//   asus-gpu-switch@<mode>.service  schedule a hardware mode and reboot
+//   asus-gpu-live@<mode>.service    switch built-in dGPU <-> XG Mobile without a reboot
 polkit.addRule(function(action, subject) {
     if (action.id == "org.freedesktop.systemd1.manage-units" &&
         action.lookup("verb") == "start" &&
         (/^asus-gpu-switch@(Integrated|Hybrid|AsusEgpu|AsusMuxDgpu)\.service$/.test(action.lookup("unit")) ||
          /^asus-gpu-live@(Hybrid|AsusEgpu)\.service$/.test(action.lookup("unit"))) &&
-        subject.isInGroup("wheel") && subject.local && subject.active) {
+        (subject.isInGroup("wheel") || subject.isInGroup("sudo")) &&
+        subject.local && subject.active) {
         return polkit.Result.YES;
     }
 });
