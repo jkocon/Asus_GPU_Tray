@@ -56,10 +56,8 @@ fi
 [[ $(<"$attr/egpu_enable/current_value") == "$want_egpu" ]] && finish 0 "Already in $target"
 [[ -f $state/pending ]] && finish 1 "A reboot-based switch is already scheduled"
 
-if command -v cardwire >/dev/null && ! cardwire get 2>/dev/null | grep -q 'Current Mode: Hybrid'; then
-    finish 1 "Switch cardwire to Hybrid first (a blocked GPU is hidden from sysfs)"
-fi
-
+# Stopping cardwired also lifts its blocks, so a GPU blocked in Integrated/Smart mode shows up in
+# sysfs again; cardwired restores its mode when it starts again in finish().
 step "Live switch to $target: stopping services"
 for s in "${services[@]}"; do
     if systemctl -q is-active "$s"; then
