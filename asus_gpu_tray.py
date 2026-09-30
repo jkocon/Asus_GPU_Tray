@@ -35,8 +35,9 @@ REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
 # Experimental live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
 LIVE_UNIT = Path("/etc/systemd/system/asus-gpu-live@.service")
 LIVE_RESULT = Path("/var/lib/asus-gpu-tray/live-result")
-# User apps that keep the NVIDIA card open; closed before a live switch and started again after.
-RESTARTABLE_APPS = ("rog-control-center",)
+# User apps that keep the NVIDIA card open; closed before a live switch and started again after,
+# with extra arguments so they come back the way they were (RCC: tray only, no window).
+RESTARTABLE_APPS = {"rog-control-center": ["--background"]}
 POLL_MS = 3000
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
@@ -331,7 +332,7 @@ def working_gpu(s: GpuState) -> Gpu | None:
     return s.igpu or (s.gpus[0] if s.gpus else None)
 
 
-def user_processes(names: tuple[str, ...]) -> list[tuple[int, list[str]]]:
+def user_processes(names) -> list[tuple[int, list[str]]]:
     """(pid, command line) of this user's processes whose executable name is in names."""
     found = []
     for proc in Path("/proc").iterdir():
@@ -577,7 +578,9 @@ class GpuTray(QSystemTrayIcon):
         ) != QMessageBox.StandardButton.Yes:
             return
         stop_processes(apps)
-        self.restart_after_live = [cmd for _, cmd in apps]
+        self.restart_after_live = [
+            cmd + [a for a in RESTARTABLE_APPS.get(Path(cmd[0]).name, []) if a not in cmd] for _, cmd in apps
+        ]
         self.live_proc = subprocess.Popen(
             ["systemctl", "start", f"asus-gpu-live@{mode}.service"],
             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
