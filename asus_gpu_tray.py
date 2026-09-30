@@ -16,6 +16,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -35,6 +36,8 @@ POLL_MS = 3000
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
 CARDWIRE_MODES = ("integrated", "hybrid", "smart")  # order in the menu
+REFRESH_EVERY_S = 60
+_last_cw_refresh = 0.0
 
 
 @dataclass(frozen=True)
@@ -218,8 +221,21 @@ def parse_cardwire_get(out: str) -> tuple[str, tuple[str, ...]]:
     return mode, tuple(m for m in CARDWIRE_MODES if m in modes) + tuple(m for m in modes if m not in CARDWIRE_MODES)
 
 
+def cardwire_missed_dgpu(cw: dict[str, dict]) -> bool:
+    """cardwired can start before the NVIDIA driver is ready and then mistake the dGPU for an
+    integrated one (the laptop looks like a desktop: only hybrid/manual modes)."""
+    if not cw or any(d.get("discrete") for d in cw.values()):
+        return False
+    return any(g.kind != "igpu" and g.driver for g in detect_gpus(cw))
+
+
 def read_state() -> GpuState:
+    global _last_cw_refresh
     cw = cardwire_devices()
+    if cw and cardwire_missed_dgpu(cw) and time.monotonic() - _last_cw_refresh > REFRESH_EVERY_S:
+        _last_cw_refresh = time.monotonic()
+        run("cardwire", "debug", "refresh-gpu")
+        cw = cardwire_devices()
     cw_mode, cw_modes = parse_cardwire_get(run("cardwire", "get")) if cw is not None else ("", ())
     supergfx = shutil.which("supergfxctl") is not None
     mode = supported = dgpu_vendor = pending = action = ""
