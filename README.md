@@ -93,25 +93,29 @@ It must run before cardwired: once cardwire blocks a GPU, the script could no lo
   and the system boots in the old mode. The blacklist is removed either way.
 - Switch back to the built-in dGPU **before** undocking the XG Mobile.
 
-### Experimental: switching without a reboot (does not work on the GV601RE)
+### Experimental: switching without a reboot
 
-> **Result on the ROG Flow X16 GV601RE:** the software part works (with KWin restricted as below,
-> nothing holds the card and it is unplugged cleanly), but the machine resets the moment
-> `egpu_enable` is written, both directions, also after an FLR of the GPU. The next boot reports
-> `Previous system reset reason [0x08000800]: an uncorrected error caused a data fabric sync flood
-> event`, so the ASUS firmware's lane switch is not safe on a running system. The submenu is hidden
-> unless the tray runs with `ASUS_GPU_TRAY_EXPERIMENTAL=1`. Results from other models are welcome.
-
-The hidden **Experimental: switch without reboot** submenu switches between the built-in dGPU and the
-XG Mobile live (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`):
+The **Experimental: switch without reboot** submenu switches between the built-in dGPU and the
+XG Mobile live, in about 40 seconds (`asus-gpu-live@<Mode>.service`, script `asus-gpu-switch-live`).
+Tested in both directions on the ROG Flow X16 GV601RE:
 
 1. stops cardwired, nvidia-powerd and supergfxd (they keep the card open);
 2. **aborts without touching the hardware** if any process still holds `/dev/nvidia*` or the
    NVIDIA card's DRM nodes - the NVIDIA driver waits forever in its PCI remove callback while the
    card is open, which is what froze the system with supergfxd's live switching;
-3. unbinds and removes the NVIDIA PCI functions, flips `egpu_enable`, rescans PCI and lets the
-   still-loaded driver bind to the new card;
-4. updates supergfxd's config and restarts the stopped services.
+3. unbinds the NVIDIA functions, resets them with a secondary bus reset from the root port and
+   removes them from PCI;
+4. masks the "Surprise Down" AER error on the root port and disables the link, then flips
+   `egpu_enable` (the firmware call itself takes ~27 s);
+5. re-enables the link, waits for it (the XG Mobile cable needs ~8 s), restores the AER mask,
+   rescans PCI and lets the still-loaded driver bind to the new card;
+6. updates supergfxd's config and restarts the stopped services.
+
+Why step 4 matters: the root port has no surprise-removal support and treats a lost link as a
+**fatal** error; on AMD platforms that means an immediate reset. Without it every attempt reset the
+laptop the moment the firmware moved the lanes (next boot: `Previous system reset reason
+[0x08000800]: an uncorrected error caused a data fabric sync flood event`). At boot the same switch
+works without these steps because AER reporting is not set up yet.
 
 Every step is synced to `/var/lib/asus-gpu-tray/live-progress`, so after a hard hang it shows
 where it stopped.

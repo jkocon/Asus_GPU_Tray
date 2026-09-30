@@ -1,9 +1,8 @@
 #!/bin/bash
 # EXPERIMENTAL. Run as root by asus-gpu-live@<mode>.service.
-# Result on a ROG Flow X16 GV601RE (nvidia-open 615): unbinding and removing the card works, but
-# the machine resets as soon as egpu_enable is written ("an uncorrected error caused a data fabric
-# sync flood event"), also after an FLR of the GPU. Kept for other models; hidden in the tray
-# unless ASUS_GPU_TRAY_EXPERIMENTAL=1.
+# Works on a ROG Flow X16 GV601RE (nvidia-open 615) in both directions, ~40 s, most of it inside
+# the firmware call. Without masking Surprise Down and disabling the link first, the firmware's
+# lane switch reset the machine ("an uncorrected error caused a data fabric sync flood event").
 # Switches between the built-in dGPU (Hybrid) and the XG Mobile (AsusEgpu) without a reboot:
 # stop services that hold the NVIDIA card, check nobody else holds it, unbind and remove the
 # NVIDIA PCI functions, flip egpu_enable, rescan PCI and let the (still loaded) driver bind to
@@ -104,10 +103,25 @@ for d in $devices; do
     step "unbind $(basename "$d") from $(basename "$(readlink "$d/driver")")"
     echo "$(basename "$d")" > "$d/driver/unbind" || finish 5 "Unbind of $(basename "$d") failed"
 done
+# The root port reports a lost link as a fatal "Surprise Down" error (it has no surprise-removal
+# support), and on AMD a fatal error means an immediate "data fabric sync flood" reset. So reset
+# the card from the port, mask Surprise Down and take the link down on purpose before the firmware
+# moves the lanes, then bring it back up.
+root=$(basename "$(dirname "$(readlink -f "$(echo "$devices" | head -n1)")")")
+[[ $root == [0-9a-f]*:*:*.* ]] || finish 1 "Could not find the root port of the NVIDIA card"
+step "secondary bus reset below $root"
+echo 1 > "/sys/bus/pci/devices/$root/reset_subordinate" || step "reset_subordinate failed, continuing"
+sleep 1
 for d in $devices; do
     step "remove $(basename "$d")"
     echo 1 > "$d/remove"
 done
+
+uemsk=$(setpci -s "$root" ECAP_AER+0x08.l)
+step "mask Surprise Down on $root (UEMsk $uemsk), disable link"
+setpci -s "$root" ECAP_AER+0x08.l=00000020:00000020
+setpci -s "$root" CAP_EXP+0x10.w=0010:0010
+sleep 0.5
 
 step "egpu_enable -> $want_egpu"
 echo "$want_egpu" > "$attr/egpu_enable/current_value"
@@ -115,6 +129,17 @@ if [[ $want_egpu == 0 && -e $attr/dgpu_disable/current_value ]]; then
     echo 0 > "$attr/dgpu_disable/current_value"
 fi
 sleep 2
+
+step "enable link on $root"
+setpci -s "$root" CAP_EXP+0x10.w=0000:0010
+for ((i = 0; i < 80; i++)); do  # up to 20 s; the XG Mobile cable link needs ~8 s
+    (( 0x$(setpci -s "$root" CAP_EXP+0x12.w) & 0x2000 )) && break  # Data Link Layer Link Active
+    sleep 0.25
+done
+step "link status $(setpci -s "$root" CAP_EXP+0x12.w), clearing AER status, restoring UEMsk"
+setpci -s "$root" ECAP_AER+0x04.l=ffffffff
+setpci -s "$root" ECAP_AER+0x08.l="$uemsk"
+sleep 1
 step "Rescanning PCI"
 echo 1 > /sys/bus/pci/rescan
 
