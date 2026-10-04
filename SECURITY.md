@@ -6,7 +6,7 @@
 |---|---|---|
 | `asus_gpu_tray.py` | the logged-in user | read sysfs, `/proc` and the kernel log, run `cardwire`, start the switch units, stop and restart the user's own ROG Control Center, kill the user's own processes that hold the NVIDIA card (only after the user confirms), reboot (logind) |
 | `asus-gpu-switch-live` | root, `asus-gpu-live@<mode>.service` | stop and start GPU services, change device node permissions for the duration of the switch, unbind/reset/remove PCI devices, write ASUS firmware attributes |
-| `asus-gpu-switch-reboot` | root, `asus-gpu-switch@<mode>.service` | write `gpu_mux_mode`, schedule a mode, blacklist the NVIDIA module for one boot, reboot (an emergency SysRq reboot when the NVIDIA driver has lost a GPU) |
+| `asus-gpu-switch-reboot` | root, `asus-gpu-switch@<mode>.service` | write `gpu_mux_mode`, schedule a mode, reboot (an emergency SysRq reboot when the NVIDIA driver has lost a GPU) |
 | `asus-gpu-switch-apply` | root, at boot | apply the scheduled mode |
 | `asus-gpu-egpu-power` | root, from udev and the live script | set `d3cold_allowed = 0` on NVIDIA functions while `egpu_enable` is 1; takes no input |
 

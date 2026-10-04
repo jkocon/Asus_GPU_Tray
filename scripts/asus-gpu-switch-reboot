@@ -59,15 +59,8 @@ fi
 mkdir -p "$state"
 echo "$target" > "$state/pending"
 
-# Block udev autoloading of NVIDIA for one boot, so asus-gpu-switch-apply can safely re-route the
-# dGPU/eGPU. Explicit loads (nvidia-modprobe) are kept away by the apply unit's Before= ordering.
-cat > /etc/modprobe.d/zz-asus-gpu-tray-switch.conf <<CONF
-# Temporary - removed by asus-gpu-switch-apply on the next boot
-blacklist nvidia
-blacklist nvidia_drm
-blacklist nvidia_modeset
-blacklist nvidia_uvm
-CONF
+# No NVIDIA blacklist any more: asus-gpu-switch-apply lets the driver come up on the current card
+# and then switches the way the live switch does (see there).
 
 sync
 

@@ -1,8 +1,8 @@
 #!/bin/bash
-# Run at boot by asus-gpu-switch-apply.service, before anything can load the NVIDIA driver.
-# Applies the mode scheduled by asus-gpu-switch-reboot: re-routes the eGPU/dGPU in firmware
-# while the NVIDIA driver is not loaded, and sets the mode in supergfxd's config when
-# supergfxd is installed. Without supergfxd the NVIDIA driver is loaded through udev.
+# Run at boot by asus-gpu-switch-apply.service, before the login screen and the GPU services.
+# Applies the mode scheduled by asus-gpu-switch-reboot: loads the NVIDIA driver on the current
+# card and re-routes the eGPU/dGPU with asus-gpu-switch-live (the same steps as a live switch),
+# and sets the mode in supergfxd's config when supergfxd is installed.
 set -u
 
 attr=/sys/class/firmware-attributes/asus-armoury/attributes
@@ -11,9 +11,9 @@ pending=$state/pending
 blacklist=/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
 conf=/etc/supergfxd.conf
 
-# The NVIDIA blacklist must go away whatever the outcome - also when only the blacklist is left
-# (pending removed by hand). supergfxd loads the driver itself; without it, replay udev "add"
-# events so the driver loads for the (new) NVIDIA card.
+# A one-boot NVIDIA blacklist left by older versions must go away whatever the outcome.
+# supergfxd loads the driver itself; without it, replay udev "add" events so the driver loads for
+# the (new) NVIDIA card.
 cleanup() {
     rm -f "$blacklist"
     if ! systemctl -q is-enabled supergfxd.service 2>/dev/null; then
@@ -63,7 +63,48 @@ if [[ $target == AsusEgpu ]]; then
     fi
 fi
 
-# The live switch never failed to bring up the new card; this path, without its reset and link
+# Preferred: switch the way the live switch does. Loading the NVIDIA driver fresh right after the
+# firmware switch deadlocked inside the driver (2 of 3 boots on a GV601RE): GSP init and the ACPI
+# NVPCF notifications the firmware sends after the switch wait for the same RM lock, and every
+# later module load (sound, Bluetooth) waits behind it. A driver that was already running never
+# did, in many live switches. So let the driver come up on the card that is there now, like on any
+# normal boot, and run the live switch script before the login screen starts. If it fails, stay in
+# the current mode rather than risk the direct path below.
+if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" && -n $(nvidia_devices) ]]; then
+    live=$(dirname "$0")/asus-gpu-switch-live
+    live_target=$([[ $want_egpu == 1 ]] && echo AsusEgpu || echo Hybrid)
+    rm -f "$blacklist"  # left by older versions of asus-gpu-switch-reboot
+    udevadm control --reload
+    echo "Loading the NVIDIA driver on the current card"
+    modprobe nvidia  # with its softdeps (nvidia-uvm, nvidia-drm)
+    bound=0
+    for ((i = 0; i < 120; i++)); do  # up to 60 s
+        for d in $(nvidia_devices); do
+            [[ $(basename "$(readlink "$d/driver" 2>/dev/null)") == nvidia ]] && bound=1
+        done
+        (( bound )) && break
+        sleep 0.5
+    done
+    if (( ! bound )); then
+        echo "The NVIDIA driver did not come up within 60 s - staying in the current mode"
+        exit 1
+    fi
+    "$live" "$live_target"
+    rc=$?
+    if (( rc == 4 )) && pgrep -x plymouthd >/dev/null; then
+        echo "The card is in use (boot splash?) - retrying without the splash"
+        plymouth quit --retain-splash
+        "$live" "$live_target"
+        rc=$?
+    fi
+    if (( rc != 0 )); then
+        echo "The live switch at boot failed (exit $rc, see live-progress) - staying in the current mode"
+        exit 1
+    fi
+fi
+
+# Fallback when no NVIDIA card is visible at all (XG Mobile mode with the dock unplugged; the
+# firmware normally switches back by itself before Linux starts then). The live switch never failed to bring up the new card; this path, without its reset and link
 # cycle, once left the NVIDIA driver hung while probing the built-in dGPU (after a warm reset), and
 # the login screen hung with it. So the same steps are done here: reset the card from its root
 # port and take the link down around the firmware switch, then wait for the link before rescanning.

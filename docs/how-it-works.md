@@ -219,21 +219,32 @@ menu click
   └─ asus-gpu-switch@<Mode>.service → scripts/asus-gpu-switch-reboot
        ├─ writes gpu_mux_mode if needed (the firmware applies it at the next boot)
        ├─ /var/lib/asus-gpu-tray/pending = <Mode>
-       ├─ /etc/modprobe.d/zz-asus-gpu-tray-switch.conf blacklists nvidia for one boot
-       └─ systemctl reboot
+       └─ systemctl reboot (SysRq emergency reboot after a GPU loss)
 boot
   └─ asus-gpu-switch-apply.service → scripts/asus-gpu-switch-apply
        ├─ runs before cardwired, nvidia-powerd, nvidia-persistenced, supergfxd and the display
-       │  manager (nvidia-modprobe loads the module explicitly, past the blacklist)
-       ├─ removes the NVIDIA functions, writes egpu_enable, rescans PCI
-       ├─ updates supergfxd's config if supergfxd is installed
-       └─ always removes the blacklist and loads the driver (supergfxd or a udev "add" replay)
+       │  manager
+       ├─ egpu_enable already right (MUX only, or the firmware switched back by itself): done
+       ├─ loads the NVIDIA driver on the current card, then runs scripts/asus-gpu-switch-live
+       ├─ no NVIDIA card visible: fallback, direct firmware switch (see below)
+       └─ updates supergfxd's config if supergfxd is installed
 ```
 
-The unit also runs when only the blacklist is left behind, so the NVIDIA driver is never blocked
-for good.
+The unit also runs when only a blacklist from an older version is left behind, and removes it.
 
-Since 2026-10-04 the boot-time switch uses the same reset and link cycle as the live switch:
+**Current design (2026-10-04, later):** the boot-time switch no longer blacklists NVIDIA. The
+driver comes up on the current card as on any boot, and `asus-gpu-switch-apply` runs
+`asus-gpu-switch-live` before the login screen starts (retrying once without the boot splash if
+the splash holds the card). The reason: loading the driver fresh right after the firmware switch
+deadlocked inside it on 2 of 3 boots. Kernel stacks showed the GSP init (`kgspInitRm`) and two ACPI
+notify workers (`rm_acpi_nvpcf_notify`, the NVPCF notifications the firmware sends after the
+switch) all waiting for the RM API lock, and every later module load (sound, Bluetooth) stuck
+behind the unfinished probe. In many live switches the already running driver never hit this,
+also with the probe starting 0.4 s after the firmware call. If the live switch fails at boot, the
+laptop stays in its current mode. The direct path below is only a fallback when no NVIDIA card is
+visible at all.
+
+Before that, the boot-time switch used the same reset and link cycle as the live switch:
 secondary bus reset below the root port, remove the functions, Link Disable, `egpu_enable`, Link
 Enable and wait for the link, rescan. Before that it only removed the functions, wrote
 `egpu_enable` and rescanned. After a warm reset the NVIDIA driver then hung once while probing
@@ -256,7 +267,7 @@ back to the built-in dGPU and resets by itself before Linux runs this unit. The 
 | `/var/lib/asus-gpu-tray/pending` | reboot script | mode to apply at the next boot |
 | `/var/lib/asus-gpu-tray/live-progress` | live script | steps of the last live switch |
 | `/var/lib/asus-gpu-tray/live-result` | live script | result message for the tray |
-| `/etc/modprobe.d/zz-asus-gpu-tray-switch.conf` | reboot script | one-boot NVIDIA blacklist |
+| `/etc/modprobe.d/zz-asus-gpu-tray-switch.conf` | older versions of the reboot script | one-boot NVIDIA blacklist, removed at boot |
 | `/sys/bus/pci/devices/<NVIDIA>/d3cold_allowed` | `asus-gpu-egpu-power` (udev, live script) | 0 while the XG Mobile is active |
 | `/run/asus-gpu-tray.lock` | live and reboot scripts | serializes switches |
 | `$XDG_RUNTIME_DIR/asus-gpu-tray.lock` | tray | single instance per session |

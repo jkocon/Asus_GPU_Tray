@@ -57,6 +57,7 @@ SESSION_PROCESSES = {"kwin_wayland", "kwin_x11", "Xwayland", "Xorg", "gnome-shel
 # Kernel messages after which a GPU is gone until a reboot: Xid 79 and a failed wake-up from D3cold.
 GPU_LOST_RE = "fallen off the bus|Unable to change power state from D3cold to D0"
 POLL_MS = 3000
+TRAY_WAIT_S = 300  # how long to wait for a system tray host at login
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
 CARDWIRE_MODES = ("integrated", "hybrid", "smart")  # order in the menu
@@ -1256,10 +1257,20 @@ def main() -> None:
     if not fallback.exists():
         fallback = HERE / "asus-gpu-tray.svg"
     app.setWindowIcon(QIcon.fromTheme("asus-gpu-tray", QIcon(str(fallback))))
-    if not QSystemTrayIcon.isSystemTrayAvailable():
-        print("No system tray available", file=sys.stderr)
-        sys.exit(1)
-    _tray = GpuTray()
+    trays: list[GpuTray] = []  # keeps the icon alive
+
+    def start(deadline: float = time.monotonic() + TRAY_WAIT_S) -> None:
+        # At login the panel may come up late (it did by ~25 s when a driver held up the boot);
+        # without a tray host, wait for one instead of exiting.
+        if QSystemTrayIcon.isSystemTrayAvailable():
+            trays.append(GpuTray())
+        elif time.monotonic() < deadline:
+            QTimer.singleShot(2000, lambda: start(deadline))
+        else:
+            print(f"No system tray available after {TRAY_WAIT_S} s", file=sys.stderr)
+            app.exit(1)
+
+    start()
     sys.exit(app.exec())
 
 
