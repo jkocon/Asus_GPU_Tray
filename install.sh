@@ -22,11 +22,18 @@ gtk-update-icon-cache -qtf /usr/local/share/icons/hicolor 2>/dev/null || true
 
 if [[ -e /sys/class/firmware-attributes/asus-armoury/attributes/egpu_enable ]]; then
     command -v setpci >/dev/null || warn "setpci (package pciutils) is missing - switching without a reboot will refuse to run"
-    install -Dm755 -t "$LIB" "$SRC/scripts/asus-gpu-switch-reboot" "$SRC/scripts/asus-gpu-switch-apply" "$SRC/scripts/asus-gpu-switch-live"
+    install -Dm755 -t "$LIB" "$SRC/scripts/asus-gpu-switch-reboot" "$SRC/scripts/asus-gpu-switch-apply" "$SRC/scripts/asus-gpu-switch-live" "$SRC/scripts/asus-gpu-egpu-power"
     install -Dm644 -t /etc/systemd/system "$SRC/systemd/asus-gpu-switch@.service" "$SRC/systemd/asus-gpu-switch-apply.service" "$SRC/systemd/asus-gpu-live@.service"
     install -Dm644 -t /etc/polkit-1/rules.d "$SRC/polkit/50-asus-gpu-tray.rules"
+    install -Dm644 -t /etc/udev/rules.d "$SRC/udev/72-asus-gpu-tray-egpu.rules"
+    udevadm control --reload
+    "$LIB/asus-gpu-egpu-power"  # an XG Mobile that is already active
     systemctl daemon-reload
     systemctl enable asus-gpu-switch-apply.service
+    if [[ -e /usr/lib/systemd/user/plasma-login-kwin_wayland.service ]]; then
+        # Keeps the login screen on the iGPU once the KDE setup's iGPU link exists (see README).
+        install -Dm755 "$SRC/kde/60-asus-gpu-tray-greeter" /etc/systemd/user-environment-generators/60-asus-gpu-tray-greeter
+    fi
     echo "Hardware switch backend installed (ASUS asus-armoury detected)"
     echo "Switching the XG Mobile without a reboot also needs the one-time KDE setup, see README."
 else

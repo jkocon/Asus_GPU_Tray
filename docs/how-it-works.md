@@ -107,9 +107,86 @@ Any failure, and SIGTERM (for example the unit's 5-minute timeout), goes through
 path. That path turns the link back on, rescans or re-probes the card, restores the permissions
 and restarts the services.
 
-The tray adds two things around this. It closes ROG Control Center, which keeps `/dev/nvidia0`
-open, and starts it again afterwards with `--background`. It also offers the reboot switch if
-the live switch is aborted.
+The tray adds a few things around this:
+
+- It closes ROG Control Center, which keeps `/dev/nvidia0` open, and starts it again afterwards
+  with `--background`.
+- It shows a *Switching in progress* window and maps the last line of `live-progress` to a stage.
+  The window is a plain raster Qt widget: showing it does not load an EGL/GL driver or open any
+  `/dev/nvidia*` or `/dev/dri/*` node (checked in `/proc/self/fd`), so the tray itself never
+  becomes a holder of the card.
+- It runs the same holder check for the user's own processes first (reading `/proc/<pid>/fd`
+  does not wake the card). It lists them and offers to kill them (SIGTERM, then SIGKILL after
+  5 s). If the user declines, or a session process such as `kwin_wayland` holds the card, it offers
+  the reboot switch instead.
+- If the script still aborts because of holders (something opened the card in between), the tray
+  asks again, up to twice, and then offers the reboot switch.
+- When a GPU is lost (below), it does not attempt a live switch at all and offers only the reboot
+  switch: unbinding the driver from a card that no longer answers is untested.
+
+## Unlocking an active XG Mobile
+
+The first design assumed that the lock switch would warn before the GPU goes away, leaving time for
+a live switch. A test on the GV601RE showed otherwise:
+
+```
+21:28:19.320 asus_wmi: Unknown key code 0xba          lock switch opened
+21:28:19.320 asus_wmi: Unknown key code 0xbe          eGPU state change
+21:28:19.438 [nvidia-drm] Removing device             the firmware has already dropped the GPU
+21:28:19.490 NVRM: Attempting to remove device 0000:01:00.0 with non-zero usage count!
+21:28:39.544 asus_wmi: Unknown key code 0xbc          dock connected again
+21:28:41.467 asus_wmi: Unknown key code 0xba          lock switch closed - no "Card present" follows
+```
+
+The lock event (0xba) also shows up when the lock is moved in built-in dGPU mode, without anything
+else happening. In XG Mobile mode the firmware follows it with 0xbe within a millisecond and
+removes the GPU. pciehp logs no Link Down. The NVIDIA driver keeps the device it could not tear
+down, the apps that had it open keep stale handles, and the slot stays empty after the dock is
+locked again.
+
+So the tray treats "XG Mobile mode, but no NVIDIA GPU on the bus" (`xg_gone`) as the real signal.
+It checks `/sys/bus/pci/devices/<addr>`, because cardwire keeps listing a blocked GPU after it has
+been removed. On the change into that state it shows a notification and offers the reboot switch to
+the built-in dGPU, and the menu keeps a *Reboot…* item. It never tries a live switch, also not when the
+GPU is still on the bus right after the lock event: in a second test the firmware took 1.1 s to
+remove it, the tray caught that window and started a live switch, and the kernel's removal of the
+GPU hung inside the NVIDIA driver while holding the PCI rescan lock. The live script then blocked
+for good in `echo 1 > /sys/bus/pci/rescan` (state D), still holding the switch lock. Now the tray
+treats "unlocked while active" like "gone", and the live script itself refuses to run while the
+XG Mobile is unlocked in XG Mobile mode or when this boot's kernel log shows a GPU loss.
+
+The reboot itself is the next problem. After the loss the NVIDIA driver is wedged: nvidia-modeset
+logs `Error while waiting for GPU progress` every 5 s, closing the device triggers a warning in
+`nvidia_dev_put`, and the processes doing so hang in the kernel. A normal shutdown waited for them
+until the laptop was powered off by hand, twice. So `asus-gpu-switch-reboot` checks whether a GPU
+was lost (XG Mobile mode without an NVIDIA device on the bus, or a kernel message from this boot
+matching `(NVRM|nvidia).*(fallen off the bus|with non-zero usage count|D3cold to D0)`). If so, it
+schedules the mode as usual and then reboots through SysRq: `s` (sync), `u` (remount read-only),
+`b` (reset). It also goes ahead when a hung live switch still holds the switch lock, but only
+after a GPU loss. The tray routes its "GPU lost – reboot" through this unit, keeping the current
+hardware mode, or the built-in dGPU when the XG Mobile was unlocked. If
+the lock opens and the GPU is still there (not seen so far), the tray starts the live switch to the
+built-in dGPU without asking; only an explicit `egpu_connected = 0` counts, never a failed read.
+
+## Lost GPUs and D3cold
+
+On 2026-10-01 the XG Mobile's RTX 3070 fell off the bus while runtime-suspended, most likely when
+something woke it: `Unable to change power state from D3cold to D0, device inaccessible`, Xid 79,
+and the root port retraining a "broken device". Vulkan then listed only the iGPU until a reboot.
+
+Two measures:
+
+- **Prevention.** `udev/72-asus-gpu-tray-egpu.rules` runs `scripts/asus-gpu-egpu-power` when an
+  NVIDIA PCI function is added or bound, and when the asus-armoury attributes appear (at boot the
+  two can come in either order). When `egpu_enable` is 1, the script sets `d3cold_allowed = 0` on
+  every NVIDIA function. The kernel then limits the card to D3hot and keeps its root port powered.
+  The live switch also runs the script directly before restarting cardwired, because cardwired
+  hides a blocked card's sysfs files from root as well. The built-in dGPU keeps D3cold: its PCI
+  functions are created anew on every switch, with the kernel default.
+- **Detection.** The tray follows `journalctl -k -b -f --grep 'fallen off the bus|Unable to change
+  power state from D3cold to D0'` and maps each message to a PCI slot. A message counts if it is
+  newer than the last successful live switch (which re-creates the devices). A `runtime_status` of
+  `error` in sysfs counts too. The tray asks once per card whether to reboot.
 
 ### How it got there
 
@@ -154,7 +231,23 @@ boot
 ```
 
 The unit also runs when only the blacklist is left behind, so the NVIDIA driver is never blocked
-for good. The display manager waits for it, which is the ~35 s black screen during a reboot switch.
+for good.
+
+Since 2026-10-04 the boot-time switch uses the same reset and link cycle as the live switch:
+secondary bus reset below the root port, remove the functions, Link Disable, `egpu_enable`, Link
+Enable and wait for the link, rescan. Before that it only removed the functions, wrote
+`egpu_enable` and rescanned. After a warm reset the NVIDIA driver then hung once while probing
+the built-in dGPU (`nvidia 0000:01:00.0: enabling device`, then nothing), and the login screen's
+KWin hung with it. The root port is remembered in `/var/lib/asus-gpu-tray/root-port` for boots
+where no NVIDIA card is visible (XG Mobile mode with the dock unplugged).
+
+When the unit is done, it removes the one-boot blacklist, runs `udevadm control --reload`, replays
+the NVIDIA "add" events and starts `modprobe@nvidia_drm.service` without waiting for it. Without the
+reload, udevd still used the modprobe config it had read with the blacklist in place. When the unit
+finished within milliseconds (nothing to switch), nvidia-powerd then loaded `nvidia` without its
+softdeps, and `nvidia_drm` was missing for the whole boot (no DRM node, cardwire offered only
+Hybrid/Manual). If the laptop starts in XG Mobile mode without a locked dock, the firmware switches
+back to the built-in dGPU and resets by itself before Linux runs this unit. The display manager waits for it, which is the ~35 s black screen during a reboot switch.
 
 ## Files and state
 
@@ -164,5 +257,6 @@ for good. The display manager waits for it, which is the ~35 s black screen duri
 | `/var/lib/asus-gpu-tray/live-progress` | live script | steps of the last live switch |
 | `/var/lib/asus-gpu-tray/live-result` | live script | result message for the tray |
 | `/etc/modprobe.d/zz-asus-gpu-tray-switch.conf` | reboot script | one-boot NVIDIA blacklist |
+| `/sys/bus/pci/devices/<NVIDIA>/d3cold_allowed` | `asus-gpu-egpu-power` (udev, live script) | 0 while the XG Mobile is active |
 | `/run/asus-gpu-tray.lock` | live and reboot scripts | serializes switches |
 | `$XDG_RUNTIME_DIR/asus-gpu-tray.lock` | tray | single instance per session |

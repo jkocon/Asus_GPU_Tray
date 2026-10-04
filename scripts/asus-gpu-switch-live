@@ -130,6 +130,15 @@ if [[ $want_egpu == 1 && $(cat "$attr/egpu_connected/current_value" 2>/dev/null)
     finish 3 "XG Mobile is not connected and locked"
 fi
 [[ $(<"$attr/egpu_enable/current_value") == "$want_egpu" ]] && finish 0 "Already in $target"
+# After a GPU loss the NVIDIA driver is wedged: unbinding or rescanning would hang in the kernel.
+if journalctl -k -b -q --no-pager \
+        --grep '(NVRM|nvidia).*(fallen off the bus|with non-zero usage count|D3cold to D0)' 2>/dev/null | grep -q .; then
+    finish 1 "The NVIDIA driver lost a GPU in this boot - only a reboot gets out of this"
+fi
+# Unlocked while active: the firmware is removing the XG Mobile's GPU right now (0.1-1.1 s).
+if [[ $(<"$attr/egpu_enable/current_value") == 1 && $(cat "$attr/egpu_connected/current_value" 2>/dev/null) != 1 ]]; then
+    finish 1 "The XG Mobile was unlocked while in use - its GPU is being removed; reboot instead"
+fi
 [[ -f $state/pending ]] && finish 1 "A reboot-based switch is already scheduled"
 [[ $(cat "$attr/gpu_mux_mode/current_value" 2>/dev/null) == 0 ]] &&
     finish 1 "MUX mode is active (the dGPU drives the panel) - switch with a reboot"
@@ -150,6 +159,7 @@ parents=$(for d in $devices; do dirname "$(readlink -f "$d")"; done | sort -u)
 [[ $(wc -l <<< "$parents") == 1 ]] || finish 1 "NVIDIA functions sit behind different ports - not supported"
 root=$(basename "$parents")
 [[ $root =~ ^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$ ]] || finish 1 "Could not find the PCIe port of the NVIDIA card"
+echo "$root" > "$state/root-port"  # for boot-time switches without a visible card
 [[ -w /sys/bus/pci/devices/$root/reset_subordinate ]] ||
     finish 1 "The kernel cannot reset the bus below $root (no reset_subordinate) - switch with a reboot"
 [[ $(setpci -s "$root" CAP_EXP+0x10.w 2>/dev/null) =~ ^[0-9a-f]{4}$ ]] ||
@@ -235,6 +245,9 @@ for ((i = 0; i < 40; i++)); do
 done
 
 [[ $now_egpu == "$want_egpu" ]] || finish 6 "The firmware did not switch (egpu_enable is still $now_egpu)"
+# udev runs this for the new card as well, but possibly only after finish() has started cardwired
+# again, and cardwired hides a blocked card's sysfs files from root too.
+"$(dirname "$0")/asus-gpu-egpu-power"
 if [[ -f $conf ]]; then
     python3 - "$conf" "$target" <<'PY'
 import json, sys

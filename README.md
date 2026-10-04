@@ -12,6 +12,10 @@ between the built-in dGPU and the XG Mobile eGPU dock without a reboot.**
 - **Detects your hardware.** It finds the iGPU, dGPU and eGPU and offers only the modes your
   laptop supports.
 - **Never wakes a sleeping dGPU just to show its status.**
+- **Undock check.** If the XG Mobile is unlocked while it is the active GPU, the tray says so and
+  offers the reboot that brings the laptop back to the built-in dGPU.
+- **Lost GPU detection.** A GPU that fell off the PCIe bus is reported, with a reboot offer. While
+  the XG Mobile is active it is kept out of D3cold, which is what made it fall off.
 
 ## Why this exists
 
@@ -100,6 +104,11 @@ does, so KWin has to be kept on the iGPU. The setup has three parts:
 
 Then run `sudo udevadm control --reload && sudo udevadm trigger -s drm` and log in again.
 
+With Plasma Login Manager, `install.sh` also installs a systemd user environment generator
+(`/etc/systemd/user-environment-generators/60-asus-gpu-tray-greeter`) that applies the same two
+settings to the login screen once `/dev/dri/asus-igpu-card` exists. Without it, a NVIDIA driver
+that hangs at boot also hangs the login screen on a black screen.
+
 `KWIN_DRM_DEVICES` is colon-separated, so a `/dev/dri/by-path/pci-…` path cannot be used, which is
 why the udev rule is needed. With this setup, monitors plugged into the XG Mobile's own ports stay
 dark. On the GV601RE they did not work with the NVIDIA driver anyway. The laptop's panel and its
@@ -118,9 +127,44 @@ Right-click the icon:
 | **Hardware** | **Built-in dGPU** / **XG Mobile** switch live in about 40 s. **… only (MUX) – reboot** reboots right away and applies the mode during boot. XG Mobile is greyed out until the dock is connected and locked. |
 
 Before a live switch the tray closes ROG Control Center, which keeps the card open, and starts it
-again afterwards (in the tray). Close games and other apps that use the NVIDIA GPU first. If
-something still holds the card, the switch is aborted without touching the hardware, and the tray
-offers to switch with a reboot instead.
+again afterwards (in the tray). Other apps of yours that have the NVIDIA GPU open are listed, and
+the tray asks whether to kill them. If you say no, it offers to reboot and switch during boot
+instead. Parts of the desktop session (`kwin_wayland`, `Xwayland`, `plasmashell`, …) are never
+killed; if one of them holds the card, only the reboot is offered. If something the tray cannot
+see (another user, a system service) still holds the card, the switch is aborted without touching
+the hardware, and the tray asks again or offers the reboot.
+
+While a live switch runs, a *Switching in progress* window shows what is happening (preparing,
+disconnecting the old GPU, the firmware switch, connecting the new GPU) and the elapsed time, like
+the window of Armoury Crate on Windows. It cannot be closed until the switch is over. When it
+succeeds, the window says so and closes after 10 seconds; when it fails, a dialog explains why.
+
+### Undocking
+
+**Switch to the built-in dGPU first, then unlock the XG Mobile.** Opening the lock switch on the
+cable while the XG Mobile is the active GPU makes the firmware drop the GPU at once (on a GV601RE
+about 0.1 s after the lock event). There is no time to switch first. Apps that were using it may
+stop responding, and the GPU does not come back when you connect and lock the dock again. Only a
+reboot recovers it.
+
+When that happens, the tray shows *XG Mobile: disconnected while in use – reboot needed*, adds a
+red dot to the icon and offers an emergency reboot that starts on the built-in dGPU. It never
+tries a live switch then: the firmware can take up to about a second to remove the GPU, and a
+live switch started in that window hung in the kernel. The live switch script refuses to run
+while the XG Mobile is unlocked or after a GPU loss in the current boot.
+
+### Lost GPU
+
+When the kernel reports that an NVIDIA GPU fell off the bus (Xid 79, or *Unable to change power
+state from D3cold to D0*), the tray asks once whether to reboot, adds a red dot to the icon and a
+*… fell off the bus – Reboot…* item to the menu. The card cannot come back without a reboot. If
+the XG Mobile is unlocked at that point, the reboot also switches to the built-in dGPU. Reading
+the kernel log needs access to the system journal (groups `wheel`, `adm` or `systemd-journal`);
+without it, only a runtime PM error in sysfs is detected.
+
+While the XG Mobile is the active GPU, a udev rule sets `d3cold_allowed = 0` on its PCI functions.
+The card can still sleep in D3hot, and the dock has its own power supply. Waking the XG Mobile from
+D3cold once left its RTX 3070 lost until a reboot. `--dump` shows the current setting.
 
 Left-click shows a notification with the active GPU. Hover for a summary.
 
@@ -132,6 +176,7 @@ Left-click shows a notification with the active GPU. Hover for a summary.
 | red **AMD** / blue **Intel** | the iGPU is doing the work |
 | grey **GPU** / **?** | unknown vendor / no GPU found |
 | purple dot | an external GPU is attached (XG Mobile mode or a Thunderbolt eGPU) |
+| red dot | a GPU fell off the bus, or the XG Mobile is unlocked while still in use |
 
 ### Command line
 
@@ -155,7 +200,8 @@ cat /sys/class/firmware-attributes/asus-armoury/attributes/{egpu_connected,egpu_
 
 | Message | Meaning |
 |---|---|
-| *the NVIDIA card is still in use by: …* | Close the listed apps. If `kwin_wayland`, `Xwayland` or `systemd-logind` are listed, the KDE setup above is missing or you have not logged in again since. |
+| *the NVIDIA card is still in use by: …* | The tray lists your own apps and offers to kill them. If `kwin_wayland`, `Xwayland` or `systemd-logind` are listed, the KDE setup above is missing or you have not logged in again since. |
+| *… fell off the bus* | The GPU stopped responding (often while waking from sleep). Reboot. `journalctl -k -b --grep 'fallen off the bus|D3cold to D0'` shows the kernel messages. |
 | *The bus reset below … failed* / *cannot reset the bus* | Your kernel cannot reset the card from its port. Use the reboot switch. |
 | *setpci (pciutils) is required* | Install `pciutils`. |
 | *MUX mode is active* | In MUX mode the dGPU drives the panel. Switch with a reboot. |
@@ -171,6 +217,15 @@ To cancel a scheduled reboot switch before rebooting, run
 - **Extra power cycle after a reboot switch** from the XG Mobile to the built-in dGPU. This was seen
   once, with supergfxd disabled. The laptop restarted by itself during POST (Linux logged a normal
   reboot), and the second boot came up fine. The cause is unknown.
+- **After a GPU loss a normal shutdown hangs.** The NVIDIA driver wedges once it has lost a GPU
+  (`nvidia-modeset: Error while waiting for GPU progress` every 5 s, a warning in `nvidia_close`),
+  and processes that close the device hang in the kernel. Seen twice on a GV601RE. That is why the
+  tray's reboot after a GPU loss is an emergency reboot (SysRq: sync, remount read-only, reset):
+  open apps are not asked to quit. If you reboot some other way and it hangs, Alt+SysRq+S, U, B
+  does the same by hand (if the keyboard SysRq is enabled).
+- **One extra automatic restart after unlocking an active XG Mobile.** When the laptop starts in
+  XG Mobile mode without a locked dock, the ASUS firmware switches back to the built-in dGPU by
+  itself and resets once more (bootloader, black screen, restart). The second start is normal.
 - **cardwire may miss the dGPU at boot.** It can start before the NVIDIA driver is ready and treat
   the laptop as a desktop, offering only Hybrid and Manual. The tray detects this and runs
   `cardwire debug refresh-gpu`.
@@ -181,8 +236,10 @@ To cancel a scheduled reboot switch before rebooting, run
   GPU (dGPU or XG Mobile) behind one PCIe port.
 - If NVIDIA modules are loaded from the initramfs (early KMS), the boot-time switch finds the driver
   already bound and refuses to run. The live switch is not affected.
-- Undock only in built-in dGPU mode. Unplugging an active XG Mobile is a surprise removal of a GPU
-  that is in use.
+- Undock only in built-in dGPU mode. Unlocking an active XG Mobile is a surprise removal of a GPU
+  that is in use: the NVIDIA driver keeps the dead device (*Attempting to remove device … with
+  non-zero usage count*), and only a reboot recovers it. The tray cannot prevent this; it can only
+  report it.
 - GPU classification uses heuristics (see [how it works](docs/how-it-works.md#gpu-detection)).
   Thunderbolt eGPUs and Intel laptops are untested.
 

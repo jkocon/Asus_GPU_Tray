@@ -6,7 +6,8 @@
 set -u
 
 attr=/sys/class/firmware-attributes/asus-armoury/attributes
-pending=/var/lib/asus-gpu-tray/pending
+state=/var/lib/asus-gpu-tray
+pending=$state/pending
 blacklist=/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
 conf=/etc/supergfxd.conf
 
@@ -16,7 +17,14 @@ conf=/etc/supergfxd.conf
 cleanup() {
     rm -f "$blacklist"
     if ! systemctl -q is-enabled supergfxd.service 2>/dev/null; then
+        # udevd keeps the modprobe config it read at startup (with the blacklist) for a while, and
+        # when this unit finishes quickly the replayed events still find NVIDIA blacklisted. Then
+        # nvidia-powerd loaded nvidia without its softdeps, and nvidia_drm was missing for the
+        # whole boot. So: reload udev first, and load nvidia_drm explicitly - in the background,
+        # so the login screen never waits for the NVIDIA driver.
+        udevadm control --reload
         udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x10de
+        systemctl --no-block start modprobe@nvidia_drm.service
     fi
 }
 trap cleanup EXIT
@@ -55,23 +63,73 @@ if [[ $target == AsusEgpu ]]; then
     fi
 fi
 
+# The live switch never failed to bring up the new card; this path, without its reset and link
+# cycle, once left the NVIDIA driver hung while probing the built-in dGPU (after a warm reset), and
+# the login screen hung with it. So the same steps are done here: reset the card from its root
+# port and take the link down around the firmware switch, then wait for the link before rescanning.
+wait_link() {  # up to 20 s; the XG Mobile cable needs ~8 s
+    local i
+    for ((i = 0; i < 80; i++)); do
+        (( 0x$(setpci -s "$root" CAP_EXP+0x12.w) & 0x2000 )) && return 0  # Data Link Layer Link Active
+        sleep 0.25
+    done
+    return 1
+}
+
 if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" ]]; then
-    for d in $(nvidia_devices); do
+    devices=$(nvidia_devices)
+    for d in $devices; do
         # snd_hda_intel on the HDMI audio function can be unbound safely - only nvidia is dangerous
         if [[ $(basename "$(readlink "$d/driver")") == nvidia ]]; then
             echo "$(basename "$d") already has the driver loaded - aborting to avoid a system hang"
             exit 1
         fi
     done
-    for d in $(nvidia_devices); do
+
+    # The NVIDIA card's root port; remembered for boots where no card is visible (dock unplugged).
+    root=""
+    if [[ -n $devices ]]; then
+        root=$(basename "$(dirname "$(readlink -f "$(head -n1 <<< "$devices")")")")
+    elif [[ -f $state/root-port ]]; then
+        root=$(<"$state/root-port")
+    fi
+    if [[ ! $root =~ ^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$ ]] || ! command -v setpci >/dev/null ||
+        [[ ! $(setpci -s "$root" CAP_EXP+0x10.w 2>/dev/null) =~ ^[0-9a-f]{4}$ ]]; then
+        echo "No controllable root port (${root:-unknown}) - switching without the reset and link cycle"
+        root=""
+    else
+        echo "$root" > "$state/root-port"
+    fi
+
+    for d in $devices; do
+        [[ -e $d/driver ]] && basename "$d" > "$d/driver/unbind"
+    done
+    if [[ -n $root && -w /sys/bus/pci/devices/$root/reset_subordinate ]]; then
+        echo "secondary bus reset below $root"
+        echo 1 > "/sys/bus/pci/devices/$root/reset_subordinate" || echo "the bus reset below $root failed"
+        sleep 1
+    fi
+    for d in $devices; do
         echo 1 > "$d/remove"
     done
+    if [[ -n $root ]]; then
+        echo "link down on $root"
+        setpci -s "$root" CAP_EXP+0x10.w=0010:0010
+        sleep 0.5
+    fi
+
     echo "egpu_enable -> $want_egpu"
     echo "$want_egpu" > "$attr/egpu_enable/current_value"
     if [[ $want_egpu == 0 && -e $attr/dgpu_disable/current_value ]]; then
         echo 0 > "$attr/dgpu_disable/current_value"
     fi
     sleep 2
+
+    if [[ -n $root ]]; then
+        setpci -s "$root" CAP_EXP+0x10.w=0000:0010
+        if wait_link; then echo "link up on $root"; else echo "the link on $root did not come up"; fi
+        setpci -s "$root" ECAP_AER+0x04.l=ffffffff 2>/dev/null  # clear what the link change logged
+    fi
     echo 1 > /sys/bus/pci/rescan
     sleep 1
 fi

@@ -1,0 +1,13 @@
+#!/bin/sh
+# systemd user environment generator, installed by Asus GPU Tray when Plasma Login Manager is
+# present. It keeps the login screen's compositor on the iGPU, like the KDE Plasma setup in the
+# README does for the user session. The NVIDIA driver once hung while probing the dGPU right after
+# a boot-time GPU switch; the login screen's KWin opened that card too and hung with it, which left
+# a black screen. Only for the login manager's account, and only when the iGPU link from
+# /etc/udev/rules.d/70-asus-igpu-card.rules exists (otherwise KWin would find no GPU at all).
+[ "$(/usr/bin/id -un)" = plasmalogin ] || exit 0
+[ -e /dev/dri/asus-igpu-card ] || exit 0
+echo KWIN_DRM_DEVICES=/dev/dri/asus-igpu-card
+[ -e /usr/share/glvnd/egl_vendor.d/50_mesa.json ] &&
+    echo __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+exit 0
