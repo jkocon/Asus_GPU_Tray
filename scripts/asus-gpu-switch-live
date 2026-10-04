@@ -135,9 +135,14 @@ if journalctl -k -b -q --no-pager \
         --grep '(NVRM|nvidia).*(fallen off the bus|with non-zero usage count|D3cold to D0)' 2>/dev/null | grep -q .; then
     finish 1 "The NVIDIA driver lost a GPU in this boot - only a reboot gets out of this"
 fi
-# Unlocked while active: the firmware is removing the XG Mobile's GPU right now (0.1-1.1 s).
+# Unlocked while active: the firmware removes the XG Mobile's GPU within 0.1-1.1 s.
+recover=0
 if [[ $(<"$attr/egpu_enable/current_value") == 1 && $(cat "$attr/egpu_connected/current_value" 2>/dev/null) != 1 ]]; then
-    finish 1 "The XG Mobile was unlocked while in use - its GPU is being removed; reboot instead"
+    [[ -n $(nvidia_devices) ]] &&
+        finish 1 "The XG Mobile was unlocked while in use - its GPU is being removed; reboot instead"
+    # EXPERIMENTAL: the GPU is gone and the kernel log (checked above) shows no unclean removal, so
+    # nothing held it and the driver let it go. Only the firmware switch back is left to do.
+    recover=1
 fi
 [[ -f $state/pending ]] && finish 1 "A reboot-based switch is already scheduled"
 [[ $(cat "$attr/gpu_mux_mode/current_value" 2>/dev/null) == 0 ]] &&
@@ -154,62 +159,72 @@ for s in "${services[@]}"; do
 done
 
 devices=$(nvidia_devices)
-[[ -n $devices ]] || finish 1 "No NVIDIA card found"
-parents=$(for d in $devices; do dirname "$(readlink -f "$d")"; done | sort -u)
-[[ $(wc -l <<< "$parents") == 1 ]] || finish 1 "NVIDIA functions sit behind different ports - not supported"
-root=$(basename "$parents")
-[[ $root =~ ^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$ ]] || finish 1 "Could not find the PCIe port of the NVIDIA card"
-echo "$root" > "$state/root-port"  # for boot-time switches without a visible card
-[[ -w /sys/bus/pci/devices/$root/reset_subordinate ]] ||
-    finish 1 "The kernel cannot reset the bus below $root (no reset_subordinate) - switch with a reboot"
+if (( recover )); then
+    root=$(cat "$state/root-port" 2>/dev/null)
+    [[ $root =~ ^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$ ]] ||
+        finish 1 "No remembered PCIe port of the XG Mobile - reboot instead"
+    step "XG Mobile GPU already removed cleanly - switching the firmware back (experimental)"
+else
+    [[ -n $devices ]] || finish 1 "No NVIDIA card found"
+    parents=$(for d in $devices; do dirname "$(readlink -f "$d")"; done | sort -u)
+    [[ $(wc -l <<< "$parents") == 1 ]] || finish 1 "NVIDIA functions sit behind different ports - not supported"
+    root=$(basename "$parents")
+    [[ $root =~ ^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$ ]] || finish 1 "Could not find the PCIe port of the NVIDIA card"
+    echo "$root" > "$state/root-port"  # for boot-time switches and recovery without a visible card
+    [[ -w /sys/bus/pci/devices/$root/reset_subordinate ]] ||
+        finish 1 "The kernel cannot reset the bus below $root (no reset_subordinate) - switch with a reboot"
+fi
 [[ $(setpci -s "$root" CAP_EXP+0x10.w 2>/dev/null) =~ ^[0-9a-f]{4}$ ]] ||
     finish 1 "Port $root has no PCIe capability that can be controlled - switch with a reboot"
 uemsk=$(setpci -s "$root" ECAP_AER+0x08.l 2>/dev/null)
 [[ $uemsk =~ ^[0-9a-f]{8}$ ]] || uemsk=""  # no AER on this port: skip the mask
 
-# --- keep new processes away from the card, then make sure nobody holds it -------------------------
-nodes=()
-for n in /dev/nvidia* /dev/nvidia-caps/*; do [[ -c $n ]] && nodes+=("$n"); done
-for d in $devices; do
-    for n in "$d"/drm/card* "$d"/drm/renderD*; do
-        [[ -e $n ]] && nodes+=("/dev/dri/$(basename "$n")")
+# Nothing to keep away or unplug when the card is already gone (recovery).
+if (( ! recover )); then
+    # --- keep new processes away from the card, then make sure nobody holds it -------------------------
+    nodes=()
+    for n in /dev/nvidia* /dev/nvidia-caps/*; do [[ -c $n ]] && nodes+=("$n"); done
+    for d in $devices; do
+        for n in "$d"/drm/card* "$d"/drm/renderD*; do
+            [[ -e $n ]] && nodes+=("/dev/dri/$(basename "$n")")
+        done
     done
-done
-for n in "${nodes[@]}"; do
-    [[ -c $n ]] || continue
-    node_modes[$n]="$(stat -c '%a %t:%T' "$n")"
-    chmod 000 "$n"
-done
+    for n in "${nodes[@]}"; do
+        [[ -c $n ]] || continue
+        node_modes[$n]="$(stat -c '%a %t:%T' "$n")"
+        chmod 000 "$n"
+    done
 
-# One find over all /proc/<pid>/fd links (a readlink per descriptor took ~6 s).
-holders=""
-if (( ${#nodes[@]} )); then
-    match=()
-    for n in "${nodes[@]}"; do match+=(-o -lname "$n"); done
-    while read -r pid; do
-        [[ $pid == "$$" ]] && continue
-        holders+="$(cat "/proc/$pid/comm" 2>/dev/null) ($pid), "
-    done < <(find /proc/[0-9]*/fd -mindepth 1 -maxdepth 1 \( "${match[@]:1}" \) -print 2>/dev/null |
-             awk -F/ '!seen[$3]++ {print $3}')
+    # One find over all /proc/<pid>/fd links (a readlink per descriptor took ~6 s).
+    holders=""
+    if (( ${#nodes[@]} )); then
+        match=()
+        for n in "${nodes[@]}"; do match+=(-o -lname "$n"); done
+        while read -r pid; do
+            [[ $pid == "$$" ]] && continue
+            holders+="$(cat "/proc/$pid/comm" 2>/dev/null) ($pid), "
+        done < <(find /proc/[0-9]*/fd -mindepth 1 -maxdepth 1 \( "${match[@]:1}" \) -print 2>/dev/null |
+                 awk -F/ '!seen[$3]++ {print $3}')
+    fi
+    [[ -n $holders ]] && finish 4 "Aborted, the NVIDIA card is still in use by: ${holders%, }"
+
+    # --- unplug the card ----------------------------------------------------------------------------
+    step "Nobody holds the card; unbinding drivers"
+    detached=1
+    for d in $devices; do
+        [[ -e $d/driver ]] || continue
+        step "unbind $(basename "$d") from $(basename "$(readlink "$d/driver")")"
+        basename "$d" > "$d/driver/unbind" || finish 5 "Unbind of $(basename "$d") failed"
+    done
+    step "secondary bus reset below $root"
+    echo 1 > "/sys/bus/pci/devices/$root/reset_subordinate" ||
+        finish 8 "The bus reset below $root failed - aborted before the firmware switch"
+    sleep 1
+    for d in $devices; do
+        step "remove $(basename "$d")"
+        echo 1 > "$d/remove"
+    done
 fi
-[[ -n $holders ]] && finish 4 "Aborted, the NVIDIA card is still in use by: ${holders%, }"
-
-# --- unplug the card ----------------------------------------------------------------------------
-step "Nobody holds the card; unbinding drivers"
-detached=1
-for d in $devices; do
-    [[ -e $d/driver ]] || continue
-    step "unbind $(basename "$d") from $(basename "$(readlink "$d/driver")")"
-    basename "$d" > "$d/driver/unbind" || finish 5 "Unbind of $(basename "$d") failed"
-done
-step "secondary bus reset below $root"
-echo 1 > "/sys/bus/pci/devices/$root/reset_subordinate" ||
-    finish 8 "The bus reset below $root failed - aborted before the firmware switch"
-sleep 1
-for d in $devices; do
-    step "remove $(basename "$d")"
-    echo 1 > "$d/remove"
-done
 
 link_down=1
 masked="no AER on the port"

@@ -58,6 +58,12 @@ SESSION_PROCESSES = {"kwin_wayland", "kwin_x11", "Xwayland", "Xorg", "gnome-shel
 GPU_LOST_RE = "fallen off the bus|Unable to change power state from D3cold to D0"
 POLL_MS = 3000
 TRAY_WAIT_S = 300  # how long to wait for a system tray host at login
+# Opt-in features that are still being tested on real hardware.
+EXPERIMENTAL = os.environ.get("ASUS_GPU_TRAY_EXPERIMENTAL") == "1"
+UNDOCK_HINT = (
+    "Before you unlock the XG Mobile, switch back to the built-in dGPU in the tray menu. "
+    "Unlocking it while it is in use needs a reboot."
+)
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
 CARDWIRE_MODES = ("integrated", "hybrid", "smart")  # order in the menu
@@ -391,13 +397,14 @@ def proc_start(pid: int) -> str:
     return stat.rsplit(")", 1)[-1].split()[19]  # field 22: starttime
 
 
-def own_processes():
-    """This user's processes, except the tray itself (kernel threads have no executable)."""
+def own_processes(all_users: bool = False):
+    """This user's processes (everyone's with all_users, as root), except the tray itself
+    (kernel threads have no executable)."""
     for proc in Path("/proc").iterdir():
         if not proc.name.isdigit() or int(proc.name) == os.getpid():
             continue
         try:
-            if proc.stat().st_uid != os.getuid():
+            if not all_users and proc.stat().st_uid != os.getuid():
                 continue
             exe = os.readlink(proc / "exe").removesuffix(" (deleted)")
             args = tuple(a for a in (proc / "cmdline").read_bytes().decode(errors="replace").split("\0") if a)
@@ -436,10 +443,10 @@ def holds(pid: int, nodes: set[str]) -> bool:
     return False
 
 
-def card_holders(nodes: set[str] | None = None) -> list[Proc]:
+def card_holders(nodes: set[str] | None = None, all_users: bool = False) -> list[Proc]:
     """This user's processes that have the NVIDIA card open. Reading /proc does not wake the card."""
     nodes = nvidia_nodes() if nodes is None else nodes
-    return [p for p in own_processes() if holds(p.pid, nodes)] if nodes else []
+    return [p for p in own_processes(all_users) if holds(p.pid, nodes)] if nodes else []
 
 
 def describe_procs(procs: list[Proc]) -> str:
@@ -714,7 +721,7 @@ class SwitchWindow(QWidget):
             return
         self.heading.setText(f"Switched to the {self.new}")
         self.info.setText(
-            "You can disconnect the XG Mobile now." if self.new != "XG Mobile" else "The graphics card is ready to use."
+            "You can disconnect the XG Mobile now." if self.new != "XG Mobile" else UNDOCK_HINT
         )
         self.stage.hide()
         t = int(time.monotonic() - self.started)
@@ -760,6 +767,7 @@ class GpuTray(QSystemTrayIcon):
         self.live_retries = 0
         self.xg_problem: bool | None = None  # XG Mobile unlocked or gone while active; None before the first poll
         self.undock_pending = False
+        self.undock_wait = 0  # experimental clean undock: polls while the firmware removes the GPU
         self.lost: tuple[Gpu, ...] = ()
         self.lost_events: dict[str, float] = {}  # PCI slot -> time of the last "GPU lost" kernel message
         self.lost_asked: set[str] = set()
@@ -912,6 +920,8 @@ class GpuTray(QSystemTrayIcon):
         def hw_item(mode: str) -> str:
             current = mode == (s.hw_pending or s.hw_mode)
             refused = mode == "AsusMuxDgpu" and s.hw_mode == "AsusEgpu"  # xg_disabled explains why
+            if mode == "Hybrid" and s.hw_mode == "AsusEgpu":
+                return hw_label(mode, s) + " – before undocking"
             return hw_label(mode, s) + ("" if current or refused or can_switch_live(s, mode) else " – reboot")
 
         if s.cardwire:
@@ -1052,10 +1062,34 @@ class GpuTray(QSystemTrayIcon):
         s = read_state()
         if self.live_proc or not (xg_gone(s) or xg_unlocked(s)):
             return
+        if EXPERIMENTAL and s.live_backend and self.try_clean_undock(s):
+            return
         self.showMessage("XG Mobile disconnected", "It was unlocked while in use - a reboot is needed.",
                          QSystemTrayIcon.MessageIcon.Critical, 10000)
         self.offer_reboot(s, "Hybrid", XG_GONE_TEXT)
         self.force_refresh()
+
+    def try_clean_undock(self, s: GpuState) -> bool:
+        """EXPERIMENTAL (ASUS_GPU_TRAY_EXPERIMENTAL=1): when nothing held the XG Mobile's GPU as it
+        was unlocked, the driver may have let it go cleanly; then the live script can switch the
+        firmware to the built-in dGPU without a reboot. The script refuses after an unclean
+        removal (kernel log), and the reboot is offered as usual. True when handled here."""
+        if not xg_gone(s):
+            # The firmware takes up to ~1 s to remove the GPU after the lock event; look again.
+            self.undock_wait += 1
+            if self.undock_wait <= 5:
+                QTimer.singleShot(1000, self.on_xg_unlocked)
+                return True
+        self.undock_wait = 0
+        if not xg_gone(s) or not ask(
+            "XG Mobile disconnected (experimental)",
+            "The XG Mobile was unlocked while it was the active GPU and its GPU is gone.\n\n"
+            "EXPERIMENTAL: switch to the built-in dGPU without a reboot? This can only work if nothing "
+            "used the GPU when it was unlocked. Otherwise the switch refuses and a reboot is offered.",
+        ):
+            return False
+        self.start_live("Hybrid")
+        return True
 
     def start_live(self, mode: str) -> None:
         s = self.state or read_state()
@@ -1117,6 +1151,8 @@ class GpuTray(QSystemTrayIcon):
         if rc == 0:
             if self.live_mode == "Hybrid":
                 message_text += "\nYou can disconnect the XG Mobile now."
+            else:
+                message_text += "\n" + UNDOCK_HINT
             self.showMessage("GPU switched", message_text, self.icon(), 10000)
         elif message_text.startswith("Aborted, the NVIDIA card is still in use") and self.live_retries < 2:
             # Something opened the card after the check. Ask about this user's apps again.
@@ -1240,6 +1276,11 @@ def main() -> None:
     if "--dump" in sys.argv:
         dump(read_state())
         return
+    if "--holders" in sys.argv:
+        # As root this sees every process; the undock experiment needs nobody holding the card.
+        procs = card_holders(all_users=os.geteuid() == 0)
+        print(describe_procs(procs) if procs else "Nobody holds the NVIDIA card")
+        sys.exit(1 if procs else 0)
     try:
         lock = single_instance_lock()
     except OSError as e:

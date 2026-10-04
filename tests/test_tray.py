@@ -259,6 +259,60 @@ class UndockTests(unittest.TestCase):
         self.switch.assert_not_called()
 
 
+class UndockHintTests(unittest.TestCase):
+    def setUp(self) -> None:
+        Tray.current = state()
+        self.tray = Tray()
+        self.addCleanup(self.tray.timer.stop)
+        self.addCleanup(self.tray.hide)
+        self.addCleanup(mock.patch.stopall)
+        # A refresh would queue another on_xg_unlocked with a real dialog for a later test.
+        mock.patch.object(self.tray, "force_refresh").start()
+
+    def test_menu_says_switch_back_before_undocking(self) -> None:
+        self.tray.build_menu(state())
+        self.assertIn("Built-in dGPU – before undocking", texts(self.tray))
+        self.tray.build_menu(state(gpus=(DGPU, IGPU), hw_mode="Hybrid"))
+        self.assertNotIn("before undocking", " ".join(texts(self.tray)))
+
+    def test_window_after_switching_to_xg_reminds(self) -> None:
+        w = t.SwitchWindow("XG Mobile", "built-in dGPU", "XG Mobile")
+        w.finish(True)
+        self.assertEqual(w.info.text(), t.UNDOCK_HINT)
+        w.close()
+
+    def test_experimental_clean_undock_tries_live_switch(self) -> None:
+        mock.patch.object(t, "EXPERIMENTAL", True).start()
+        mock.patch.object(t, "read_state", lambda: Tray.current).start()
+        mock.patch.object(t, "ask", return_value=True).start()
+        live = mock.patch.object(self.tray, "start_live").start()
+        offer = mock.patch.object(self.tray, "offer_reboot").start()
+        Tray.current = state(gpus=(IGPU,), egpu_connected=False)
+        self.tray.on_xg_unlocked()
+        live.assert_called_once_with("Hybrid")
+        offer.assert_not_called()
+
+    def test_experimental_declined_offers_reboot(self) -> None:
+        mock.patch.object(t, "EXPERIMENTAL", True).start()
+        mock.patch.object(t, "read_state", lambda: Tray.current).start()
+        mock.patch.object(t, "ask", return_value=False).start()
+        live = mock.patch.object(self.tray, "start_live").start()
+        offer = mock.patch.object(self.tray, "offer_reboot").start()
+        Tray.current = state(gpus=(IGPU,), egpu_connected=False)
+        self.tray.on_xg_unlocked()
+        live.assert_not_called()
+        offer.assert_called_once()
+
+    def test_without_experimental_only_reboot(self) -> None:
+        mock.patch.object(t, "read_state", lambda: Tray.current).start()
+        live = mock.patch.object(self.tray, "start_live").start()
+        offer = mock.patch.object(self.tray, "offer_reboot").start()
+        Tray.current = state(gpus=(IGPU,), egpu_connected=False)
+        self.tray.on_xg_unlocked()
+        live.assert_not_called()
+        offer.assert_called_once()
+
+
 class DetectTests(unittest.TestCase):
     def test_removed_gpu_is_not_taken_from_cardwire(self) -> None:
         cw = {"0000:01:00.0": {"blocked": True, "discrete": True, "vendor": "Nvidia", "name": "NVIDIA GeForce RTX 3070"}}

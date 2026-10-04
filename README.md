@@ -153,6 +153,17 @@ tries a live switch then: the firmware can take up to about a second to remove t
 live switch started in that window hung in the kernel. The live switch script refuses to run
 while the XG Mobile is unlocked or after a GPU loss in the current boot.
 
+In XG Mobile mode the menu labels the built-in dGPU *– before undocking*, and the window and
+notification after a switch to the XG Mobile remind you to switch back before unlocking.
+
+**Experimental: undocking without a reboot.** Start the tray with
+`ASUS_GPU_TRAY_EXPERIMENTAL=1`. If nothing holds the XG Mobile's GPU when you unlock it, the
+driver may let it go cleanly, and the tray then offers to switch the firmware back to the
+built-in dGPU without a reboot. Check with `sudo python3 asus_gpu_tray.py --holders`: it must
+print *Nobody holds the NVIDIA card*, so close games, browsers and ROG Control Center and stop
+`cardwired` and `nvidia-powerd` first. After an unclean removal the switch refuses and the reboot
+is offered as usual.
+
 ### Lost GPU
 
 When the kernel reports that an NVIDIA GPU fell off the bus (Xid 79, or *Unable to change power
@@ -182,6 +193,7 @@ Left-click shows a notification with the active GPU. Hover for a summary.
 
 ```bash
 python3 asus_gpu_tray.py --dump                  # detected GPUs, modes and backends; no GUI
+sudo python3 asus_gpu_tray.py --holders         # processes that have the NVIDIA card open
 systemctl start asus-gpu-live@AsusEgpu.service   # live switch to the XG Mobile (…@Hybrid: built-in dGPU)
 systemctl start asus-gpu-switch@AsusMuxDgpu.service   # schedule a mode and reboot now
 ```
