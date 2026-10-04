@@ -317,6 +317,60 @@ class UndockHintTests(unittest.TestCase):
         self.assertNotIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
 
 
+class UndockNowTests(unittest.TestCase):
+    def setUp(self) -> None:
+        Tray.current = state()
+        self.tray = Tray()
+        self.addCleanup(self.tray.timer.stop)
+        self.addCleanup(self.tray.hide)
+        self.addCleanup(mock.patch.stopall)
+        mock.patch.object(self.tray, "force_refresh").start()
+        self.live = mock.patch.object(self.tray, "start_live").start()
+        self.offer = mock.patch.object(self.tray, "offer_reboot").start()
+        self.stop = mock.patch.object(t, "stop_processes").start()
+        self.game = t.Proc(4242, "1", "/usr/bin/game", ("game",))
+        self.holders = mock.patch.object(t, "card_holders", return_value=[self.game]).start()
+        self.tray.state = state()
+
+    def test_menu_item_only_in_xg_mobile_mode(self) -> None:
+        self.tray.build_menu(state())
+        self.assertIn("Undock now (close all GPU apps)…", texts(self.tray))
+        self.tray.build_menu(state(gpus=(DGPU, IGPU), hw_mode="Hybrid"))
+        self.assertNotIn("Undock now (close all GPU apps)…", texts(self.tray))
+
+    def test_one_confirmation_closes_apps_and_switches(self) -> None:
+        ask = mock.patch.object(t, "ask", return_value=True).start()
+        with mock.patch.object(t.Proc, "alive", return_value=False):
+            self.tray.undock_now()
+        ask.assert_called_once()
+        self.assertIn("game (PID 4242)", ask.call_args.args[1])
+        self.stop.assert_called_once_with([self.game])
+        self.live.assert_called_once_with("Hybrid")
+
+    def test_declined_does_nothing(self) -> None:
+        mock.patch.object(t, "ask", return_value=False).start()
+        self.tray.undock_now()
+        self.stop.assert_not_called()
+        self.live.assert_not_called()
+
+    def test_session_process_holding_the_gpu_means_reboot(self) -> None:
+        self.holders.return_value = [t.Proc(1, "1", "/usr/bin/kwin_wayland", ("kwin_wayland",))]
+        mock.patch.object(t, "message").start()
+        ask = mock.patch.object(t, "ask").start()
+        self.tray.undock_now()
+        ask.assert_not_called()
+        self.stop.assert_not_called()
+        self.offer.assert_called_once()
+
+    def test_after_unlock_it_is_too_late(self) -> None:
+        ask = mock.patch.object(t, "ask").start()
+        self.tray.state = state(egpu_connected=False)
+        self.tray.undock_now()
+        ask.assert_not_called()
+        self.live.assert_not_called()
+        self.offer.assert_called_once()
+
+
 class DetectTests(unittest.TestCase):
     def test_removed_gpu_is_not_taken_from_cardwire(self) -> None:
         cw = {"0000:01:00.0": {"blocked": True, "discrete": True, "vendor": "Nvidia", "name": "NVIDIA GeForce RTX 3070"}}

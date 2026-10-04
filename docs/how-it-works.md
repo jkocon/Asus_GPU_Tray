@@ -115,6 +115,10 @@ The tray adds a few things around this:
   The window is a plain raster Qt widget: showing it does not load an EGL/GL driver or open any
   `/dev/nvidia*` or `/dev/dri/*` node (checked in `/proc/self/fd`), so the tray itself never
   becomes a holder of the card.
+- **Undock now** (XG Mobile mode only) is the same live switch to the built-in dGPU with a single
+  confirmation: it lists the holders once, closes them all without asking again, and refuses
+  (offering the reboot) when a desktop session process holds the card or the dock is already
+  unlocked.
 - It runs the same holder check for the user's own processes first (reading `/proc/<pid>/fd`
   does not wake the card). It lists them and offers to kill them (SIGTERM, then SIGKILL after
   5 s). If the user declines, or a session process such as `kwin_wayland` holds the card, it offers

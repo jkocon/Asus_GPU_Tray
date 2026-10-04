@@ -12,8 +12,10 @@ between the built-in dGPU and the XG Mobile eGPU dock without a reboot.**
 - **Detects your hardware.** It finds the iGPU, dGPU and eGPU and offers only the modes your
   laptop supports.
 - **Never wakes a sleeping dGPU just to show its status.**
-- **Undock check.** If the XG Mobile is unlocked while it is the active GPU, the tray says so and
-  offers the reboot that brings the laptop back to the built-in dGPU.
+- **Undock now.** One click closes every app that uses the XG Mobile and switches to the built-in
+  dGPU, so the dock can be unplugged.
+- **Undock check.** If the XG Mobile is unlocked while it is the active GPU, the tray brings the
+  built-in dGPU back without a reboot when nothing used the GPU, and otherwise offers the reboot.
 - **Lost GPU detection.** A GPU that fell off the PCIe bus is reported, with a reboot offer. While
   the XG Mobile is active it is kept out of D3cold, which is what made it fall off.
 
@@ -124,6 +126,7 @@ Right-click the icon:
 |---|---|
 | (top) | every GPU with its driver and power state (`active`, `suspended`, `blocked`), plus the XG Mobile dock status |
 | **GPU access (live, cardwire)** | **Integrated** blocks the dGPU/eGPU for new apps. **Hybrid** allows all GPUs. **Smart** allows the dGPU only for approved apps. Apps that are already running keep their GPU. |
+| **Undock now (close all GPU apps)…** | XG Mobile mode only: after one confirmation it closes every app that has the GPU open (SIGTERM, SIGKILL after 5 s) and switches to the built-in dGPU live. |
 | **Hardware** | **Built-in dGPU** / **XG Mobile** switch live in about 40 s. **… only (MUX) – reboot** reboots right away and applies the mode during boot. XG Mobile is greyed out until the dock is connected and locked. |
 
 Before a live switch the tray closes ROG Control Center, which keeps the card open, and starts it
@@ -141,7 +144,13 @@ succeeds, the window says so and closes after 10 seconds; when it fails, a dialo
 
 ### Undocking
 
-**Switch to the built-in dGPU first, then unlock the XG Mobile.** Opening the lock switch on the
+**Switch to the built-in dGPU first, then unlock the XG Mobile.** In a hurry, use **Undock now
+(close all GPU apps)…**: one confirmation lists the apps that use the XG Mobile, closes them all
+without further questions (unsaved work in them is lost), stops the GPU services and switches to
+the built-in dGPU; unplug when it says *You can disconnect the XG Mobile now*. This only works
+before unlocking: once the lock is open, closing the apps would hang in the NVIDIA driver.
+
+Opening the lock switch on the
 cable while the XG Mobile is the active GPU makes the firmware drop the GPU at once (on a GV601RE
 about 0.1 s after the lock event). There is no time to switch first. Apps that were using it may
 stop responding, and the GPU does not come back when you connect and lock the dock again. Only a

@@ -958,6 +958,10 @@ class GpuTray(QSystemTrayIcon):
             m.addSeparator()
             m.addAction("Switching unavailable (install cardwire)").setEnabled(False)
 
+        if s.hw_mode == "AsusEgpu" and can_switch_live(s, "Hybrid") and not self.live_proc:
+            m.addSeparator()
+            m.addAction("Undock now (close all GPU apps)…", self.undock_now)
+
         m.addSeparator()
         m.addAction("Refresh", self.force_refresh)
         m.addAction("Quit", QApplication.quit)
@@ -1020,6 +1024,51 @@ class GpuTray(QSystemTrayIcon):
             return self.force_refresh()
         if self.free_card(s, mode):
             self.start_live(mode)
+        self.force_refresh()
+
+    def undock_now(self) -> None:
+        """One confirmation, then close every app that has the XG Mobile's GPU open and switch to
+        the built-in dGPU live, so the dock can be unplugged. For when there is no time to go
+        through the apps one by one. It must happen before the XG Mobile is unlocked: afterwards
+        the firmware has already dropped the GPU, and closing the apps would hang in the driver."""
+        s = self.state or read_state()
+        if self.live_proc:
+            return
+        self.live_retries = 0
+        if self.lost or xg_gone(s) or xg_unlocked(s):
+            self.offer_reboot(s, "Hybrid", XG_GONE_TEXT)
+            return self.force_refresh()
+        procs = [p for p in card_holders() if p.name not in RESTARTABLE_APPS]
+        session = [p for p in procs if p.name in SESSION_PROCESSES]
+        if session:
+            message(
+                QMessageBox.Icon.Warning, "Undock now",
+                f"The desktop session itself uses the XG Mobile:\n\n{describe_procs(session)}\n\n"
+                "These cannot be closed without ending the session. See the KDE Plasma setup in the README.",
+            )
+            self.offer_reboot(s, "Hybrid", "")
+            return self.force_refresh()
+        text = "Switch to the built-in dGPU now, so the XG Mobile can be unplugged?\n\n"
+        if procs:
+            text += (
+                f"These apps use the XG Mobile and will be closed without asking again; unsaved work "
+                f"in them is lost:\n\n{describe_procs(procs)}\n\n"
+            )
+        text += (
+            "ROG Control Center is closed and started again, and the GPU services are stopped during "
+            "the switch. It takes about 35 seconds. Keep the XG Mobile locked until it is done."
+        )
+        if not ask("Undock now", text):
+            return self.force_refresh()
+        # Again: apps may have opened the GPU while the dialog was up.
+        procs = [p for p in card_holders() if p.name not in RESTARTABLE_APPS and p.name not in SESSION_PROCESSES]
+        stop_processes(procs)
+        left = [p for p in procs if p.alive()]
+        if left:
+            message(QMessageBox.Icon.Warning, "Undock now", f"These apps did not quit:\n\n{describe_procs(left)}")
+            self.offer_reboot(s, "Hybrid", "")
+            return self.force_refresh()
+        self.start_live("Hybrid")
         self.force_refresh()
 
     def free_card(self, s: GpuState, mode: str) -> bool:
