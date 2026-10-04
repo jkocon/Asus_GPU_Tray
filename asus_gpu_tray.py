@@ -58,8 +58,9 @@ SESSION_PROCESSES = {"kwin_wayland", "kwin_x11", "Xwayland", "Xorg", "gnome-shel
 GPU_LOST_RE = "fallen off the bus|Unable to change power state from D3cold to D0"
 POLL_MS = 3000
 TRAY_WAIT_S = 300  # how long to wait for a system tray host at login
-# Opt-in features that are still being tested on real hardware.
-EXPERIMENTAL = os.environ.get("ASUS_GPU_TRAY_EXPERIMENTAL") == "1"
+# After an unlock, how long to wait for the firmware: it removes the GPU within ~1 s and, after a
+# clean release, switches back to the built-in dGPU within another second.
+UNDOCK_WAIT_S = 5
 UNDOCK_HINT = (
     "Before you unlock the XG Mobile, switch back to the built-in dGPU in the tray menu. "
     "Unlocking it while it is in use needs a reboot."
@@ -101,6 +102,7 @@ class GpuState:
     hw_pending: str  # hardware mode scheduled for the next boot
     reboot_backend: bool
     live_backend: bool
+    dgpu_disabled: bool = False  # asus-armoury dgpu_disable: the built-in dGPU is powered off on purpose
 
     @property
     def igpu(self) -> Gpu | None:
@@ -317,6 +319,7 @@ def read_state() -> GpuState:
         hw_pending=read(PENDING),
         reboot_backend=REBOOT_UNIT.exists() and asus_egpu,
         live_backend=LIVE_UNIT.exists() and asus_egpu,
+        dgpu_disabled=read_attr("dgpu_disable") == "1",
     )
 
 
@@ -562,6 +565,13 @@ def xg_unlocked(s: GpuState) -> bool:
     return s.hw_mode == "AsusEgpu" and not s.egpu_connected and not s.hw_pending
 
 
+def dgpu_missing(s: GpuState) -> bool:
+    """Built-in dGPU mode, but the dGPU is not on the bus. What a clean undock leaves behind: with
+    nothing holding the XG Mobile's GPU, the firmware switches back by itself (as on Windows) but
+    the root port's link stays disabled. asus-gpu-live@Hybrid brings it back."""
+    return s.asus_egpu and s.hw_mode == "Hybrid" and s.dgpu is None and not s.dgpu_disabled and not s.hw_pending
+
+
 def xg_gone(s: GpuState) -> bool:
     """XG Mobile mode, but its GPU is no longer on the bus. Unlocking the XG Mobile makes the
     firmware drop the GPU at once (GV601RE: ~0.1 s after the lock event), and it does not come back
@@ -767,7 +777,7 @@ class GpuTray(QSystemTrayIcon):
         self.live_retries = 0
         self.xg_problem: bool | None = None  # XG Mobile unlocked or gone while active; None before the first poll
         self.undock_pending = False
-        self.undock_wait = 0  # experimental clean undock: polls while the firmware removes the GPU
+        self.undock_wait = 0  # seconds waited for the firmware after an unlock
         self.lost: tuple[Gpu, ...] = ()
         self.lost_events: dict[str, float] = {}  # PCI slot -> time of the last "GPU lost" kernel message
         self.lost_asked: set[str] = set()
@@ -831,7 +841,7 @@ class GpuTray(QSystemTrayIcon):
             return
         self.state = s
         self.lost = lost
-        alert = bool(lost) or (not self.live_proc and (xg_unlocked(s) or xg_gone(s)))
+        alert = bool(lost) or (not self.live_proc and (xg_unlocked(s) or xg_gone(s) or dgpu_missing(s)))
         self.setIcon(make_icon(working_gpu(s), s.egpu is not None, alert))
         tip = [f"GPU: {describe(s)}"]
         tip += [f"{g.name} fell off the bus – reboot needed" for g in lost]
@@ -855,7 +865,7 @@ class GpuTray(QSystemTrayIcon):
 
     def watch(self, s: GpuState, lost: tuple[Gpu, ...]) -> None:
         """React to the XG Mobile being unlocked and to lost GPUs - once no dialog is open."""
-        problem = xg_unlocked(s) or xg_gone(s)
+        problem = xg_unlocked(s) or xg_gone(s) or dgpu_missing(s)
         if self.xg_problem is False and problem and not self.live_proc:
             self.undock_pending = True
         if not problem:
@@ -902,6 +912,8 @@ class GpuTray(QSystemTrayIcon):
             m.addAction(xg_line(s)).setEnabled(False)
         if xg_gone(s) and not self.live_proc:
             m.addAction("⚠ XG Mobile disconnected – Reboot…", lambda _=False: self.offer_reboot(s, "Hybrid", XG_GONE_TEXT))
+        if dgpu_missing(s) and s.live_backend and not self.live_proc:
+            m.addAction("⚠ Built-in dGPU missing – Bring it back", lambda _=False: self.start_live("Hybrid"))
         if s.hw_pending:
             m.addAction(menu_text(f"After reboot: {hw_label(s.hw_pending, s)}")).setEnabled(False)
 
@@ -1056,40 +1068,32 @@ class GpuTray(QSystemTrayIcon):
             self.start_reboot_switch(mode)
 
     def on_xg_unlocked(self) -> None:
-        """The XG Mobile was unlocked (or its GPU vanished) while it was the active GPU. The firmware
-        removes the GPU at once (0.1-1.1 s on a GV601RE), so there is never time for a live switch:
-        one started in that window hung in the kernel. Explain and offer the (emergency) reboot."""
+        """The XG Mobile was unlocked while it was the active GPU. The firmware removes its GPU at
+        once (0.1-1.1 s on a GV601RE), so there is never time for a live switch: one started in
+        that window hung in the kernel. What follows tells the two outcomes apart:
+        - nothing held the GPU, the driver let it go, and the firmware switched back to the built-in
+          dGPU by itself: only the link and a rescan are missing - done live, no reboot;
+        - something held it: egpu_enable stays 1 and the NVIDIA driver is wedged - reboot."""
         s = read_state()
-        if self.live_proc or not (xg_gone(s) or xg_unlocked(s)):
+        if self.live_proc:
             return
-        if EXPERIMENTAL and s.live_backend and self.try_clean_undock(s):
+        if dgpu_missing(s) and s.live_backend:
+            self.undock_wait = 0
+            self.showMessage("XG Mobile released", "Bringing back the built-in dGPU…", self.icon(), 5000)
+            self.start_live("Hybrid")
             return
+        if not (xg_gone(s) or xg_unlocked(s)):
+            self.undock_wait = 0
+            return
+        if self.undock_wait < UNDOCK_WAIT_S:
+            self.undock_wait += 1
+            QTimer.singleShot(1000, self.on_xg_unlocked)
+            return
+        self.undock_wait = 0
         self.showMessage("XG Mobile disconnected", "It was unlocked while in use - a reboot is needed.",
                          QSystemTrayIcon.MessageIcon.Critical, 10000)
         self.offer_reboot(s, "Hybrid", XG_GONE_TEXT)
         self.force_refresh()
-
-    def try_clean_undock(self, s: GpuState) -> bool:
-        """EXPERIMENTAL (ASUS_GPU_TRAY_EXPERIMENTAL=1): when nothing held the XG Mobile's GPU as it
-        was unlocked, the driver may have let it go cleanly; then the live script can switch the
-        firmware to the built-in dGPU without a reboot. The script refuses after an unclean
-        removal (kernel log), and the reboot is offered as usual. True when handled here."""
-        if not xg_gone(s):
-            # The firmware takes up to ~1 s to remove the GPU after the lock event; look again.
-            self.undock_wait += 1
-            if self.undock_wait <= 5:
-                QTimer.singleShot(1000, self.on_xg_unlocked)
-                return True
-        self.undock_wait = 0
-        if not xg_gone(s) or not ask(
-            "XG Mobile disconnected (experimental)",
-            "The XG Mobile was unlocked while it was the active GPU and its GPU is gone.\n\n"
-            "EXPERIMENTAL: switch to the built-in dGPU without a reboot? This can only work if nothing "
-            "used the GPU when it was unlocked. Otherwise the switch refuses and a reboot is offered.",
-        ):
-            return False
-        self.start_live("Hybrid")
-        return True
 
     def start_live(self, mode: str) -> None:
         s = self.state or read_state()

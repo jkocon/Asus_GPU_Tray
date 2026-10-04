@@ -156,13 +156,14 @@ while the XG Mobile is unlocked or after a GPU loss in the current boot.
 In XG Mobile mode the menu labels the built-in dGPU *– before undocking*, and the window and
 notification after a switch to the XG Mobile remind you to switch back before unlocking.
 
-**Experimental: undocking without a reboot.** Start the tray with
-`ASUS_GPU_TRAY_EXPERIMENTAL=1`. If nothing holds the XG Mobile's GPU when you unlock it, the
-driver may let it go cleanly, and the tray then offers to switch the firmware back to the
-built-in dGPU without a reboot. Check with `sudo python3 asus_gpu_tray.py --holders`: it must
-print *Nobody holds the NVIDIA card*, so close games, browsers and ROG Control Center and stop
-`cardwired` and `nvidia-powerd` first. After an unclean removal the switch refuses and the reboot
-is offered as usual.
+**Unlocking without a reboot** works when nothing holds the XG Mobile's GPU at that moment. The
+driver then lets it go, the firmware switches back to the built-in dGPU by itself (as on Windows),
+and the tray brings the dGPU back without asking (link up and PCI rescan, a few seconds). To get
+there, close games, browsers and ROG Control Center, stop `cardwired` and `nvidia-powerd`, and
+check with `sudo python3 asus_gpu_tray.py --holders` that it prints *Nobody holds the NVIDIA
+card*. If something still held the GPU, the firmware does not switch back, and after a few seconds
+the tray offers the reboot. Switching to the built-in dGPU from the menu first is still the
+simple way.
 
 ### Lost GPU
 

@@ -144,6 +144,17 @@ removes the GPU. pciehp logs no Link Down. The NVIDIA driver keeps the device it
 down, the apps that had it open keep stale handles, and the slot stays empty after the dock is
 locked again.
 
+A later test with nothing holding the GPU (games, browsers and ROG Control Center closed,
+cardwired and nvidia-powerd stopped) went differently. The driver let the GPU go ("Removing
+device", no usage-count warning), and the firmware switched `egpu_enable` back to 0 by itself
+within a second (key code 0xc2, as after our own firmware calls). That is the Windows behaviour:
+the OS releases the device, the firmware completes the switch. It left the root port with Link
+Disable set and the built-in dGPU off the bus. `asus-gpu-switch-live Hybrid` handles that case
+("already in Hybrid, but no NVIDIA device"): it clears Link Disable, waits for the link, rescans,
+and the still-loaded driver binds to the dGPU. So the firmware's reaction tells the two cases
+apart: switched back by itself means clean (bring the dGPU back live), `egpu_enable` still 1 means
+the driver held on and is wedged (reboot). The tray waits up to 5 s after the unlock to see which.
+
 So the tray treats "XG Mobile mode, but no NVIDIA GPU on the bus" (`xg_gone`) as the real signal.
 It checks `/sys/bus/pci/devices/<addr>`, because cardwire keeps listing a blocked GPU after it has
 been removed. On the change into that state it shows a notification and offers the reboot switch to

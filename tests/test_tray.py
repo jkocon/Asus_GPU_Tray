@@ -194,6 +194,7 @@ class UndockTests(unittest.TestCase):
         self.addCleanup(self.tray.hide)
         self.switch = mock.patch.object(self.tray, "switch_hw_live").start()
         mock.patch.object(t, "read_state", lambda: Tray.current).start()  # on_xg_unlocked reads it again
+        mock.patch.object(t, "UNDOCK_WAIT_S", 0).start()  # no waiting for the firmware in these tests
         self.addCleanup(mock.patch.stopall)
 
     def unlock(self, attr_value: str) -> None:
@@ -281,36 +282,36 @@ class UndockHintTests(unittest.TestCase):
         self.assertEqual(w.info.text(), t.UNDOCK_HINT)
         w.close()
 
-    def test_experimental_clean_undock_tries_live_switch(self) -> None:
-        mock.patch.object(t, "EXPERIMENTAL", True).start()
+    def test_clean_undock_brings_the_dgpu_back_without_reboot(self) -> None:
+        # Nothing held the XG Mobile's GPU: the firmware switched back to the built-in dGPU itself,
+        # which is not on the bus yet.
         mock.patch.object(t, "read_state", lambda: Tray.current).start()
-        mock.patch.object(t, "ask", return_value=True).start()
         live = mock.patch.object(self.tray, "start_live").start()
         offer = mock.patch.object(self.tray, "offer_reboot").start()
-        Tray.current = state(gpus=(IGPU,), egpu_connected=False)
+        Tray.current = state(gpus=(IGPU,), egpu_connected=False, hw_mode="Hybrid")
         self.tray.on_xg_unlocked()
         live.assert_called_once_with("Hybrid")
         offer.assert_not_called()
 
-    def test_experimental_declined_offers_reboot(self) -> None:
-        mock.patch.object(t, "EXPERIMENTAL", True).start()
+    def test_unclean_undock_waits_then_offers_reboot(self) -> None:
         mock.patch.object(t, "read_state", lambda: Tray.current).start()
-        mock.patch.object(t, "ask", return_value=False).start()
         live = mock.patch.object(self.tray, "start_live").start()
         offer = mock.patch.object(self.tray, "offer_reboot").start()
-        Tray.current = state(gpus=(IGPU,), egpu_connected=False)
+        single = mock.patch.object(t.QTimer, "singleShot").start()
+        Tray.current = state(gpus=(IGPU,), egpu_connected=False)  # egpu_enable stayed 1
+        self.tray.on_xg_unlocked()
+        single.assert_called_once()  # waits for the firmware first
+        offer.assert_not_called()
+        self.tray.undock_wait = t.UNDOCK_WAIT_S
         self.tray.on_xg_unlocked()
         live.assert_not_called()
         offer.assert_called_once()
 
-    def test_without_experimental_only_reboot(self) -> None:
-        mock.patch.object(t, "read_state", lambda: Tray.current).start()
-        live = mock.patch.object(self.tray, "start_live").start()
-        offer = mock.patch.object(self.tray, "offer_reboot").start()
-        Tray.current = state(gpus=(IGPU,), egpu_connected=False)
-        self.tray.on_xg_unlocked()
-        live.assert_not_called()
-        offer.assert_called_once()
+    def test_dgpu_missing_menu_item(self) -> None:
+        self.tray.build_menu(state(gpus=(IGPU,), hw_mode="Hybrid"))
+        self.assertIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
+        self.tray.build_menu(state(gpus=(IGPU,), hw_mode="Hybrid", dgpu_disabled=True))
+        self.assertNotIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
 
 
 class DetectTests(unittest.TestCase):
