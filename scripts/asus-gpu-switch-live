@@ -181,19 +181,17 @@ for n in "${nodes[@]}"; do
     chmod 000 "$n"
 done
 
+# One find over all /proc/<pid>/fd links (a readlink per descriptor took ~6 s).
 holders=""
-for p in /proc/[0-9]*; do
-    [[ $p == /proc/$$ ]] && continue
-    for fd in "$p"/fd/*; do
-        link=$(readlink "$fd" 2>/dev/null) || continue
-        for n in "${nodes[@]}"; do
-            if [[ $link == "$n" ]]; then
-                holders+="$(cat "$p/comm" 2>/dev/null) ($(basename "$p")), "
-                continue 3
-            fi
-        done
-    done
-done
+if (( ${#nodes[@]} )); then
+    match=()
+    for n in "${nodes[@]}"; do match+=(-o -lname "$n"); done
+    while read -r pid; do
+        [[ $pid == "$$" ]] && continue
+        holders+="$(cat "/proc/$pid/comm" 2>/dev/null) ($pid), "
+    done < <(find /proc/[0-9]*/fd -mindepth 1 -maxdepth 1 \( "${match[@]:1}" \) -print 2>/dev/null |
+             awk -F/ '!seen[$3]++ {print $3}')
+fi
 [[ -n $holders ]] && finish 4 "Aborted, the NVIDIA card is still in use by: ${holders%, }"
 
 # --- unplug the card ----------------------------------------------------------------------------

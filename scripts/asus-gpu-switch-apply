@@ -73,6 +73,8 @@ fi
 if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" && -n $(nvidia_devices) ]]; then
     live=$(dirname "$0")/asus-gpu-switch-live
     live_target=$([[ $want_egpu == 1 ]] && echo AsusEgpu || echo Hybrid)
+    # The login screen waits for this (~45 s, most of it in the firmware); say so on the splash.
+    plymouth display-message --text="Switching graphics to the $([[ $want_egpu == 1 ]] && echo "XG Mobile" || echo "built-in GPU") - about 45 seconds" 2>/dev/null
     rm -f "$blacklist"  # left by older versions of asus-gpu-switch-reboot
     udevadm control --reload
     echo "Loading the NVIDIA driver on the current card"
@@ -97,6 +99,7 @@ if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" && -n $(nvidia_devic
         "$live" "$live_target"
         rc=$?
     fi
+    plymouth display-message --text="" 2>/dev/null
     if (( rc != 0 )); then
         echo "The live switch at boot failed (exit $rc, see live-progress) - staying in the current mode"
         exit 1
