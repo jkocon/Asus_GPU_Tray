@@ -48,7 +48,9 @@ fi
 if [[ -e $attr/gpu_mux_mode/current_value ]]; then
     mux=$(cat "$attr/gpu_mux_mode/current_value")
     if [[ $target == AsusMuxDgpu && $mux != 0 ]]; then
-        echo 0 > "$attr/gpu_mux_mode/current_value"
+        # The firmware answers EBUSY while the XG Mobile is active.
+        echo 0 2>/dev/null > "$attr/gpu_mux_mode/current_value" ||
+            { echo "The firmware refused the MUX mode - switch to the built-in dGPU first"; exit 1; }
     elif [[ $target != AsusMuxDgpu && $mux == 0 ]]; then
         echo 1 > "$attr/gpu_mux_mode/current_value"
     fi

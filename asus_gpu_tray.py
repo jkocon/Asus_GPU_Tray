@@ -902,11 +902,16 @@ class GpuTray(QSystemTrayIcon):
         def xg_disabled(mode: str) -> str:
             if self.live_proc:
                 return "switching…"
-            return "connect and lock the dock" if mode == "AsusEgpu" and not s.egpu_connected else ""
+            if mode == "AsusEgpu" and not s.egpu_connected:
+                return "connect and lock the dock"
+            if mode == "AsusMuxDgpu" and s.hw_mode == "AsusEgpu":
+                return "switch to the built-in dGPU first"  # the firmware refuses it (EBUSY)
+            return ""
 
         def hw_item(mode: str) -> str:
             current = mode == (s.hw_pending or s.hw_mode)
-            return hw_label(mode, s) + ("" if current or can_switch_live(s, mode) else " – reboot")
+            refused = mode == "AsusMuxDgpu" and s.hw_mode == "AsusEgpu"  # xg_disabled explains why
+            return hw_label(mode, s) + ("" if current or refused or can_switch_live(s, mode) else " – reboot")
 
         if s.cardwire:
             self.radio_section(
@@ -1161,9 +1166,20 @@ class GpuTray(QSystemTrayIcon):
         return ask("Change GPU mode", text)
 
     def start_reboot_switch(self, mode: str) -> None:
-        ok, err = run_checked(["systemctl", "start", f"asus-gpu-switch@{mode}.service"])
+        unit = f"asus-gpu-switch@{mode}.service"
+        ok, err = run_checked(["systemctl", "start", unit])
         if not ok:
             message(QMessageBox.Icon.Critical, "Change GPU mode", f"Switching failed:\n{err}")
+            return
+        # The unit is Type=simple, so "start" succeeds even when the script refuses; the reboot
+        # follows within a second when it does not.
+        QTimer.singleShot(3000, lambda: self.check_reboot_unit(unit))
+
+    def check_reboot_unit(self, unit: str) -> None:
+        if run("systemctl", "is-failed", unit) != "failed":
+            return
+        why = run("journalctl", "-b", "-u", unit, "-n", "1", "-o", "cat", "--no-pager")
+        message(QMessageBox.Icon.Warning, "Change GPU mode", f"The switch was not scheduled:\n{why or unit + ' failed'}")
 
     # --- supergfxd fallback ---------------------------------------------------------------------
 

@@ -99,7 +99,7 @@ class MenuTests(unittest.TestCase):
         items = texts(self.tray)
         self.assertIn("Hardware", items)
         self.assertNotIn("GPU access (live, cardwire)", items)
-        self.assertIn("Built-in dGPU only (MUX) – reboot", items)
+        self.assertIn("Built-in dGPU only (MUX) – switch to the built-in dGPU first", items)
 
     def test_everything_disabled_while_switching(self) -> None:
         self.tray.live_proc = mock.Mock()
@@ -108,6 +108,20 @@ class MenuTests(unittest.TestCase):
         self.assertTrue(switchable)
         self.assertTrue(all(not a.isEnabled() for a in switchable))
         self.tray.live_proc = None
+
+    def test_mux_disabled_in_xg_mobile_mode(self) -> None:
+        self.tray.build_menu(state())
+        self.assertIn("Built-in dGPU only (MUX) – switch to the built-in dGPU first", texts(self.tray))
+        self.tray.build_menu(state(gpus=(DGPU, IGPU), hw_mode="Hybrid"))
+        self.assertIn("RTX 3050 Ti only (MUX) – reboot", texts(self.tray))
+
+    def test_refused_reboot_switch_is_reported(self) -> None:
+        with mock.patch.object(t, "run_checked", return_value=(True, "")), \
+                mock.patch.object(t, "run", side_effect=["failed", "The firmware refused the MUX mode"]), \
+                mock.patch.object(t, "message") as msg:
+            self.tray.start_reboot_switch("AsusMuxDgpu")
+            self.tray.check_reboot_unit("asus-gpu-switch@AsusMuxDgpu.service")
+        self.assertIn("The firmware refused the MUX mode", msg.call_args.args[2])
 
     def test_ampersand_is_not_a_mnemonic(self) -> None:
         odd = t.Gpu("0000:02:00.0", "AMD", "R9 290 & 390", "amdgpu", "dgpu", "active", False)
