@@ -317,6 +317,48 @@ class UndockHintTests(unittest.TestCase):
         self.assertNotIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
 
 
+class DockTests(unittest.TestCase):
+    """Connecting and locking the XG Mobile on the built-in dGPU offers the live switch to it."""
+
+    def setUp(self) -> None:
+        Tray.current = state(gpus=(DGPU, IGPU), hw_mode="Hybrid", egpu_connected=False)
+        self.tray = Tray()
+        self.addCleanup(self.tray.timer.stop)
+        self.addCleanup(self.tray.hide)
+        self.addCleanup(mock.patch.stopall)
+        mock.patch.object(t, "read_state", lambda: Tray.current).start()
+        self.switch = mock.patch.object(self.tray, "switch_hw_live").start()
+
+    def lock(self, **kw) -> None:
+        Tray.current = state(gpus=(DGPU, IGPU), hw_mode="Hybrid", egpu_connected=True, **kw)
+        self.tray.refresh()
+        process_events()
+
+    def test_locking_offers_the_switch(self) -> None:
+        self.lock()
+        self.switch.assert_called_once()
+        self.assertEqual(self.switch.call_args.args[0], "AsusEgpu")
+        self.assertIn("connected and locked", self.switch.call_args.kwargs["intro"])
+
+    def test_no_question_at_startup(self) -> None:
+        Tray.current = state(gpus=(DGPU, IGPU), hw_mode="Hybrid", egpu_connected=True)
+        tray = Tray()
+        self.addCleanup(tray.timer.stop)
+        self.addCleanup(tray.hide)
+        with mock.patch.object(tray, "switch_hw_live") as switch:
+            process_events()
+        switch.assert_not_called()
+
+    def test_not_without_the_live_backend(self) -> None:
+        self.lock(live_backend=False)
+        self.switch.assert_not_called()
+
+    def test_asks_once_per_lock(self) -> None:
+        self.lock()
+        self.lock()
+        self.assertEqual(self.switch.call_count, 1)
+
+
 class UndockNowTests(unittest.TestCase):
     def setUp(self) -> None:
         Tray.current = state()

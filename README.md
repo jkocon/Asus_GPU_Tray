@@ -12,6 +12,7 @@ between the built-in dGPU and the XG Mobile eGPU dock without a reboot.**
 - **Detects your hardware.** It finds the iGPU, dGPU and eGPU and offers only the modes your
   laptop supports.
 - **Never wakes a sleeping dGPU just to show its status.**
+- **Dock prompt.** Locking the XG Mobile on the built-in dGPU offers the switch to it, no reboot.
 - **Undock now.** One click closes every app that uses the XG Mobile and switches to the built-in
   dGPU, so the dock can be unplugged.
 - **Undock check.** If the XG Mobile is unlocked while it is the active GPU, the tray brings the
@@ -142,6 +143,12 @@ disconnecting the old GPU, the firmware switch, connecting the new GPU) and the 
 the window of Armoury Crate on Windows. It cannot be closed until the switch is over. When it
 succeeds, the window says so and closes after 10 seconds; when it fails, a dialog explains why.
 
+### Docking
+
+When you connect and lock the XG Mobile while the built-in dGPU is active, the tray asks whether
+to switch to it now, without a reboot (the same live switch as from the menu). It asks once per
+lock, and not when the tray starts with the dock already locked.
+
 ### Undocking
 
 **Switch to the built-in dGPU first, then unlock the XG Mobile.** In a hurry, use **Undock now
@@ -246,9 +253,12 @@ To cancel a scheduled reboot switch before rebooting, run
   tray's reboot after a GPU loss is an emergency reboot (SysRq: sync, remount read-only, reset):
   open apps are not asked to quit. If you reboot some other way and it hangs, Alt+SysRq+S, U, B
   does the same by hand (if the keyboard SysRq is enabled).
-- **One extra automatic restart after unlocking an active XG Mobile.** When the laptop starts in
-  XG Mobile mode without a locked dock, the ASUS firmware switches back to the built-in dGPU by
-  itself and resets once more (bootloader, black screen, restart). The second start is normal.
+- **Two restarts after unlocking an active XG Mobile.** After the emergency reboot the laptop
+  starts in XG Mobile mode without a locked dock. The ASUS firmware then switches back to the
+  built-in dGPU by itself and resets once more: the bootloader appears, the screen goes black,
+  and the laptop restarts on its own. The second start is normal and needs nothing from you. The
+  tray could avoid it only by switching the firmware before the reboot, which with a lost GPU
+  risks an instant reset, so it does not.
 - **cardwire may miss the dGPU at boot.** It can start before the NVIDIA driver is ready and treat
   the laptop as a desktop, offering only Hybrid and Manual. The tray detects this and runs
   `cardwire debug refresh-gpu`.

@@ -779,6 +779,8 @@ class GpuTray(QSystemTrayIcon):
         self.xg_problem: bool | None = None  # XG Mobile unlocked or gone while active; None before the first poll
         self.undock_pending = False
         self.undock_wait = 0  # seconds waited for the firmware after an unlock
+        self.xg_was_locked: bool | None = None  # None before the first poll: no question at startup
+        self.dock_pending = False
         self.lost: tuple[Gpu, ...] = ()
         self.lost_events: dict[str, float] = {}  # PCI slot -> time of the last "GPU lost" kernel message
         self.lost_asked: set[str] = set()
@@ -865,13 +867,19 @@ class GpuTray(QSystemTrayIcon):
             self.build_menu(s)
 
     def watch(self, s: GpuState, lost: tuple[Gpu, ...]) -> None:
-        """React to the XG Mobile being unlocked and to lost GPUs - once no dialog is open."""
+        """React to the XG Mobile being locked or unlocked and to lost GPUs - once no dialog is open."""
         problem = xg_unlocked(s) or xg_gone(s) or dgpu_missing(s)
         if self.xg_problem is False and problem and not self.live_proc:
             self.undock_pending = True
         if not problem:
             self.undock_pending = False
         self.xg_problem = problem
+        # Dock connected and locked while on the built-in dGPU: offer to switch to it.
+        if self.xg_was_locked is False and s.egpu_connected and not self.live_proc:
+            self.dock_pending = True
+        if not s.egpu_connected or s.hw_mode != "Hybrid":
+            self.dock_pending = False
+        self.xg_was_locked = s.egpu_connected
         if self.live_proc or QApplication.activeModalWidget() is not None:
             return
         new_lost = tuple(g for g in lost if g.addr not in self.lost_asked)
@@ -881,6 +889,9 @@ class GpuTray(QSystemTrayIcon):
         elif self.undock_pending:
             self.undock_pending = False
             QTimer.singleShot(0, self.on_xg_unlocked)
+        elif self.dock_pending:
+            self.dock_pending = False
+            QTimer.singleShot(0, self.on_xg_locked)
 
     def radio_section(self, title: str, modes, current: str, label, handler, disabled=lambda m: "") -> None:
         m = self.menu
@@ -1003,8 +1014,8 @@ class GpuTray(QSystemTrayIcon):
             self.start_reboot_switch(mode)
         self.force_refresh()
 
-    def switch_hw_live(self, mode: str) -> None:
-        """Live switch built-in dGPU <-> XG Mobile."""
+    def switch_hw_live(self, mode: str, intro: str = "") -> None:
+        """Live switch built-in dGPU <-> XG Mobile. intro goes before the question."""
         s = self.state or read_state()
         self.live_retries = 0
         if self.lost or xg_gone(s) or xg_unlocked(s):
@@ -1014,13 +1025,13 @@ class GpuTray(QSystemTrayIcon):
             self.offer_reboot(s, mode, XG_GONE_TEXT if not self.lost else f"{gone} is lost, so the switch needs a reboot.")
             return self.force_refresh()
         text = (
-            f"Switch to: {hw_label(mode, s)}?\n\n"
+            f"{intro}Switch to: {hw_label(mode, s)}?\n\n"
             "No reboot needed; it takes about 40 seconds. Apps that use the NVIDIA GPU will be "
             "listed first, so you can close them."
         )
         if user_processes(RESTARTABLE_APPS):
             text += "\n\nROG Control Center will be closed and started again afterwards."
-        if not ask("Change GPU mode", text):
+        if not ask("XG Mobile connected" if intro else "Change GPU mode", text):
             return self.force_refresh()
         if self.free_card(s, mode):
             self.start_live(mode)
@@ -1116,6 +1127,17 @@ class GpuTray(QSystemTrayIcon):
             text += "\n\nDisconnect the XG Mobile only once the computer has restarted."
         if ask("Reboot", text):
             self.start_reboot_switch(mode)
+
+    def on_xg_locked(self) -> None:
+        """The XG Mobile was connected and locked while the built-in dGPU is active: offer the
+        live switch to it (the same dialogs as from the menu)."""
+        s = read_state()
+        if self.live_proc or not s.egpu_connected or s.hw_mode != "Hybrid" or self.lost or dgpu_missing(s):
+            return
+        if not can_switch_live(s, "AsusEgpu"):
+            return  # no live backend, or a reboot switch is pending: the menu still offers what works
+        self.state = s
+        self.switch_hw_live("AsusEgpu", intro="The XG Mobile is connected and locked.\n\n")
 
     def on_xg_unlocked(self) -> None:
         """The XG Mobile was unlocked while it was the active GPU. The firmware removes its GPU at
