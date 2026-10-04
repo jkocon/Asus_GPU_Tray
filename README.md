@@ -62,11 +62,28 @@ most.
 | GPU access modes | [cardwire](https://opengamingcollective.github.io/cardwire/getting-started/installation.html) (needs BPF LSM and Wayland) |
 | hardware switching | a kernel with the `asus-armoury` driver (`/sys/class/firmware-attributes/asus-armoury`), systemd, polkit |
 | switching without a reboot | additionally `setpci` (`pciutils`), and a compositor that does not use the NVIDIA card (see below) |
+| translations | `msgfmt` (`gettext`) at install time; without it the tray is in English |
+| GPU numbers in the menu | `nvidia-smi` (`nvidia-utils`) |
 
 supergfxd is **not** needed. If it is installed and cardwire is not, the tray offers its modes as
 a fallback.
 
 ## Installation
+
+**Arch Linux and derivatives:** build the package from `packaging/aur` (the same PKGBUILD as the
+AUR package `asus-gpu-tray-git`):
+
+```bash
+git clone https://github.com/jkocon/Asus_GPU_Tray.git
+cd Asus_GPU_Tray/packaging/aur
+makepkg -si
+```
+
+It installs into `/usr` (program in `/usr/lib/asus-gpu-tray`) and enables the boot-time unit. If
+you used `install.sh` before, run `sudo ./uninstall.sh` first: both install the autostart entry, so
+pacman refuses to overwrite it.
+
+**Other distributions:**
 
 ```bash
 git clone https://github.com/jkocon/Asus_GPU_Tray.git
@@ -305,7 +322,27 @@ shellcheck scripts/* install.sh uninstall.sh
 | `scripts/asus-gpu-switch-reboot` | schedules a mode and reboots (root, `asus-gpu-switch@.service`) |
 | `scripts/asus-gpu-switch-apply` | applies a scheduled mode at boot (root, `asus-gpu-switch-apply.service`) |
 | `systemd/`, `polkit/`, `desktop/`, `icons/` | units, the polkit rule, launcher and autostart entries, icons |
+| `udev/`, `kde/` | the XG Mobile D3cold rule, the login-screen environment generator |
+| `po/` | translations (`asus-gpu-tray.pot` template, `pl.po` Polish) |
+| `packaging/aur/` | PKGBUILD for Arch Linux |
 | `tests/` | unit tests |
+
+### Translations
+
+The tray follows the system language (`LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, `LANG`) and falls back
+to English. Polish is included. To add a language, or to refresh the template after changing
+texts:
+
+```bash
+xgettext --language=Python --keyword=tr --keyword=N_ --from-code=UTF-8 --no-wrap \
+    -o po/asus-gpu-tray.pot asus_gpu_tray.py
+msginit --no-wrap -i po/asus-gpu-tray.pot -l de_DE.UTF-8 -o po/de.po   # new language
+msgmerge --no-wrap -U po/pl.po po/asus-gpu-tray.pot                    # existing one
+LANGUAGE=de python3 asus_gpu_tray.py                                   # after install.sh
+```
+
+Keep the `{placeholders}` of a text in its translation. The root scripts and their messages
+(switch progress, kernel-level errors) stay in English.
 
 Bug reports and hardware reports are welcome. Please include `--dump` output, your laptop model and
 `/var/lib/asus-gpu-tray/live-progress` for switch problems. For security issues, see

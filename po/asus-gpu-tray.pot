@@ -1,0 +1,524 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Asus GPU Tray package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Asus GPU Tray\n"
+"Report-Msgid-Bugs-To: https://github.com/jkocon/Asus_GPU_Tray/issues\n"
+"POT-Creation-Date: 2026-10-04 23:56+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: asus_gpu_tray.py:80
+msgid "Before you unlock the XG Mobile, switch back to the built-in dGPU in the tray menu. Unlocking it while it is in use needs a reboot."
+msgstr ""
+
+#: asus_gpu_tray.py:84
+msgid "These cannot be closed without ending the session. See the KDE Plasma setup in the README."
+msgstr ""
+
+#: asus_gpu_tray.py:87 asus_gpu_tray.py:365
+msgid "built-in dGPU"
+msgstr ""
+
+#: asus_gpu_tray.py:365
+#, python-brace-format
+msgid "built-in {vendor}"
+msgstr ""
+
+#: asus_gpu_tray.py:373
+#, python-brace-format
+msgid "{igpu} only"
+msgstr ""
+
+#: asus_gpu_tray.py:374
+#, python-brace-format
+msgid "Hybrid ({igpu} + {dgpu})"
+msgstr ""
+
+#: asus_gpu_tray.py:376 asus_gpu_tray.py:388
+#, python-brace-format
+msgid "{dgpu} only (MUX)"
+msgstr ""
+
+#: asus_gpu_tray.py:377
+#, python-brace-format
+msgid "VFIO ({dgpu} for virtual machines)"
+msgstr ""
+
+#: asus_gpu_tray.py:378
+#, python-brace-format
+msgid "Hybrid without NVIDIA modeset ({igpu} + {dgpu})"
+msgstr ""
+
+#: asus_gpu_tray.py:386
+#, python-brace-format
+msgid "Built-in dGPU ({name})"
+msgstr ""
+
+#: asus_gpu_tray.py:386 asus_gpu_tray.py:388
+msgid "Built-in dGPU"
+msgstr ""
+
+#: asus_gpu_tray.py:397
+#, python-brace-format
+msgid "Integrated – block {name}"
+msgstr ""
+
+#: asus_gpu_tray.py:398
+msgid "Hybrid – all GPUs available"
+msgstr ""
+
+#: asus_gpu_tray.py:399
+#, python-brace-format
+msgid "Smart – {name} only for approved apps"
+msgstr ""
+
+#: asus_gpu_tray.py:579
+msgid "active"
+msgstr ""
+
+#: asus_gpu_tray.py:579
+msgid "suspended"
+msgstr ""
+
+#: asus_gpu_tray.py:579
+msgid "suspending"
+msgstr ""
+
+#: asus_gpu_tray.py:580
+msgid "resuming"
+msgstr ""
+
+#: asus_gpu_tray.py:580
+msgid "error"
+msgstr ""
+
+#: asus_gpu_tray.py:587
+#, python-brace-format
+msgid "{power}, blocked"
+msgstr ""
+
+#: asus_gpu_tray.py:587
+msgid "blocked"
+msgstr ""
+
+#: asus_gpu_tray.py:588
+msgid "no runtime PM"
+msgstr ""
+
+#: asus_gpu_tray.py:594 asus_gpu_tray.py:1057
+msgid "No graphics card detected"
+msgstr ""
+
+#: asus_gpu_tray.py:603
+msgid "no driver"
+msgstr ""
+
+#: asus_gpu_tray.py:608
+msgid "XG Mobile: disconnected while in use – reboot needed"
+msgstr ""
+
+#: asus_gpu_tray.py:610
+msgid "XG Mobile: unlocked, still in use – do not disconnect"
+msgstr ""
+
+#: asus_gpu_tray.py:611
+msgid "XG Mobile: connected"
+msgstr ""
+
+#: asus_gpu_tray.py:611
+msgid "XG Mobile: not connected"
+msgstr ""
+
+#: asus_gpu_tray.py:686
+msgid "A normal shutdown would hang in the NVIDIA driver, so the computer restarts the emergency way: the disks are synced and remounted read-only, then it resets at once. Open apps are not asked to quit - save your work first."
+msgstr ""
+
+#: asus_gpu_tray.py:692
+msgid ""
+"The XG Mobile was disconnected while it was the active GPU. Unlocking it disconnects the GPU at once, and it stays gone until a reboot, also after you connect it again. Apps that were using it may stop responding.\n"
+"\n"
+"Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile. (Unlocking works without a reboot only when nothing at all uses the GPU, system services included.)"
+msgstr ""
+
+#: asus_gpu_tray.py:756 asus_gpu_tray.py:796
+msgid "Preparing…"
+msgstr ""
+
+#: asus_gpu_tray.py:758
+#, python-brace-format
+msgid "Disconnecting the {gpu}…"
+msgstr ""
+
+#: asus_gpu_tray.py:760
+msgid "Switching the graphics lanes in the firmware…"
+msgstr ""
+
+#: asus_gpu_tray.py:762
+#, python-brace-format
+msgid "Connecting the {gpu}…"
+msgstr ""
+
+#: asus_gpu_tray.py:785 asus_gpu_tray.py:993
+#, python-brace-format
+msgid "Switching to {target}…"
+msgstr ""
+
+#: asus_gpu_tray.py:792
+msgid "Switching in progress, please wait. Do not disconnect the XG Mobile, close the lid or shut down the computer."
+msgstr ""
+
+#: asus_gpu_tray.py:802
+msgid "Close"
+msgstr ""
+
+#: asus_gpu_tray.py:826
+#, python-brace-format
+msgid "{time} · usually about {seconds} seconds"
+msgstr ""
+
+#: asus_gpu_tray.py:835
+#, python-brace-format
+msgid "Switched to the {gpu}"
+msgstr ""
+
+#: asus_gpu_tray.py:836 asus_gpu_tray.py:1378
+msgid "You can disconnect the XG Mobile now."
+msgstr ""
+
+#: asus_gpu_tray.py:839
+#, python-brace-format
+msgid "Took {time}"
+msgstr ""
+
+#: asus_gpu_tray.py:935
+msgid "Active GPU"
+msgstr ""
+
+#: asus_gpu_tray.py:963
+#, python-brace-format
+msgid "{name} woke up"
+msgstr ""
+
+#: asus_gpu_tray.py:964
+#, python-brace-format
+msgid "On battery, used by: {apps}"
+msgstr ""
+
+#: asus_gpu_tray.py:985
+#, python-brace-format
+msgid "{name} fell off the bus – reboot needed"
+msgstr ""
+
+#: asus_gpu_tray.py:987
+#, python-brace-format
+msgid "cardwire mode: {mode}"
+msgstr ""
+
+#: asus_gpu_tray.py:989
+#, python-brace-format
+msgid "supergfxd mode: {mode}"
+msgstr ""
+
+#: asus_gpu_tray.py:995 asus_gpu_tray.py:1067
+#, python-brace-format
+msgid "After reboot: {mode}"
+msgstr ""
+
+#: asus_gpu_tray.py:997
+#, python-brace-format
+msgid "Pending: {mode}"
+msgstr ""
+
+#: asus_gpu_tray.py:1059
+#, python-brace-format
+msgid "⚠ {name} fell off the bus – Reboot…"
+msgstr ""
+
+#: asus_gpu_tray.py:1063
+msgid "⚠ XG Mobile disconnected – Reboot…"
+msgstr ""
+
+#: asus_gpu_tray.py:1065
+msgid "⚠ Built-in dGPU missing – Bring it back"
+msgstr ""
+
+#: asus_gpu_tray.py:1070 asus_gpu_tray.py:1074
+msgid "switching…"
+msgstr ""
+
+#: asus_gpu_tray.py:1076
+msgid "connect and lock the dock"
+msgstr ""
+
+#: asus_gpu_tray.py:1078
+msgid "switch to the built-in dGPU first"
+msgstr ""
+
+#: asus_gpu_tray.py:1085
+msgid " – before undocking"
+msgstr ""
+
+#: asus_gpu_tray.py:1086
+msgid " – reboot"
+msgstr ""
+
+#: asus_gpu_tray.py:1090
+msgid "GPU access (live, cardwire)"
+msgstr ""
+
+#: asus_gpu_tray.py:1097
+msgid "Mode (switch with reboot)"
+msgstr ""
+
+#: asus_gpu_tray.py:1097
+msgid "Mode (supergfxd)"
+msgstr ""
+
+#: asus_gpu_tray.py:1103
+msgid "Hardware"
+msgstr ""
+
+#: asus_gpu_tray.py:1107
+msgid "Switching unavailable (install cardwire)"
+msgstr ""
+
+#: asus_gpu_tray.py:1111
+msgid "Undock now (close all GPU apps)…"
+msgstr ""
+
+#: asus_gpu_tray.py:1115
+msgid "Notify when the dGPU wakes up on battery"
+msgstr ""
+
+#: asus_gpu_tray.py:1119
+msgid "Refresh"
+msgstr ""
+
+#: asus_gpu_tray.py:1120
+msgid "Quit"
+msgstr ""
+
+#: asus_gpu_tray.py:1134 asus_gpu_tray.py:1152 asus_gpu_tray.py:1176
+#: asus_gpu_tray.py:1258 asus_gpu_tray.py:1427 asus_gpu_tray.py:1433
+#: asus_gpu_tray.py:1443 asus_gpu_tray.py:1467 asus_gpu_tray.py:1470
+#: asus_gpu_tray.py:1474
+msgid "Change GPU mode"
+msgstr ""
+
+#: asus_gpu_tray.py:1134
+#, python-brace-format
+msgid ""
+"cardwire failed:\n"
+"{error}"
+msgstr ""
+
+#: asus_gpu_tray.py:1136
+msgid "Apps already running keep their GPU until restarted."
+msgstr ""
+
+#: asus_gpu_tray.py:1137
+msgid "GPU mode"
+msgstr ""
+
+#: asus_gpu_tray.py:1147 asus_gpu_tray.py:1453
+msgid "XG Mobile is not connected and locked."
+msgstr ""
+
+#: asus_gpu_tray.py:1153
+msgid "The reboot-based switch backend is not installed. Run install.sh as root."
+msgstr ""
+
+#: asus_gpu_tray.py:1167
+#, python-brace-format
+msgid "{name} is lost, so the switch needs a reboot."
+msgstr ""
+
+#: asus_gpu_tray.py:1170 asus_gpu_tray.py:1422 asus_gpu_tray.py:1467
+#, python-brace-format
+msgid "Switch to: {target}?"
+msgstr ""
+
+#: asus_gpu_tray.py:1171
+msgid "No reboot needed; it takes about 40 seconds. Apps that use the NVIDIA GPU will be listed first, so you can close them."
+msgstr ""
+
+#: asus_gpu_tray.py:1175
+msgid "ROG Control Center will be closed and started again afterwards."
+msgstr ""
+
+#: asus_gpu_tray.py:1176
+msgid "XG Mobile connected"
+msgstr ""
+
+#: asus_gpu_tray.py:1198 asus_gpu_tray.py:1214 asus_gpu_tray.py:1221
+msgid "Undock now"
+msgstr ""
+
+#: asus_gpu_tray.py:1199 asus_gpu_tray.py:1239
+#, python-brace-format
+msgid "The desktop session itself uses the {gpu}:"
+msgstr ""
+
+#: asus_gpu_tray.py:1204
+msgid "Switch to the built-in dGPU now, so the XG Mobile can be unplugged?"
+msgstr ""
+
+#: asus_gpu_tray.py:1207
+msgid "These apps use the XG Mobile and will be closed without asking again; unsaved work in them is lost:"
+msgstr ""
+
+#: asus_gpu_tray.py:1211
+msgid "ROG Control Center is closed and started again, and the GPU services are stopped during the switch. It takes about 35 seconds. Keep the XG Mobile locked until it is done."
+msgstr ""
+
+#: asus_gpu_tray.py:1221 asus_gpu_tray.py:1251
+msgid "These apps did not quit:"
+msgstr ""
+
+#: asus_gpu_tray.py:1234
+msgid "NVIDIA GPU"
+msgstr ""
+
+#: asus_gpu_tray.py:1238 asus_gpu_tray.py:1243 asus_gpu_tray.py:1251
+msgid "GPU in use"
+msgstr ""
+
+#: asus_gpu_tray.py:1244
+#, python-brace-format
+msgid "These apps are using the {gpu}:"
+msgstr ""
+
+#: asus_gpu_tray.py:1245
+msgid "Kill them to continue the switch? Unsaved work in them will be lost."
+msgstr ""
+
+#: asus_gpu_tray.py:1259
+msgid "The reboot-based switch backend is not installed."
+msgstr ""
+
+#: asus_gpu_tray.py:1263
+#, python-brace-format
+msgid "Reboot now and switch to {target} during boot?"
+msgstr ""
+
+#: asus_gpu_tray.py:1264
+msgid "Save your work first: the computer restarts right away."
+msgstr ""
+
+#: asus_gpu_tray.py:1269
+msgid "Disconnect the XG Mobile only once the computer has restarted."
+msgstr ""
+
+#: asus_gpu_tray.py:1270 asus_gpu_tray.py:1418
+msgid "Reboot"
+msgstr ""
+
+#: asus_gpu_tray.py:1282
+msgid "The XG Mobile is connected and locked."
+msgstr ""
+
+#: asus_gpu_tray.py:1296
+msgid "XG Mobile released"
+msgstr ""
+
+#: asus_gpu_tray.py:1296
+msgid "Bringing back the built-in dGPU…"
+msgstr ""
+
+#: asus_gpu_tray.py:1307
+msgid "XG Mobile disconnected"
+msgstr ""
+
+#: asus_gpu_tray.py:1307
+msgid "It was unlocked while in use - a reboot is needed."
+msgstr ""
+
+#: asus_gpu_tray.py:1314
+msgid "Still holding the GPU:"
+msgstr ""
+
+#: asus_gpu_tray.py:1315
+msgid "Without a reboot the built-in dGPU stays unavailable until the next boot."
+msgstr ""
+
+#: asus_gpu_tray.py:1372
+#, python-brace-format
+msgid "systemctl exited with {code}"
+msgstr ""
+
+#: asus_gpu_tray.py:1381
+msgid "GPU switched"
+msgstr ""
+
+#: asus_gpu_tray.py:1403
+#, python-brace-format
+msgid "{names} fell off the PCIe bus. Apps can no longer use it, and it comes back only after a reboot."
+msgstr ""
+
+#: asus_gpu_tray.py:1405
+msgid "Reboot now?"
+msgstr ""
+
+#: asus_gpu_tray.py:1409
+msgid "The XG Mobile was unlocked, so the computer will start on the built-in dGPU."
+msgstr ""
+
+#: asus_gpu_tray.py:1411
+msgid "Save your work first."
+msgstr ""
+
+#: asus_gpu_tray.py:1412
+msgid "GPU lost"
+msgstr ""
+
+#: asus_gpu_tray.py:1418
+msgid "Reboot failed:"
+msgstr ""
+
+#: asus_gpu_tray.py:1423
+msgid "The computer will reboot right away and the change is applied during boot. Save your work."
+msgstr ""
+
+#: asus_gpu_tray.py:1426
+msgid "Disconnect the XG Mobile only once the new mode is active."
+msgstr ""
+
+#: asus_gpu_tray.py:1433 asus_gpu_tray.py:1470
+msgid "Switching failed:"
+msgstr ""
+
+#: asus_gpu_tray.py:1444
+msgid "The switch was not scheduled:"
+msgstr ""
+
+#: asus_gpu_tray.py:1461
+msgid "supergfxd will perform the change. It may require logging out or rebooting."
+msgstr ""
+
+#: asus_gpu_tray.py:1464
+msgid "Warning: live switching unloads the NVIDIA driver and has frozen ASUS laptops with nvidia-open. Run install.sh to get the safer reboot-based switching."
+msgstr ""
+
+#: asus_gpu_tray.py:1475
+#, python-brace-format
+msgid "supergfxd is waiting for: {action}"
+msgstr ""
+
+#: asus_gpu_tray.py:1515
+#, python-brace-format
+msgid "{app} is already running"
+msgstr ""
+
+#: asus_gpu_tray.py:1516
+msgid "The icon is in the system tray."
+msgstr ""

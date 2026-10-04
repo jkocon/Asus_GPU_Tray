@@ -13,6 +13,7 @@ from pathlib import Path
 from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+os.environ["LANGUAGE"] = "C"  # the tests check the English texts, also where a translation is installed
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import asus_gpu_tray as t  # noqa: E402

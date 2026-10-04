@@ -15,6 +15,16 @@ command -v cardwire >/dev/null || warn "cardwire is not installed - the Integrat
 
 install -Dm755 "$SRC/asus_gpu_tray.py" "$LIB/asus_gpu_tray.py"
 install -Dm644 -t "$LIB" "$SRC/icons/nvidia.svg" "$SRC/icons/asus-gpu-tray.svg"
+rm -rf "$LIB/locale"
+if command -v msgfmt >/dev/null; then
+    for po in "$SRC"/po/*.po; do
+        lang=$(basename "$po" .po)
+        install -d "$LIB/locale/$lang/LC_MESSAGES"
+        msgfmt -o "$LIB/locale/$lang/LC_MESSAGES/asus-gpu-tray.mo" "$po"
+    done
+else
+    warn "msgfmt (package gettext) is missing - the tray stays in English"
+fi
 install -Dm644 "$SRC/desktop/asus-gpu-tray-autostart.desktop" /etc/xdg/autostart/asus-gpu-tray.desktop
 install -Dm644 "$SRC/desktop/asus-gpu-tray.desktop" /usr/local/share/applications/asus-gpu-tray.desktop
 install -Dm644 "$SRC/icons/asus-gpu-tray.svg" /usr/local/share/icons/hicolor/scalable/apps/asus-gpu-tray.svg

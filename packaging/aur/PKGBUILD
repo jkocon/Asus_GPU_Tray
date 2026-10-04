@@ -1,0 +1,70 @@
+# Maintainer: jkocon <https://github.com/jkocon>
+pkgname=asus-gpu-tray-git
+_repo=Asus_GPU_Tray
+pkgver=r0
+pkgrel=1
+pkgdesc="Tray icon for ASUS ROG laptops: shows the working GPU, switches built-in dGPU and XG Mobile without a reboot"
+arch=('any')
+url="https://github.com/jkocon/Asus_GPU_Tray"
+license=('GPL-3.0-only')
+depends=('python' 'python-pyqt6' 'hwdata' 'pciutils' 'polkit' 'systemd')
+makedepends=('git' 'gettext')
+checkdepends=('python-pyqt6')
+optdepends=(
+    'cardwire: Integrated/Hybrid/Smart GPU access modes'
+    'nvidia-utils: GPU numbers in the menu (nvidia-smi)'
+)
+provides=('asus-gpu-tray')
+conflicts=('asus-gpu-tray')
+install=asus-gpu-tray.install
+source=("git+${url}.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "$_repo"
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+check() {
+    cd "$_repo"
+    QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests
+}
+
+package() {
+    cd "$_repo"
+    local lib=/usr/lib/asus-gpu-tray
+
+    install -Dm755 asus_gpu_tray.py "$pkgdir$lib/asus_gpu_tray.py"
+    install -Dm644 -t "$pkgdir$lib" icons/nvidia.svg icons/asus-gpu-tray.svg
+    install -Dm755 -t "$pkgdir$lib" scripts/asus-gpu-switch-reboot scripts/asus-gpu-switch-apply \
+        scripts/asus-gpu-switch-live scripts/asus-gpu-egpu-power
+    for po in po/*.po; do
+        local lang
+        lang=$(basename "$po" .po)
+        install -d "$pkgdir$lib/locale/$lang/LC_MESSAGES"
+        msgfmt -o "$pkgdir$lib/locale/$lang/LC_MESSAGES/asus-gpu-tray.mo" "$po"
+    done
+
+    # The sources point at install.sh's /usr/local/lib/asus-gpu-tray.
+    install -Dm644 -t "$pkgdir/usr/lib/systemd/system" systemd/*.service
+    install -Dm644 -t "$pkgdir/usr/lib/udev/rules.d" udev/72-asus-gpu-tray-egpu.rules
+    install -Dm644 desktop/asus-gpu-tray-autostart.desktop "$pkgdir/etc/xdg/autostart/asus-gpu-tray.desktop"
+    install -Dm644 desktop/asus-gpu-tray.desktop "$pkgdir/usr/share/applications/asus-gpu-tray.desktop"
+    sed -i "s|/usr/local/lib/asus-gpu-tray|$lib|g" \
+        "$pkgdir"/usr/lib/systemd/system/*.service \
+        "$pkgdir/usr/lib/udev/rules.d/72-asus-gpu-tray-egpu.rules" \
+        "$pkgdir/etc/xdg/autostart/asus-gpu-tray.desktop" \
+        "$pkgdir/usr/share/applications/asus-gpu-tray.desktop"
+
+    # The boot-time half of the reboot switch has to run on every boot (it does nothing unless a
+    # switch is scheduled), so it is enabled here, like install.sh does.
+    install -d "$pkgdir/usr/lib/systemd/system/multi-user.target.wants"
+    ln -s ../asus-gpu-switch-apply.service "$pkgdir/usr/lib/systemd/system/multi-user.target.wants/"
+
+    install -Dm644 polkit/50-asus-gpu-tray.rules "$pkgdir/usr/share/polkit-1/rules.d/50-asus-gpu-tray.rules"
+    install -Dm755 kde/60-asus-gpu-tray-greeter \
+        "$pkgdir/usr/lib/systemd/user-environment-generators/60-asus-gpu-tray-greeter"
+    install -Dm644 icons/asus-gpu-tray.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/asus-gpu-tray.svg"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" README.md SECURITY.md docs/how-it-works.md
+}

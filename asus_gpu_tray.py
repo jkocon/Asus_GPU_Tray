@@ -14,6 +14,7 @@ which a polkit rule lets local administrators start.
   asus_gpu_tray.py --dump   print the detected state and exit"""
 
 import fcntl
+import gettext
 import json
 import os
 import re
@@ -34,16 +35,30 @@ from PyQt6.QtWidgets import (
     QVBoxLayout, QWidget,
 )
 
+HERE = Path(__file__).resolve().parent
+# Translations: <program dir>/locale/<lang>/LC_MESSAGES/asus-gpu-tray.mo, built from po/*.po by
+# install.sh (msgfmt). The language follows LANGUAGE / LC_ALL / LC_MESSAGES / LANG; English when
+# there is no translation. Named tr, not _, because _ is the unused-argument name in the lambdas.
+tr = gettext.translation("asus-gpu-tray", HERE / "locale", fallback=True).gettext
+
+
+def N_(text: str) -> str:
+    """Marks a string for translation where it is defined; tr() is applied where it is shown."""
+    return text
+
+
 APP_NAME = "Asus GPU Tray"
 ATTR = Path("/sys/class/firmware-attributes/asus-armoury/attributes")
 PCI = Path("/sys/bus/pci/devices")
 PCI_IDS = "/usr/share/hwdata/pci.ids"
 # Reboot backend (switch at boot, before the NVIDIA driver loads); the polkit rule allows only these modes.
-REBOOT_UNIT = Path("/etc/systemd/system/asus-gpu-switch@.service")
+# install.sh puts the units into /etc/systemd/system, a distribution package into /usr/lib/systemd/system.
+UNIT_DIRS = (Path("/etc/systemd/system"), Path("/usr/lib/systemd/system"))
+REBOOT_UNIT = "asus-gpu-switch@.service"
 REBOOT_MODES = ("Integrated", "Hybrid", "AsusEgpu", "AsusMuxDgpu")
 # Live hardware switch (built-in dGPU <-> XG Mobile) without a reboot.
 LIVE_MODES = ("Hybrid", "AsusEgpu")
-LIVE_UNIT = Path("/etc/systemd/system/asus-gpu-live@.service")
+LIVE_UNIT = "asus-gpu-live@.service"
 LIVE_RESULT = Path("/var/lib/asus-gpu-tray/live-result")
 LIVE_PROGRESS = Path("/var/lib/asus-gpu-tray/live-progress")
 LIVE_EXPECTED_S = 40
@@ -61,10 +76,16 @@ TRAY_WAIT_S = 300  # how long to wait for a system tray host at login
 # After an unlock, how long to wait for the firmware: it removes the GPU within ~1 s and, after a
 # clean release, switches back to the built-in dGPU within another second.
 UNDOCK_WAIT_S = 5
-UNDOCK_HINT = (
+UNDOCK_HINT = tr(
     "Before you unlock the XG Mobile, switch back to the built-in dGPU in the tray menu. "
     "Unlocking it while it is in use needs a reboot."
 )
+SESSION_HOLDS_TEXT = tr(
+    "These cannot be closed without ending the session. See the KDE Plasma setup in the README."
+)
+# GPU roles shown in the progress window; compared untranslated, shown with tr().
+BUILTIN = N_("built-in dGPU")
+XG = "XG Mobile"
 VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
 CARDWIRE_MODES = ("integrated", "hybrid", "smart")  # order in the menu
@@ -278,6 +299,10 @@ def cardwire_missed_dgpu(cw: dict[str, dict]) -> bool:
     return any(g.kind != "igpu" and g.driver for g in detect_gpus(cw))
 
 
+def unit_installed(name: str) -> bool:
+    return any((d / name).exists() for d in UNIT_DIRS)
+
+
 def read_state() -> GpuState:
     global _last_cw_refresh, _cw_repairs
     cw = cardwire_devices()
@@ -328,8 +353,8 @@ def read_state() -> GpuState:
         hw_mode=hw_mode,
         has_mux=(ATTR / "gpu_mux_mode").exists(),
         hw_pending=read(PENDING),
-        reboot_backend=REBOOT_UNIT.exists() and asus_egpu,
-        live_backend=LIVE_UNIT.exists() and asus_egpu,
+        reboot_backend=unit_installed(REBOOT_UNIT) and asus_egpu,
+        live_backend=unit_installed(LIVE_UNIT) and asus_egpu,
         dgpu_disabled=read_attr("dgpu_disable") == "1",
     )
 
@@ -337,7 +362,7 @@ def read_state() -> GpuState:
 def dgpu_name(s: GpuState) -> str:
     if s.dgpu:
         return s.dgpu.name
-    return f"built-in {s.dgpu_vendor}" if s.dgpu_vendor else "built-in dGPU"
+    return tr("built-in {vendor}").format(vendor=s.dgpu_vendor) if s.dgpu_vendor else tr("built-in dGPU")
 
 
 def mode_label(mode: str, s: GpuState) -> str:
@@ -345,12 +370,12 @@ def mode_label(mode: str, s: GpuState) -> str:
     ig = s.igpu.name if s.igpu else "iGPU"
     dg = dgpu_name(s)
     label = {
-        "Integrated": f"{ig} only",
-        "Hybrid": f"Hybrid ({ig} + {dg})",
+        "Integrated": tr("{igpu} only").format(igpu=ig),
+        "Hybrid": tr("Hybrid ({igpu} + {dgpu})").format(igpu=ig, dgpu=dg),
         "AsusEgpu": "XG Mobile" + (f" ({s.egpu.name})" if s.egpu else ""),
-        "AsusMuxDgpu": f"{dg} only (MUX)",
-        "Vfio": f"VFIO ({dg} for virtual machines)",
-        "NvidiaNoModeset": f"Hybrid without NVIDIA modeset ({ig} + {dg})",
+        "AsusMuxDgpu": tr("{dgpu} only (MUX)").format(dgpu=dg),
+        "Vfio": tr("VFIO ({dgpu} for virtual machines)").format(dgpu=dg),
+        "NvidiaNoModeset": tr("Hybrid without NVIDIA modeset ({igpu} + {dgpu})").format(igpu=ig, dgpu=dg),
     }.get(mode, mode)
     return label[0].upper() + label[1:]
 
@@ -358,9 +383,10 @@ def mode_label(mode: str, s: GpuState) -> str:
 def hw_label(mode: str, s: GpuState) -> str:
     """Label for a hardware mode switched with a reboot (ASUS)."""
     if mode == "Hybrid":
-        return f"Built-in dGPU ({s.dgpu.name})" if s.dgpu else "Built-in dGPU"
+        return tr("Built-in dGPU ({name})").format(name=s.dgpu.name) if s.dgpu else tr("Built-in dGPU")
     if mode == "AsusMuxDgpu":
-        return f"{s.dgpu.name if s.dgpu else 'Built-in dGPU'} only (MUX)"
+        label = tr("{dgpu} only (MUX)").format(dgpu=s.dgpu.name if s.dgpu else tr("Built-in dGPU"))
+        return label[0].upper() + label[1:]  # translations may start with a lowercase word
     return mode_label(mode, s)
 
 
@@ -368,9 +394,9 @@ def cw_label(mode: str, s: GpuState) -> str:
     ext = s.egpu or s.dgpu
     name = ext.name if ext else "dGPU"
     return {
-        "integrated": f"Integrated – block {name}",
-        "hybrid": "Hybrid – all GPUs available",
-        "smart": f"Smart – {name} only for approved apps",
+        "integrated": tr("Integrated – block {name}").format(name=name),
+        "hybrid": tr("Hybrid – all GPUs available"),
+        "smart": tr("Smart – {name} only for approved apps").format(name=name),
     }.get(mode, mode.capitalize())
 
 
@@ -548,16 +574,24 @@ def stop_processes(procs: list[Proc], timeout_s: float = 5) -> None:
     signal_alive(signal.SIGKILL)
 
 
+# runtime_status values from the kernel, as shown in the menu.
+POWER_LABEL = {
+    "active": N_("active"), "suspended": N_("suspended"), "suspending": N_("suspending"),
+    "resuming": N_("resuming"), "error": N_("error"),
+}
+
+
 def state_label(g: Gpu) -> str:
+    power = tr(POWER_LABEL[g.power]) if g.power in POWER_LABEL else g.power
     if g.blocked:
-        return f"{g.power}, blocked" if g.power else "blocked"
-    return g.power or "no runtime PM"
+        return tr("{power}, blocked").format(power=power) if power else tr("blocked")
+    return power or tr("no runtime PM")
 
 
 def describe(s: GpuState) -> str:
     g = working_gpu(s)
     if not g:
-        return "No graphics card detected"
+        return tr("No graphics card detected")
     others = [x for x in s.gpus if x is not g]
     text = f"{g.name} ({KIND_LABEL[g.kind]})"
     if others:
@@ -566,15 +600,15 @@ def describe(s: GpuState) -> str:
 
 
 def gpu_line(g: Gpu) -> str:
-    return f"{KIND_LABEL[g.kind]}: {g.name} – {g.driver or 'no driver'}, {state_label(g)}"
+    return f"{KIND_LABEL[g.kind]}: {g.name} – {g.driver or tr('no driver')}, {state_label(g)}"
 
 
 def xg_line(s: GpuState) -> str:
     if xg_gone(s):
-        return "XG Mobile: disconnected while in use – reboot needed"
+        return tr("XG Mobile: disconnected while in use – reboot needed")
     if xg_unlocked(s):
-        return "XG Mobile: unlocked, still in use – do not disconnect"
-    return f"XG Mobile: {'connected' if s.egpu_connected else 'not connected'}"
+        return tr("XG Mobile: unlocked, still in use – do not disconnect")
+    return tr("XG Mobile: connected") if s.egpu_connected else tr("XG Mobile: not connected")
 
 
 def dump(s: GpuState) -> None:
@@ -648,13 +682,13 @@ def xg_gone(s: GpuState) -> bool:
 
 
 # The NVIDIA driver wedges after losing a GPU, and a normal shutdown then hangs in it.
-EMERGENCY_REBOOT_TEXT = (
+EMERGENCY_REBOOT_TEXT = tr(
     "A normal shutdown would hang in the NVIDIA driver, so the computer restarts the emergency way: "
     "the disks are synced and remounted read-only, then it resets at once. Open apps are not asked "
     "to quit - save your work first."
 )
 
-XG_GONE_TEXT = (
+XG_GONE_TEXT = tr(
     "The XG Mobile was disconnected while it was the active GPU. Unlocking it disconnects the GPU "
     "at once, and it stays gone until a reboot, also after you connect it again. Apps that were "
     "using it may stop responding.\n\n"
@@ -676,7 +710,6 @@ def hw_modes(s: GpuState) -> tuple[str, ...]:
 
 # --- GUI ---------------------------------------------------------------------
 
-HERE = Path(__file__).resolve().parent
 NVIDIA_SVG = next((p for p in (HERE / "nvidia.svg", HERE / "icons" / "nvidia.svg") if p.exists()), None)
 BADGE = {"AMD": ("AMD", "#ed1c24"), "Intel": ("Intel", "#0071c5")}
 
@@ -720,13 +753,13 @@ def switch_stage(step: str, old: str, new: str) -> str:
     """A line of live-progress ("12:00:01 unbind ...") -> what the progress window says, or ""."""
     step = step.split(" ", 1)[-1]
     if step.startswith(("Live switch to", "Nobody holds")):
-        return "Preparing…"
+        return tr("Preparing…")
     if step.startswith(("unbind", "secondary bus reset", "remove")):
-        return f"Disconnecting the {old}…"
+        return tr("Disconnecting the {gpu}…").format(gpu=tr(old))
     if step.startswith(("link down/up", "egpu_enable")):
-        return "Switching the graphics lanes in the firmware…"
+        return tr("Switching the graphics lanes in the firmware…")
     if step.startswith(("enable link", "link on", "Rescanning")):
-        return f"Connecting the {new}…"
+        return tr("Connecting the {gpu}…").format(gpu=tr(new))
     return ""
 
 
@@ -749,24 +782,24 @@ class SwitchWindow(QWidget):
         icon = QLabel()
         icon.setPixmap(QApplication.windowIcon().pixmap(48, 48))
         icon.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.heading = QLabel(f"Switching to {target}…")
+        self.heading = QLabel(tr("Switching to {target}…").format(target=target))
         font = self.heading.font()
         font.setPointSizeF(font.pointSizeF() * 1.3)
         font.setBold(True)
         self.heading.setFont(font)
         self.heading.setWordWrap(True)
-        self.info = QLabel(
+        self.info = QLabel(tr(
             "Switching in progress, please wait. Do not disconnect the XG Mobile, close the lid or "
             "shut down the computer."
-        )
+        ))
         self.info.setWordWrap(True)
-        self.stage = QLabel("Preparing…")
+        self.stage = QLabel(tr("Preparing…"))
         self.bar = QProgressBar()
         self.bar.setRange(0, 0)  # busy: the firmware call gives no progress
         self.bar.setTextVisible(False)
         self.elapsed = QLabel()
         self.elapsed.setEnabled(False)  # greyed out
-        self.button = QPushButton("Close")
+        self.button = QPushButton(tr("Close"))
         self.button.clicked.connect(self.close)
         self.button.hide()
 
@@ -790,7 +823,8 @@ class SwitchWindow(QWidget):
         if stage:
             self.stage.setText(stage)
         t = int(time.monotonic() - self.started)
-        self.elapsed.setText(f"{t // 60}:{t % 60:02d} · usually about {LIVE_EXPECTED_S} seconds")
+        self.elapsed.setText(tr("{time} · usually about {seconds} seconds").format(
+            time=f"{t // 60}:{t % 60:02d}", seconds=LIVE_EXPECTED_S))
 
     def finish(self, ok: bool) -> None:
         """Failure: close right away, a dialog follows. Success: say so, close after 10 s."""
@@ -798,13 +832,11 @@ class SwitchWindow(QWidget):
         if not ok:
             self.close()
             return
-        self.heading.setText(f"Switched to the {self.new}")
-        self.info.setText(
-            "You can disconnect the XG Mobile now." if self.new != "XG Mobile" else UNDOCK_HINT
-        )
+        self.heading.setText(tr("Switched to the {gpu}").format(gpu=tr(self.new)))
+        self.info.setText(tr("You can disconnect the XG Mobile now.") if self.new != XG else UNDOCK_HINT)
         self.stage.hide()
         t = int(time.monotonic() - self.started)
-        self.elapsed.setText(f"Took {t // 60}:{t % 60:02d}")
+        self.elapsed.setText(tr("Took {time}").format(time=f"{t // 60}:{t % 60:02d}"))
         self.bar.setRange(0, 1)
         self.bar.setValue(1)
         self.button.show()
@@ -900,7 +932,7 @@ class GpuTray(QSystemTrayIcon):
             stats = gpu_stats(g) if g else ""
             if stats:
                 text += f"\n{stats}"
-            self.showMessage("Active GPU", text, self.icon(), 4000)
+            self.showMessage(tr("Active GPU"), text, self.icon(), 4000)
 
     def on_menu_show(self) -> None:
         self.menu_open = False
@@ -928,7 +960,8 @@ class GpuTray(QSystemTrayIcon):
             return
         self.wake_told[names] = time.monotonic()
         self.showMessage(
-            f"{g.name} woke up", f"On battery, used by: {', '.join(names)}", self.icon(), 8000,
+            tr("{name} woke up").format(name=g.name),
+            tr("On battery, used by: {apps}").format(apps=", ".join(names)), self.icon(), 8000,
         )
 
     def on_menu_hide(self) -> None:
@@ -949,19 +982,19 @@ class GpuTray(QSystemTrayIcon):
         alert = bool(lost) or (not self.live_proc and (xg_unlocked(s) or xg_gone(s) or dgpu_missing(s)))
         self.setIcon(make_icon(working_gpu(s), s.egpu is not None, alert))
         tip = [f"GPU: {describe(s)}"]
-        tip += [f"{g.name} fell off the bus – reboot needed" for g in lost]
+        tip += [tr("{name} fell off the bus – reboot needed").format(name=g.name) for g in lost]
         if s.cardwire:
-            tip.append(f"cardwire mode: {s.cw_mode.capitalize()}")
+            tip.append(tr("cardwire mode: {mode}").format(mode=s.cw_mode.capitalize()))
         elif s.supergfx:
-            tip.append(f"supergfxd mode: {s.mode}")
+            tip.append(tr("supergfxd mode: {mode}").format(mode=s.mode))
         if s.asus_egpu:
             tip.append(xg_line(s))
         if self.live_proc:
-            tip.append(f"Switching to {hw_label(self.live_mode, s)}…")
+            tip.append(tr("Switching to {target}…").format(target=hw_label(self.live_mode, s)))
         if s.hw_pending:
-            tip.append(f"After reboot: {hw_label(s.hw_pending, s)}")
+            tip.append(tr("After reboot: {mode}").format(mode=hw_label(s.hw_pending, s)))
         elif s.pending:
-            tip.append(f"Pending: {s.pending}" + (f" ({s.pending_action})" if s.pending_action else ""))
+            tip.append(tr("Pending: {mode}").format(mode=s.pending) + (f" ({s.pending_action})" if s.pending_action else ""))
         self.setToolTip("\n".join(tip))
         if self.menu_open:
             self.menu_dirty = True
@@ -1021,70 +1054,70 @@ class GpuTray(QSystemTrayIcon):
             if self.gpu_stats.get(g.addr):
                 m.addAction(menu_text(f"    {self.gpu_stats[g.addr]}")).setEnabled(False)
         if not s.gpus:
-            m.addAction("No graphics card detected").setEnabled(False)
+            m.addAction(tr("No graphics card detected")).setEnabled(False)
         for g in self.lost:
-            m.addAction(menu_text(f"⚠ {g.name} fell off the bus – Reboot…"), lambda _=False, g=g: self.ask_reboot_lost((g,)))
+            m.addAction(menu_text(tr("⚠ {name} fell off the bus – Reboot…").format(name=g.name)), lambda _=False, g=g: self.ask_reboot_lost((g,)))
         if s.asus_egpu:
             m.addAction(xg_line(s)).setEnabled(False)
         if xg_gone(s) and not self.live_proc:
-            m.addAction("⚠ XG Mobile disconnected – Reboot…", lambda _=False: self.offer_reboot(s, "Hybrid", XG_GONE_TEXT))
+            m.addAction(tr("⚠ XG Mobile disconnected – Reboot…"), lambda _=False: self.offer_reboot(s, "Hybrid", XG_GONE_TEXT))
         if dgpu_missing(s) and s.live_backend and not self.live_proc:
-            m.addAction("⚠ Built-in dGPU missing – Bring it back", lambda _=False: self.start_live("Hybrid"))
+            m.addAction(tr("⚠ Built-in dGPU missing – Bring it back"), lambda _=False: self.start_live("Hybrid"))
         if s.hw_pending:
-            m.addAction(menu_text(f"After reboot: {hw_label(s.hw_pending, s)}")).setEnabled(False)
+            m.addAction(menu_text(tr("After reboot: {mode}").format(mode=hw_label(s.hw_pending, s)))).setEnabled(False)
 
         def busy(_mode: str) -> str:
-            return "switching…" if self.live_proc else ""
+            return tr("switching…") if self.live_proc else ""
 
         def xg_disabled(mode: str) -> str:
             if self.live_proc:
-                return "switching…"
+                return tr("switching…")
             if mode == "AsusEgpu" and not s.egpu_connected:
-                return "connect and lock the dock"
+                return tr("connect and lock the dock")
             if mode == "AsusMuxDgpu" and s.hw_mode == "AsusEgpu":
-                return "switch to the built-in dGPU first"  # the firmware refuses it (EBUSY)
+                return tr("switch to the built-in dGPU first")  # the firmware refuses it (EBUSY)
             return ""
 
         def hw_item(mode: str) -> str:
             current = mode == (s.hw_pending or s.hw_mode)
             refused = mode == "AsusMuxDgpu" and s.hw_mode == "AsusEgpu"  # xg_disabled explains why
             if mode == "Hybrid" and s.hw_mode == "AsusEgpu":
-                return hw_label(mode, s) + " – before undocking"
-            return hw_label(mode, s) + ("" if current or refused or can_switch_live(s, mode) else " – reboot")
+                return hw_label(mode, s) + tr(" – before undocking")
+            return hw_label(mode, s) + ("" if current or refused or can_switch_live(s, mode) else tr(" – reboot"))
 
         if s.cardwire:
             self.radio_section(
-                "GPU access (live, cardwire)", s.cw_modes, s.cw_mode, lambda x: cw_label(x, s), self.switch_live, busy
+                tr("GPU access (live, cardwire)"), s.cw_modes, s.cw_mode, lambda x: cw_label(x, s), self.switch_live, busy
             )
         elif s.supergfx and s.supported:
             # Modes the Hardware section already covers are left out on ASUS laptops.
             modes = [x for x in s.supported if x not in hw_modes(s)]
             if modes:
                 self.radio_section(
-                    f"Mode ({'switch with reboot' if s.reboot_backend else 'supergfxd'})", modes, s.mode,
+                    tr("Mode (switch with reboot)") if s.reboot_backend else tr("Mode (supergfxd)"), modes, s.mode,
                     lambda x: mode_label(x, s), self.switch_supergfx, busy,
                 )
         # The hardware switch needs only asus-armoury - neither cardwire nor supergfxd.
         if s.asus_egpu:
             self.radio_section(
-                "Hardware", hw_modes(s), s.hw_pending or s.hw_mode, hw_item, self.switch_hw, xg_disabled,
+                tr("Hardware"), hw_modes(s), s.hw_pending or s.hw_mode, hw_item, self.switch_hw, xg_disabled,
             )
         if not s.cardwire and not s.supergfx and not s.asus_egpu:
             m.addSeparator()
-            m.addAction("Switching unavailable (install cardwire)").setEnabled(False)
+            m.addAction(tr("Switching unavailable (install cardwire)")).setEnabled(False)
 
         if s.hw_mode == "AsusEgpu" and can_switch_live(s, "Hybrid") and not self.live_proc:
             m.addSeparator()
-            m.addAction("Undock now (close all GPU apps)…", self.undock_now)
+            m.addAction(tr("Undock now (close all GPU apps)…"), self.undock_now)
 
         m.addSeparator()
         if s.dgpu:
-            wake = QAction("Notify when the dGPU wakes up on battery", m, checkable=True)
+            wake = QAction(tr("Notify when the dGPU wakes up on battery"), m, checkable=True)
             wake.setChecked(self.notify_wake_enabled())
             wake.toggled.connect(self.set_notify_wake)
             m.addAction(wake)
-        m.addAction("Refresh", self.force_refresh)
-        m.addAction("Quit", QApplication.quit)
+        m.addAction(tr("Refresh"), self.force_refresh)
+        m.addAction(tr("Quit"), QApplication.quit)
 
     def force_refresh(self) -> None:
         self.state = None
@@ -1098,10 +1131,10 @@ class GpuTray(QSystemTrayIcon):
             return self.force_refresh()  # clicked the current mode - just restore the check mark
         ok, err = run_checked(["cardwire", "set", mode])
         if not ok:
-            message(QMessageBox.Icon.Critical, "Change GPU mode", f"cardwire failed:\n{err}")
+            message(QMessageBox.Icon.Critical, tr("Change GPU mode"), tr("cardwire failed:\n{error}").format(error=err))
         else:
-            note = "" if mode == "hybrid" else "\nApps already running keep their GPU until restarted."
-            self.showMessage("GPU mode", f"{cw_label(mode, s)}{note}", self.icon(), 4000)
+            note = "" if mode == "hybrid" else "\n" + tr("Apps already running keep their GPU until restarted.")
+            self.showMessage(tr("GPU mode"), f"{cw_label(mode, s)}{note}", self.icon(), 4000)
         self.force_refresh()
 
     # --- hardware (ASUS) ------------------------------------------------------------------------
@@ -1111,13 +1144,13 @@ class GpuTray(QSystemTrayIcon):
         if mode == (s.hw_pending or s.hw_mode) or self.live_proc:
             return self.force_refresh()
         if mode == "AsusEgpu" and read_attr("egpu_connected") != "1":
-            message(QMessageBox.Icon.Warning, "XG Mobile", "XG Mobile is not connected and locked.")
+            message(QMessageBox.Icon.Warning, "XG Mobile", tr("XG Mobile is not connected and locked."))
             return self.force_refresh()
         if can_switch_live(s, mode):
             return self.switch_hw_live(mode)
         if not s.reboot_backend:
-            message(QMessageBox.Icon.Warning, "Change GPU mode",
-                    "The reboot-based switch backend is not installed. Run install.sh as root.")
+            message(QMessageBox.Icon.Warning, tr("Change GPU mode"),
+                    tr("The reboot-based switch backend is not installed. Run install.sh as root."))
             return self.force_refresh()
         if self.confirm_reboot(hw_label(mode, s)):
             self.start_reboot_switch(mode)
@@ -1130,17 +1163,17 @@ class GpuTray(QSystemTrayIcon):
         if self.lost or xg_gone(s) or xg_unlocked(s):
             # A lost GPU, or one the firmware is removing: the NVIDIA driver is (about to be) wedged,
             # and the live switch would hang in it. Only a reboot gets out of this.
-            gone = ", ".join(g.name for g in self.lost) or "The XG Mobile GPU"
-            self.offer_reboot(s, mode, XG_GONE_TEXT if not self.lost else f"{gone} is lost, so the switch needs a reboot.")
+            gone = ", ".join(g.name for g in self.lost)
+            self.offer_reboot(s, mode, tr("{name} is lost, so the switch needs a reboot.").format(name=gone)
+                              if self.lost else XG_GONE_TEXT)
             return self.force_refresh()
-        text = (
-            f"{intro}Switch to: {hw_label(mode, s)}?\n\n"
+        text = intro + tr("Switch to: {target}?").format(target=hw_label(mode, s)) + "\n\n" + tr(
             "No reboot needed; it takes about 40 seconds. Apps that use the NVIDIA GPU will be "
             "listed first, so you can close them."
         )
         if user_processes(RESTARTABLE_APPS):
-            text += "\n\nROG Control Center will be closed and started again afterwards."
-        if not ask("XG Mobile connected" if intro else "Change GPU mode", text):
+            text += "\n\n" + tr("ROG Control Center will be closed and started again afterwards.")
+        if not ask(tr("XG Mobile connected") if intro else tr("Change GPU mode"), text):
             return self.force_refresh()
         if self.free_card(s, mode):
             self.start_live(mode)
@@ -1162,30 +1195,30 @@ class GpuTray(QSystemTrayIcon):
         session = [p for p in procs if p.name in SESSION_PROCESSES]
         if session:
             message(
-                QMessageBox.Icon.Warning, "Undock now",
-                f"The desktop session itself uses the XG Mobile:\n\n{describe_procs(session)}\n\n"
-                "These cannot be closed without ending the session. See the KDE Plasma setup in the README.",
+                QMessageBox.Icon.Warning, tr("Undock now"),
+                tr("The desktop session itself uses the {gpu}:").format(gpu="XG Mobile")
+                + f"\n\n{describe_procs(session)}\n\n" + SESSION_HOLDS_TEXT,
             )
             self.offer_reboot(s, "Hybrid", "")
             return self.force_refresh()
-        text = "Switch to the built-in dGPU now, so the XG Mobile can be unplugged?\n\n"
+        text = tr("Switch to the built-in dGPU now, so the XG Mobile can be unplugged?") + "\n\n"
         if procs:
-            text += (
-                f"These apps use the XG Mobile and will be closed without asking again; unsaved work "
-                f"in them is lost:\n\n{describe_procs(procs)}\n\n"
-            )
-        text += (
+            text += tr(
+                "These apps use the XG Mobile and will be closed without asking again; unsaved work "
+                "in them is lost:"
+            ) + f"\n\n{describe_procs(procs)}\n\n"
+        text += tr(
             "ROG Control Center is closed and started again, and the GPU services are stopped during "
             "the switch. It takes about 35 seconds. Keep the XG Mobile locked until it is done."
         )
-        if not ask("Undock now", text):
+        if not ask(tr("Undock now"), text):
             return self.force_refresh()
         # Again: apps may have opened the GPU while the dialog was up.
         procs = [p for p in card_holders() if p.name not in RESTARTABLE_APPS and p.name not in SESSION_PROCESSES]
         stop_processes(procs)
         left = [p for p in procs if p.alive()]
         if left:
-            message(QMessageBox.Icon.Warning, "Undock now", f"These apps did not quit:\n\n{describe_procs(left)}")
+            message(QMessageBox.Icon.Warning, tr("Undock now"), tr("These apps did not quit:") + f"\n\n{describe_procs(left)}")
             self.offer_reboot(s, "Hybrid", "")
             return self.force_refresh()
         self.start_live("Hybrid")
@@ -1198,43 +1231,43 @@ class GpuTray(QSystemTrayIcon):
         if not procs:
             return True
         gpu = s.egpu or s.dgpu
-        name = f"{gpu.name} ({KIND_LABEL[gpu.kind]})" if gpu else "NVIDIA GPU"
+        name = f"{gpu.name} ({KIND_LABEL[gpu.kind]})" if gpu else tr("NVIDIA GPU")
         session = [p for p in procs if p.name in SESSION_PROCESSES]
         if session:
             message(
-                QMessageBox.Icon.Warning, "GPU in use",
-                f"The desktop session itself uses the {name}:\n\n{describe_procs(session)}\n\n"
-                "These cannot be closed without ending the session. See the KDE Plasma setup in the README.",
+                QMessageBox.Icon.Warning, tr("GPU in use"),
+                tr("The desktop session itself uses the {gpu}:").format(gpu=name)
+                + f"\n\n{describe_procs(session)}\n\n" + SESSION_HOLDS_TEXT,
             )
         elif ask(
-            "GPU in use",
-            f"These apps are using the {name}:\n\n{describe_procs(procs)}\n\n"
-            "Kill them to continue the switch? Unsaved work in them will be lost.",
+            tr("GPU in use"),
+            tr("These apps are using the {gpu}:").format(gpu=name) + f"\n\n{describe_procs(procs)}\n\n"
+            + tr("Kill them to continue the switch? Unsaved work in them will be lost."),
         ):
             stop_processes(procs)
             left = [p for p in procs if p.alive()]
             if not left:
                 return True
-            message(QMessageBox.Icon.Warning, "GPU in use", f"These apps did not quit:\n\n{describe_procs(left)}")
+            message(QMessageBox.Icon.Warning, tr("GPU in use"), tr("These apps did not quit:") + f"\n\n{describe_procs(left)}")
         self.offer_reboot(s, mode, "")
         return False
 
     def offer_reboot(self, s: GpuState, mode: str, why: str) -> None:
         """Ask to reboot and switch during boot instead of live."""
         if not s.reboot_backend:
-            message(QMessageBox.Icon.Warning, "Change GPU mode",
-                    (why + "\n\n" if why else "") + "The reboot-based switch backend is not installed.")
+            message(QMessageBox.Icon.Warning, tr("Change GPU mode"),
+                    (why + "\n\n" if why else "") + tr("The reboot-based switch backend is not installed."))
             return
         text = (
             (why + "\n\n" if why else "")
-            + f"Reboot now and switch to {hw_label(mode, s)} during boot?\n\n"
-            "Save your work first: the computer restarts right away."
+            + tr("Reboot now and switch to {target} during boot?").format(target=hw_label(mode, s)) + "\n\n"
+            + tr("Save your work first: the computer restarts right away.")
         )
         if self.lost or xg_gone(s) or xg_unlocked(s):
             text += "\n\n" + EMERGENCY_REBOOT_TEXT
         elif s.hw_mode == "AsusEgpu":
-            text += "\n\nDisconnect the XG Mobile only once the computer has restarted."
-        if ask("Reboot", text):
+            text += "\n\n" + tr("Disconnect the XG Mobile only once the computer has restarted.")
+        if ask(tr("Reboot"), text):
             self.start_reboot_switch(mode)
 
     def on_xg_locked(self) -> None:
@@ -1246,7 +1279,7 @@ class GpuTray(QSystemTrayIcon):
         if not can_switch_live(s, "AsusEgpu"):
             return  # no live backend, or a reboot switch is pending: the menu still offers what works
         self.state = s
-        self.switch_hw_live("AsusEgpu", intro="The XG Mobile is connected and locked.\n\n")
+        self.switch_hw_live("AsusEgpu", intro=tr("The XG Mobile is connected and locked.") + "\n\n")
 
     def on_xg_unlocked(self) -> None:
         """The XG Mobile was unlocked while it was the active GPU. The firmware removes its GPU at
@@ -1260,7 +1293,7 @@ class GpuTray(QSystemTrayIcon):
             return
         if dgpu_missing(s) and s.live_backend:
             self.undock_wait = 0
-            self.showMessage("XG Mobile released", "Bringing back the built-in dGPU…", self.icon(), 5000)
+            self.showMessage(tr("XG Mobile released"), tr("Bringing back the built-in dGPU…"), self.icon(), 5000)
             self.start_live("Hybrid")
             return
         if not (xg_gone(s) or xg_unlocked(s)):
@@ -1271,15 +1304,15 @@ class GpuTray(QSystemTrayIcon):
             QTimer.singleShot(1000, self.on_xg_unlocked)
             return
         self.undock_wait = 0
-        self.showMessage("XG Mobile disconnected", "It was unlocked while in use - a reboot is needed.",
+        self.showMessage(tr("XG Mobile disconnected"), tr("It was unlocked while in use - a reboot is needed."),
                          QSystemTrayIcon.MessageIcon.Critical, 10000)
         why = XG_GONE_TEXT
         # The apps still have the dead GPU open; services such as cardwired and nvidia-powerd do
         # too, but run as root and cannot be seen from here.
         procs = card_holders()
         if procs:
-            why += f"\n\nStill holding the GPU:\n{describe_procs(procs)}"
-        why += "\n\nWithout a reboot the built-in dGPU stays unavailable until the next boot."
+            why += "\n\n" + tr("Still holding the GPU:") + f"\n{describe_procs(procs)}"
+        why += "\n\n" + tr("Without a reboot the built-in dGPU stays unavailable until the next boot.")
         self.offer_reboot(s, "Hybrid", why)
         self.force_refresh()
 
@@ -1287,7 +1320,7 @@ class GpuTray(QSystemTrayIcon):
         s = self.state or read_state()
         to_xg = mode == "AsusEgpu"
         self.progress_win = SwitchWindow(
-            hw_label(mode, s), "built-in dGPU" if to_xg else "XG Mobile", "XG Mobile" if to_xg else "built-in dGPU"
+            hw_label(mode, s), BUILTIN if to_xg else XG, XG if to_xg else BUILTIN
         )
         self.progress_win.show()
         self.progress_win.raise_()
@@ -1336,16 +1369,16 @@ class GpuTray(QSystemTrayIcon):
             fresh = LIVE_RESULT.stat().st_mtime >= self.live_started - 1
         except OSError:
             fresh = False
-        message_text = (read(LIVE_RESULT) if fresh else "") or err.strip() or f"systemctl exited with {rc}"
+        message_text = (read(LIVE_RESULT) if fresh else "") or err.strip() or tr("systemctl exited with {code}").format(code=rc)
         if self.progress_win:
             self.progress_win.finish(rc == 0)
         s = self.state or read_state()
         if rc == 0:
             if self.live_mode == "Hybrid":
-                message_text += "\nYou can disconnect the XG Mobile now."
+                message_text += "\n" + tr("You can disconnect the XG Mobile now.")
             else:
                 message_text += "\n" + UNDOCK_HINT
-            self.showMessage("GPU switched", message_text, self.icon(), 10000)
+            self.showMessage(tr("GPU switched"), message_text, self.icon(), 10000)
         elif message_text.startswith("Aborted, the NVIDIA card is still in use") and self.live_retries < 2:
             # Something opened the card after the check. Ask about this user's apps again.
             self.live_retries += 1
@@ -1366,39 +1399,38 @@ class GpuTray(QSystemTrayIcon):
         else:
             mode = s.hw_pending or s.hw_mode
         via_unit = s.reboot_backend and mode in REBOOT_MODES
-        text = (
-            f"{names} fell off the PCIe bus. Apps can no longer use it, and it comes back only after a "
-            "reboot.\n\nReboot now?"
-        )
+        text = tr(
+            "{names} fell off the PCIe bus. Apps can no longer use it, and it comes back only after a "
+            "reboot."
+        ).format(names=names) + "\n\n" + tr("Reboot now?")
         if via_unit:
             text += "\n\n" + EMERGENCY_REBOOT_TEXT
             if mode == "Hybrid" and s.hw_mode == "AsusEgpu":
-                text += "\n\nThe XG Mobile was unlocked, so the computer will start on the built-in dGPU."
+                text += "\n\n" + tr("The XG Mobile was unlocked, so the computer will start on the built-in dGPU.")
         else:
-            text += " Save your work first."
-        if not ask("GPU lost", text):
+            text += " " + tr("Save your work first.")
+        if not ask(tr("GPU lost"), text):
             return
         if via_unit:
             return self.start_reboot_switch(mode)
         ok, err = run_checked(["systemctl", "reboot"])
         if not ok:
-            message(QMessageBox.Icon.Critical, "Reboot", f"Reboot failed:\n{err}")
+            message(QMessageBox.Icon.Critical, tr("Reboot"), tr("Reboot failed:") + f"\n{err}")
 
     def confirm_reboot(self, title: str) -> bool:
         s = self.state
-        text = (
-            f"Switch to: {title}?\n\nThe computer will reboot right away and the change is applied "
-            "during boot. Save your work."
+        text = tr("Switch to: {target}?").format(target=title) + "\n\n" + tr(
+            "The computer will reboot right away and the change is applied during boot. Save your work."
         )
         if s and s.hw_mode == "AsusEgpu":
-            text += "\n\nDisconnect the XG Mobile only once the new mode is active."
-        return ask("Change GPU mode", text)
+            text += "\n\n" + tr("Disconnect the XG Mobile only once the new mode is active.")
+        return ask(tr("Change GPU mode"), text)
 
     def start_reboot_switch(self, mode: str) -> None:
         unit = f"asus-gpu-switch@{mode}.service"
         ok, err = run_checked(["systemctl", "start", unit])
         if not ok:
-            message(QMessageBox.Icon.Critical, "Change GPU mode", f"Switching failed:\n{err}")
+            message(QMessageBox.Icon.Critical, tr("Change GPU mode"), tr("Switching failed:") + f"\n{err}")
             return
         # The unit is Type=simple, so "start" succeeds even when the script refuses; the reboot
         # follows within a second when it does not.
@@ -1408,7 +1440,8 @@ class GpuTray(QSystemTrayIcon):
         if run("systemctl", "is-failed", unit) != "failed":
             return
         why = run("journalctl", "-b", "-u", unit, "-n", "1", "-o", "cat", "--no-pager")
-        message(QMessageBox.Icon.Warning, "Change GPU mode", f"The switch was not scheduled:\n{why or unit + ' failed'}")
+        message(QMessageBox.Icon.Warning, tr("Change GPU mode"),
+                tr("The switch was not scheduled:") + f"\n{why or unit + ' failed'}")
 
     # --- supergfxd fallback ---------------------------------------------------------------------
 
@@ -1417,7 +1450,7 @@ class GpuTray(QSystemTrayIcon):
         if mode == s.mode or self.live_proc:
             return self.force_refresh()
         if mode == "AsusEgpu" and s.asus_egpu and read_attr("egpu_connected") != "1":
-            message(QMessageBox.Icon.Warning, "XG Mobile", "XG Mobile is not connected and locked.")
+            message(QMessageBox.Icon.Warning, "XG Mobile", tr("XG Mobile is not connected and locked."))
             return self.force_refresh()
         if s.asus_egpu and can_switch_live(s, mode):
             return self.switch_hw_live(mode)
@@ -1425,20 +1458,21 @@ class GpuTray(QSystemTrayIcon):
             if self.confirm_reboot(mode_label(mode, s)):
                 self.start_reboot_switch(mode)
             return self.force_refresh()
-        how = "supergfxd will perform the change. It may require logging out or rebooting."
+        how = tr("supergfxd will perform the change. It may require logging out or rebooting.")
         if s.asus_egpu:
-            how += (
-                "\n\nWarning: live switching unloads the NVIDIA driver and has frozen ASUS laptops "
+            how += "\n\n" + tr(
+                "Warning: live switching unloads the NVIDIA driver and has frozen ASUS laptops "
                 "with nvidia-open. Run install.sh to get the safer reboot-based switching."
             )
-        if ask("Change GPU mode", f"Switch to: {mode_label(mode, s)}?\n\n{how}"):
+        if ask(tr("Change GPU mode"), tr("Switch to: {target}?").format(target=mode_label(mode, s)) + f"\n\n{how}"):
             ok, err = run_checked(["supergfxctl", "-m", mode])
             if not ok:
-                message(QMessageBox.Icon.Critical, "Change GPU mode", f"Switching failed:\n{err}")
+                message(QMessageBox.Icon.Critical, tr("Change GPU mode"), tr("Switching failed:") + f"\n{err}")
             else:
                 action = run("supergfxctl", "-p")
                 if action and action not in ("Nothing", "None"):
-                    message(QMessageBox.Icon.Information, "Change GPU mode", f"supergfxd is waiting for: {action}")
+                    message(QMessageBox.Icon.Information, tr("Change GPU mode"),
+                            tr("supergfxd is waiting for: {action}").format(action=action))
         self.force_refresh()
 
 
@@ -1478,8 +1512,8 @@ def main() -> None:
     except OSError as e:
         sys.exit(f"Cannot create the single-instance lock: {e}")
     if lock is None:
-        run("notify-send", "-a", APP_NAME, "-i", "asus-gpu-tray", f"{APP_NAME} is already running",
-            "The icon is in the system tray.")
+        run("notify-send", "-a", APP_NAME, "-i", "asus-gpu-tray", tr("{app} is already running").format(app=APP_NAME),
+            tr("The icon is in the system tray."))
         return
     sys.excepthook = log_exception
     app = QApplication(sys.argv)
