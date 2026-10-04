@@ -590,7 +590,8 @@ XG_GONE_TEXT = (
     "The XG Mobile was disconnected while it was the active GPU. Unlocking it disconnects the GPU "
     "at once, and it stays gone until a reboot, also after you connect it again. Apps that were "
     "using it may stop responding.\n\n"
-    "Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile."
+    "Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile. (Unlocking "
+    "works without a reboot only when nothing at all uses the GPU, system services included.)"
 )
 
 
@@ -1092,7 +1093,14 @@ class GpuTray(QSystemTrayIcon):
         self.undock_wait = 0
         self.showMessage("XG Mobile disconnected", "It was unlocked while in use - a reboot is needed.",
                          QSystemTrayIcon.MessageIcon.Critical, 10000)
-        self.offer_reboot(s, "Hybrid", XG_GONE_TEXT)
+        why = XG_GONE_TEXT
+        # The apps still have the dead GPU open; services such as cardwired and nvidia-powerd do
+        # too, but run as root and cannot be seen from here.
+        procs = card_holders()
+        if procs:
+            why += f"\n\nStill holding the GPU:\n{describe_procs(procs)}"
+        why += "\n\nWithout a reboot the built-in dGPU stays unavailable until the next boot."
+        self.offer_reboot(s, "Hybrid", why)
         self.force_refresh()
 
     def start_live(self, mode: str) -> None:

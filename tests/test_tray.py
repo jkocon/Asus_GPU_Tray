@@ -230,7 +230,7 @@ class UndockTests(unittest.TestCase):
             process_events()
         self.switch.assert_not_called()
         offer.assert_called_once()
-        self.assertIs(offer.call_args.args[2], t.XG_GONE_TEXT)
+        self.assertTrue(offer.call_args.args[2].startswith(t.XG_GONE_TEXT))
         self.assertIn("XG Mobile: disconnected while in use – reboot needed", texts(self.tray))
         self.assertIn("⚠ XG Mobile disconnected – Reboot…", texts(self.tray))
 
@@ -303,9 +303,12 @@ class UndockHintTests(unittest.TestCase):
         single.assert_called_once()  # waits for the firmware first
         offer.assert_not_called()
         self.tray.undock_wait = t.UNDOCK_WAIT_S
-        self.tray.on_xg_unlocked()
+        game = t.Proc(4242, "1", "/usr/bin/steam", ("steam",))
+        with mock.patch.object(t, "card_holders", return_value=[game]):
+            self.tray.on_xg_unlocked()
         live.assert_not_called()
         offer.assert_called_once()
+        self.assertIn("Still holding the GPU:\n• steam (PID 4242)", offer.call_args.args[2])
 
     def test_dgpu_missing_menu_item(self) -> None:
         self.tray.build_menu(state(gpus=(IGPU,), hw_mode="Hybrid"))
