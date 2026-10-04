@@ -212,8 +212,9 @@ To cancel a scheduled reboot switch before rebooting, run
 
 ## Known issues
 
-- **Black screen for about 35 s during a reboot switch.** The firmware call behind `egpu_enable`
-  takes about 30 s, and the login screen waits so it cannot grab the card mid-switch.
+- **About 40 s before the login screen during a reboot switch.** The firmware call behind
+  `egpu_enable` takes about 30 s, and the login screen waits so it cannot grab the card
+  mid-switch. The text console shows what is happening meanwhile.
 - **Extra power cycle after a reboot switch** from the XG Mobile to the built-in dGPU. This was seen
   once, with supergfxd disabled. The laptop restarted by itself during POST (Linux logged a normal
   reboot), and the second boot came up fine. The cause is unknown.

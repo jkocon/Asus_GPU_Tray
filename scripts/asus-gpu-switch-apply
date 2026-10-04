@@ -73,8 +73,16 @@ fi
 if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" && -n $(nvidia_devices) ]]; then
     live=$(dirname "$0")/asus-gpu-switch-live
     live_target=$([[ $want_egpu == 1 ]] && echo AsusEgpu || echo Hybrid)
-    # The login screen waits for this (~45 s, most of it in the firmware); say so on the splash.
-    plymouth display-message --text="Switching graphics to the $([[ $want_egpu == 1 ]] && echo "XG Mobile" || echo "built-in GPU") - about 45 seconds" 2>/dev/null
+    # The login screen waits for this (~40 s, most of it in the firmware). The splash went black
+    # while the GPUs changed, so stop it and write to the text console instead: the first output
+    # makes the console (fbcon on the iGPU) take over the screen, whatever the splash did.
+    plymouth quit 2>/dev/null
+    console() { printf '%s\n' "$*" > /dev/tty1 2>/dev/null; }
+    printf '\033[2J\033[H' > /dev/tty1 2>/dev/null  # clear the screen, cursor to the top
+    console ""
+    console "  Asus GPU Tray: switching graphics to the $([[ $want_egpu == 1 ]] && echo "XG Mobile" || echo "built-in dGPU")"
+    console "  This takes about 40 seconds. Do not turn off the computer or disconnect the XG Mobile."
+    console ""
     rm -f "$blacklist"  # left by older versions of asus-gpu-switch-reboot
     udevadm control --reload
     echo "Loading the NVIDIA driver on the current card"
@@ -91,16 +99,14 @@ if [[ $(<"$attr/egpu_enable/current_value") != "$want_egpu" && -n $(nvidia_devic
         echo "The NVIDIA driver did not come up within 60 s - staying in the current mode"
         exit 1
     fi
-    "$live" "$live_target"
-    rc=$?
-    if (( rc == 4 )) && pgrep -x plymouthd >/dev/null; then
-        echo "The card is in use (boot splash?) - retrying without the splash"
-        plymouth quit --retain-splash
-        "$live" "$live_target"
-        rc=$?
-    fi
-    plymouth display-message --text="" 2>/dev/null
+    # Each step of the live switch goes to the journal and to the console.
+    "$live" "$live_target" | while IFS= read -r line; do
+        echo "$line"
+        console "  $line"
+    done
+    rc=${PIPESTATUS[0]}
     if (( rc != 0 )); then
+        console "  The switch failed - starting in the current mode."
         echo "The live switch at boot failed (exit $rc, see live-progress) - staying in the current mode"
         exit 1
     fi

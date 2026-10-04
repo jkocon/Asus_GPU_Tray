@@ -234,8 +234,9 @@ The unit also runs when only a blacklist from an older version is left behind, a
 
 **Current design (2026-10-04, later):** the boot-time switch no longer blacklists NVIDIA. The
 driver comes up on the current card as on any boot, and `asus-gpu-switch-apply` runs
-`asus-gpu-switch-live` before the login screen starts (retrying once without the boot splash if
-the splash holds the card). The reason: loading the driver fresh right after the firmware switch
+`asus-gpu-switch-live` before the login screen starts. It stops the boot splash first (it went
+black while the GPUs changed) and writes what is happening, including each step of the switch, to
+the text console on `/dev/tty1`. The reason for this design: loading the driver fresh right after the firmware switch
 deadlocked inside it on 2 of 3 boots. Kernel stacks showed the GSP init (`kgspInitRm`) and two ACPI
 notify workers (`rm_acpi_nvpcf_notify`, the NVPCF notifications the firmware sends after the
 switch) all waiting for the RM API lock, and every later module load (sound, Bluetooth) stuck
