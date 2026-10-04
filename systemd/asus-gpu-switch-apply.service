@@ -1,13 +1,13 @@
 [Unit]
-Description=Apply scheduled GPU hardware mode change (before the NVIDIA driver loads)
+Description=Apply scheduled GPU hardware mode change (before the login screen)
 DefaultDependencies=no
 After=local-fs.target systemd-udevd.service
-# Everything that may load or open the NVIDIA driver waits: nvidia-modprobe (used by NVML/CUDA
-# clients such as nvidia-powerd) loads the module explicitly, past the one-boot blacklist.
+# Everything that may open the NVIDIA card waits, so nothing holds it during the switch
+# (the script stops these services itself when it runs live).
 Before=supergfxd.service cardwired.service nvidia-powerd.service nvidia-persistenced.service
 Before=display-manager.service plasmalogin.service shutdown.target
 Conflicts=shutdown.target
-# Also runs when only the blacklist is left behind, so the NVIDIA driver is never blocked for good.
+# Also runs when only a blacklist from an older version is left behind, and removes it.
 ConditionPathExists=|/var/lib/asus-gpu-tray/pending
 ConditionPathExists=|/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
 
