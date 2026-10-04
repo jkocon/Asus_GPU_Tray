@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from PyQt6.QtCore import QProcess, QRectF, Qt, QTimer
+from PyQt6.QtCore import QProcess, QRectF, QSettings, Qt, QTimer
 from PyQt6.QtGui import QAction, QActionGroup, QColor, QFont, QFontMetrics, QIcon, QPainter, QPixmap
 from PyQt6.QtWidgets import (
     QApplication, QHBoxLayout, QLabel, QMenu, QMessageBox, QProgressBar, QPushButton, QSystemTrayIcon,
@@ -69,7 +69,9 @@ VENDORS = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}
 KIND_LABEL = {"igpu": "iGPU", "dgpu": "dGPU", "egpu": "eGPU"}
 CARDWIRE_MODES = ("integrated", "hybrid", "smart")  # order in the menu
 REFRESH_EVERY_S = 60
+CW_RESTARTS_MAX = 2  # cardwired restarts per episode when refresh-gpu does not fix the GPU list
 _last_cw_refresh = 0.0
+_cw_repairs = 0
 
 
 @dataclass(frozen=True)
@@ -277,12 +279,21 @@ def cardwire_missed_dgpu(cw: dict[str, dict]) -> bool:
 
 
 def read_state() -> GpuState:
-    global _last_cw_refresh
+    global _last_cw_refresh, _cw_repairs
     cw = cardwire_devices()
-    if cw and cardwire_missed_dgpu(cw) and time.monotonic() - _last_cw_refresh > REFRESH_EVERY_S:
+    missed = bool(cw) and cardwire_missed_dgpu(cw)
+    if missed and time.monotonic() - _last_cw_refresh > REFRESH_EVERY_S:
         _last_cw_refresh = time.monotonic()
-        run("cardwire", "debug", "refresh-gpu")
+        # refresh-gpu first; it did not always help (2026-10-04), restarting cardwired did. The
+        # polkit rule allows exactly this restart.
+        if _cw_repairs == 0:
+            run("cardwire", "debug", "refresh-gpu")
+        elif _cw_repairs <= CW_RESTARTS_MAX:
+            run("systemctl", "--no-block", "restart", "cardwired.service")
+        _cw_repairs += 1
         cw = cardwire_devices()
+    elif not missed:
+        _cw_repairs = 0
     cw_mode, cw_modes = parse_cardwire_get(run("cardwire", "get")) if cw is not None else ("", ())
     supergfx = shutil.which("supergfxctl") is not None
     mode = supported = dgpu_vendor = pending = action = ""
@@ -361,6 +372,63 @@ def cw_label(mode: str, s: GpuState) -> str:
         "hybrid": "Hybrid – all GPUs available",
         "smart": f"Smart – {name} only for approved apps",
     }.get(mode, mode.capitalize())
+
+
+def parse_gpu_stats(out: str) -> str:
+    """nvidia-smi "temperature, power, utilization, memory used, memory total" (csv, no units) ->
+    "54 °C · 38 W · 12 % · 1.2/4.0 GB". Implausible or [N/A] fields are left out (the first power
+    reading after a wake-up can be several hundred watts)."""
+    fields = [f.strip() for f in out.splitlines()[0].split(",")] if out.strip() else []
+    if len(fields) != 5:
+        return ""
+
+    def num(text: str, limit: float) -> float | None:
+        try:
+            value = float(text)
+        except ValueError:
+            return None
+        return value if 0 <= value <= limit else None
+
+    temp, power, util = num(fields[0], 150), num(fields[1], 400), num(fields[2], 100)
+    used, total = num(fields[3], 1e6), num(fields[4], 1e6)
+    parts = []
+    if temp is not None:
+        parts.append(f"{temp:.0f} °C")
+    if power is not None:
+        parts.append(f"{power:.0f} W")
+    if util is not None:
+        parts.append(f"{util:.0f} %")
+    if used is not None and total:
+        parts.append(f"{used / 1024:.1f}/{total / 1024:.1f} GB")
+    return " · ".join(parts)
+
+
+def gpu_stats(g: Gpu) -> str:
+    """Live numbers of an NVIDIA GPU that is awake anyway. Never for a suspended or blocked card:
+    nvidia-smi opens the device and would wake it. Only called when the user opens the menu or
+    clicks the icon, never from the polling timer, so it does not keep the card awake either."""
+    if g.vendor != "NVIDIA" or g.blocked or g.power != "active" or g.driver != "nvidia":
+        return ""
+    if not shutil.which("nvidia-smi"):
+        return ""
+    return parse_gpu_stats(run(
+        "nvidia-smi", f"--id={g.addr}", "--format=csv,noheader,nounits",
+        "--query-gpu=temperature.gpu,power.draw,utilization.gpu,memory.used,memory.total",
+    ))
+
+
+def on_battery() -> bool:
+    supplies = list(Path("/sys/class/power_supply").glob("*"))
+    mains = [p for p in supplies if read(p / "type") == "Mains"]
+    return bool(mains) and not any(read(p / "online") == "1" for p in mains)
+
+
+def gpu_users(g: Gpu) -> list[Proc]:
+    """This user's processes that have this GPU itself open (/dev/nvidiaN or its DRM nodes) - not
+    the control nodes (/dev/nvidiactl, -uvm, -modeset), which apps open just to list GPUs."""
+    nodes = {str(n) for n in Path("/dev").glob("nvidia[0-9]*") if n.is_char_device()}
+    nodes |= {f"/dev/dri/{n.name}" for n in (PCI / g.addr / "drm").glob("*") if n.name.startswith(("card", "renderD"))}
+    return card_holders(nodes)
 
 
 def working_gpu(s: GpuState) -> Gpu | None:
@@ -780,6 +848,10 @@ class GpuTray(QSystemTrayIcon):
         self.undock_pending = False
         self.undock_wait = 0  # seconds waited for the firmware after an unlock
         self.xg_was_locked: bool | None = None  # None before the first poll: no question at startup
+        self.settings = QSettings("asus-gpu-tray", "asus-gpu-tray")
+        self.gpu_stats: dict[str, str] = {}  # PCI address -> live numbers, filled when the menu opens
+        self.wake_polls = 0  # polls the built-in dGPU has been awake in a row
+        self.wake_told: dict[tuple[str, ...], float] = {}  # app names -> when they were reported
         self.dock_pending = False
         self.lost: tuple[Gpu, ...] = ()
         self.lost_events: dict[str, float] = {}  # PCI slot -> time of the last "GPU lost" kernel message
@@ -823,12 +895,41 @@ class GpuTray(QSystemTrayIcon):
     def on_activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.refresh()
-            self.showMessage("Active GPU", describe(self.state), self.icon(), 3000)
+            text = describe(self.state)
+            g = working_gpu(self.state)
+            stats = gpu_stats(g) if g else ""
+            if stats:
+                text += f"\n{stats}"
+            self.showMessage("Active GPU", text, self.icon(), 4000)
 
     def on_menu_show(self) -> None:
         self.menu_open = False
+        s = read_state()
+        self.gpu_stats = {g.addr: gpu_stats(g) for g in s.gpus}
         self.force_refresh()  # open the menu with the current state
         self.menu_open = True
+
+    def notify_wake_enabled(self) -> bool:
+        return self.settings.value("notify_dgpu_wake", True, type=bool)
+
+    def set_notify_wake(self, on: bool) -> None:
+        self.settings.setValue("notify_dgpu_wake", on)
+
+    def check_wake(self, s: GpuState) -> None:
+        """On battery: say which apps woke the built-in dGPU once it has been awake for two polls
+        (~6 s). Each set of apps at most every 10 minutes."""
+        g = s.dgpu
+        awake = bool(g and g.power == "active" and not g.blocked and g.driver)
+        self.wake_polls = self.wake_polls + 1 if awake else 0
+        if self.wake_polls != 2 or not self.notify_wake_enabled() or not on_battery():
+            return
+        names = tuple(sorted({p.name for p in gpu_users(g)}))
+        if not names or time.monotonic() - self.wake_told.get(names, -1e9) < 600:
+            return
+        self.wake_told[names] = time.monotonic()
+        self.showMessage(
+            f"{g.name} woke up", f"On battery, used by: {', '.join(names)}", self.icon(), 8000,
+        )
 
     def on_menu_hide(self) -> None:
         self.menu_open = False
@@ -837,6 +938,7 @@ class GpuTray(QSystemTrayIcon):
 
     def refresh(self) -> None:
         s = read_state()
+        self.check_wake(s)
         # During a live switch the cards are removed and re-created on purpose.
         lost = () if self.live_proc else lost_gpus(s, self.lost_events, last_live_switch())
         self.watch(s, lost)
@@ -916,6 +1018,8 @@ class GpuTray(QSystemTrayIcon):
             group.deleteLater()
         for g in s.gpus:
             m.addAction(menu_text(gpu_line(g))).setEnabled(False)
+            if self.gpu_stats.get(g.addr):
+                m.addAction(menu_text(f"    {self.gpu_stats[g.addr]}")).setEnabled(False)
         if not s.gpus:
             m.addAction("No graphics card detected").setEnabled(False)
         for g in self.lost:
@@ -974,6 +1078,11 @@ class GpuTray(QSystemTrayIcon):
             m.addAction("Undock now (close all GPU apps)…", self.undock_now)
 
         m.addSeparator()
+        if s.dgpu:
+            wake = QAction("Notify when the dGPU wakes up on battery", m, checkable=True)
+            wake.setChecked(self.notify_wake_enabled())
+            wake.toggled.connect(self.set_notify_wake)
+            m.addAction(wake)
         m.addAction("Refresh", self.force_refresh)
         m.addAction("Quit", QApplication.quit)
 

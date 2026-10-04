@@ -17,7 +17,10 @@
 - `asus-gpu-switch@{Integrated,Hybrid,AsusEgpu,AsusMuxDgpu}.service`
 - `asus-gpu-live@{Hybrid,AsusEgpu}.service`
 
-It allows only the `start` verb, and only for a subject that is **local**, **active** and in the
+and restarting `cardwired.service` (the tray does that when cardwired missed the dGPU at boot and
+`cardwire debug refresh-gpu` did not help).
+
+It allows only the `start` verb for the switch units and only `restart` for cardwired, and only for a subject that is **local**, **active** and in the
 `wheel` or `sudo` group, the same people who can already use `sudo`. The rule does not grant
 anything beyond what they have; it only removes the password prompt.
 

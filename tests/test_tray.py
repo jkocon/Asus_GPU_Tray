@@ -413,6 +413,81 @@ class UndockNowTests(unittest.TestCase):
         self.offer.assert_called_once()
 
 
+class StatsTests(unittest.TestCase):
+    def test_parse(self) -> None:
+        self.assertEqual(t.parse_gpu_stats("54, 38.12, 12, 1234, 4096"), "54 °C · 38 W · 12 % · 1.2/4.0 GB")
+        self.assertEqual(t.parse_gpu_stats("42, 752.67, 2, 2, 4096"), "42 °C · 2 % · 0.0/4.0 GB")  # bogus power
+        self.assertEqual(t.parse_gpu_stats("[N/A], [N/A], 0, 5, 8192"), "0 % · 0.0/8.0 GB")
+        self.assertEqual(t.parse_gpu_stats(""), "")
+
+    def test_never_wakes_a_sleeping_card(self) -> None:
+        with mock.patch.object(t, "run") as run:
+            self.assertEqual(t.gpu_stats(DGPU), "")  # suspended
+            blocked = t.Gpu(DGPU.addr, DGPU.vendor, DGPU.name, DGPU.driver, DGPU.kind, "active", True)
+            self.assertEqual(t.gpu_stats(blocked), "")
+            self.assertEqual(t.gpu_stats(IGPU), "")
+        run.assert_not_called()
+
+    def test_menu_shows_stats_of_an_awake_card(self) -> None:
+        Tray.current = state()
+        tray = Tray()
+        self.addCleanup(tray.timer.stop)
+        self.addCleanup(tray.hide)
+        tray.gpu_stats = {EGPU.addr: "54 °C · 38 W"}
+        tray.build_menu(state())
+        self.assertIn("    54 °C · 38 W", texts(tray))
+
+
+class WakeTests(unittest.TestCase):
+    AWAKE = t.Gpu(DGPU.addr, DGPU.vendor, DGPU.name, DGPU.driver, DGPU.kind, "active", False)
+
+    def setUp(self) -> None:
+        Tray.current = state(gpus=(DGPU, IGPU), hw_mode="Hybrid")
+        self.tray = Tray()
+        self.addCleanup(self.tray.timer.stop)
+        self.addCleanup(self.tray.hide)
+        self.addCleanup(mock.patch.stopall)
+        self.msg = mock.patch.object(self.tray, "showMessage").start()
+        self.battery = mock.patch.object(t, "on_battery", return_value=True).start()
+        mock.patch.object(self.tray, "notify_wake_enabled", return_value=True).start()
+        brave = t.Proc(77, "1", "/opt/brave/brave", ("brave",))
+        mock.patch.object(t, "gpu_users", return_value=[brave]).start()
+
+    def poll(self, gpu: t.Gpu, times: int) -> None:
+        for _ in range(times):
+            self.tray.check_wake(state(gpus=(gpu, IGPU), hw_mode="Hybrid"))
+
+    def test_tells_once_after_two_polls_on_battery(self) -> None:
+        self.poll(self.AWAKE, 1)
+        self.msg.assert_not_called()
+        self.poll(self.AWAKE, 3)
+        self.msg.assert_called_once()
+        self.assertIn("brave", self.msg.call_args.args[1])
+        self.poll(DGPU, 1)  # suspended again
+        self.poll(self.AWAKE, 2)  # same app within 10 minutes: quiet
+        self.msg.assert_called_once()
+
+    def test_quiet_on_ac(self) -> None:
+        self.battery.return_value = False
+        self.poll(self.AWAKE, 3)
+        self.msg.assert_not_called()
+
+
+class CardwireRepairTests(unittest.TestCase):
+    def test_refresh_then_restart_then_give_up(self) -> None:
+        calls = []
+        with mock.patch.object(t, "cardwire_devices", return_value={"x": {}}), \
+                mock.patch.object(t, "cardwire_missed_dgpu", return_value=True), \
+                mock.patch.object(t, "run", side_effect=lambda *a: calls.append(a) or ""), \
+                mock.patch.object(t, "_cw_repairs", 0):
+            for _ in range(5):
+                t._last_cw_refresh = 0.0
+                t.read_state()
+        repairs = [c for c in calls if c[:3] == ("cardwire", "debug", "refresh-gpu") or c[:1] == ("systemctl",)]
+        self.assertEqual(repairs[0], ("cardwire", "debug", "refresh-gpu"))
+        self.assertEqual(repairs[1:], [("systemctl", "--no-block", "restart", "cardwired.service")] * t.CW_RESTARTS_MAX)
+
+
 class DetectTests(unittest.TestCase):
     def test_removed_gpu_is_not_taken_from_cardwire(self) -> None:
         cw = {"0000:01:00.0": {"blocked": True, "discrete": True, "vendor": "Nvidia", "name": "NVIDIA GeForce RTX 3070"}}

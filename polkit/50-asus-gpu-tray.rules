@@ -2,13 +2,21 @@
 // units without a password. Only these unit names and modes are allowed:
 //   asus-gpu-switch@<mode>.service  schedule a hardware mode and reboot
 //   asus-gpu-live@<mode>.service    switch built-in dGPU <-> XG Mobile without a reboot
+// and restart cardwired.service (when it missed the dGPU at boot and refresh-gpu did not help).
 polkit.addRule(function(action, subject) {
-    if (action.id == "org.freedesktop.systemd1.manage-units" &&
-        action.lookup("verb") == "start" &&
-        (/^asus-gpu-switch@(Integrated|Hybrid|AsusEgpu|AsusMuxDgpu)\.service$/.test(action.lookup("unit")) ||
-         /^asus-gpu-live@(Hybrid|AsusEgpu)\.service$/.test(action.lookup("unit"))) &&
-        (subject.isInGroup("wheel") || subject.isInGroup("sudo")) &&
-        subject.local && subject.active) {
+    if (action.id != "org.freedesktop.systemd1.manage-units" ||
+        !(subject.isInGroup("wheel") || subject.isInGroup("sudo")) ||
+        !subject.local || !subject.active) {
+        return polkit.Result.NOT_HANDLED;
+    }
+    var verb = action.lookup("verb"), unit = action.lookup("unit");
+    if (verb == "start" &&
+        (/^asus-gpu-switch@(Integrated|Hybrid|AsusEgpu|AsusMuxDgpu)\.service$/.test(unit) ||
+         /^asus-gpu-live@(Hybrid|AsusEgpu)\.service$/.test(unit))) {
         return polkit.Result.YES;
     }
+    if (verb == "restart" && unit == "cardwired.service") {
+        return polkit.Result.YES;
+    }
+    return polkit.Result.NOT_HANDLED;
 });

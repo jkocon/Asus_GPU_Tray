@@ -12,6 +12,8 @@ between the built-in dGPU and the XG Mobile eGPU dock without a reboot.**
 - **Detects your hardware.** It finds the iGPU, dGPU and eGPU and offers only the modes your
   laptop supports.
 - **Never wakes a sleeping dGPU just to show its status.**
+- **Who woke the dGPU.** On battery, a notification names the apps that woke the built-in dGPU.
+- **GPU numbers.** Temperature, power, load and memory of an awake NVIDIA GPU in the menu.
 - **Dock prompt.** Locking the XG Mobile on the built-in dGPU offers the switch to it, no reboot.
 - **Undock now.** One click closes every app that uses the XG Mobile and switches to the built-in
   dGPU, so the dock can be unplugged.
@@ -125,7 +127,8 @@ Right-click the icon:
 
 | Section | What it does |
 |---|---|
-| (top) | every GPU with its driver and power state (`active`, `suspended`, `blocked`), plus the XG Mobile dock status |
+| (top) | every GPU with its driver and power state (`active`, `suspended`, `blocked`), plus the XG Mobile dock status. An NVIDIA GPU that is awake anyway also shows temperature, power, load and memory (from `nvidia-smi`, read only when the menu opens, so a sleeping card is never woken and an awake one is not kept awake) |
+| **Notify when the dGPU wakes up on battery** | on by default: when the built-in dGPU has been awake for a few seconds on battery, a notification names the apps that use it (each set of apps at most every 10 minutes) |
 | **GPU access (live, cardwire)** | **Integrated** blocks the dGPU/eGPU for new apps. **Hybrid** allows all GPUs. **Smart** allows the dGPU only for approved apps. Apps that are already running keep their GPU. |
 | **Undock now (close all GPU apps)…** | XG Mobile mode only: after one confirmation it closes every app that has the GPU open (SIGTERM, SIGKILL after 5 s) and switches to the built-in dGPU live. |
 | **Hardware** | **Built-in dGPU** / **XG Mobile** switch live in about 40 s. **… only (MUX) – reboot** reboots right away and applies the mode during boot. XG Mobile is greyed out until the dock is connected and locked. |
@@ -194,7 +197,8 @@ While the XG Mobile is the active GPU, a udev rule sets `d3cold_allowed = 0` on 
 The card can still sleep in D3hot, and the dock has its own power supply. Waking the XG Mobile from
 D3cold once left its RTX 3070 lost until a reboot. `--dump` shows the current setting.
 
-Left-click shows a notification with the active GPU. Hover for a summary.
+Left-click shows a notification with the active GPU (and its numbers when it is an awake NVIDIA
+GPU). Hover for a summary. Settings are stored in `~/.config/asus-gpu-tray/asus-gpu-tray.conf`.
 
 ### The icon
 
@@ -261,7 +265,8 @@ To cancel a scheduled reboot switch before rebooting, run
   risks an instant reset, so it does not.
 - **cardwire may miss the dGPU at boot.** It can start before the NVIDIA driver is ready and treat
   the laptop as a desktop, offering only Hybrid and Manual. The tray detects this and runs
-  `cardwire debug refresh-gpu`.
+  `cardwire debug refresh-gpu`; when that does not help a minute later, it restarts cardwired (at
+  most twice; the polkit rule allows that one restart).
 
 ## Limitations
 
