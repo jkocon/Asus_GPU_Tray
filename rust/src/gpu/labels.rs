@@ -141,15 +141,9 @@ mod tests {
     use std::os::unix::fs::symlink;
 
     use super::*;
+    use crate::gpu::cardwire::CwDevice;
     use crate::gpu::state::{read_state, CwRepair};
     use crate::gpu::testutil::{write, FakeCmd};
-
-    const CW_LIST: &str = r#"{
-      "0": {"id": 0, "name": "AMD Radeon 680M", "pci": "0000:3a:00.0", "discrete": false,
-            "vendor": "AMD", "driver": "amdgpu", "blocked": false},
-      "1": {"id": 1, "name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU", "pci": "0000:01:00.0", "discrete": true,
-            "vendor": "Nvidia", "driver": "nvidia", "blocked": false}
-    }"#;
 
     /// The X16 (GV601RE) in Hybrid mode, XG Mobile not connected, as of 2026-10-08.
     fn x16_tree(root: &std::path::Path) -> Paths {
@@ -186,10 +180,19 @@ mod tests {
     fn dump_matches_python_on_the_x16() {
         let tmp = tempfile::tempdir().unwrap();
         let paths = x16_tree(tmp.path());
-        let cmd = FakeCmd::new(&["cardwire"])
-            .out("cardwire list --json", CW_LIST)
-            .out("cardwire get", "Current Mode: Hybrid\nAvailable Mode: integrated, hybrid, smart");
-        let s = read_state(&paths, &cmd, &mut CwRepair::default());
+        let gpu = |name: &str, vendor: &str, driver: &str, discrete| CwDevice {
+            name: Some(name.into()),
+            vendor: Some(vendor.into()),
+            driver: driver.into(),
+            blocked: false,
+            discrete,
+        };
+        let devices = [
+            ("0000:3a:00.0".to_string(), gpu("AMD Radeon 680M", "AMD", "amdgpu", false)),
+            ("0000:01:00.0".to_string(), gpu("NVIDIA GeForce RTX 3050 Ti Laptop GPU", "Nvidia", "nvidia", true)),
+        ];
+        let cmd = FakeCmd::new(&[]).cardwire_devices(devices.into(), "hybrid", &["integrated", "hybrid", "smart"]);
+        let s = read_state(&paths, &cmd, &cmd, &mut CwRepair::default());
         let expected = include_str!("../../tests/reference/x16-hybrid-dump.txt");
         assert_eq!(dump(&s, &paths), expected);
         assert!(!cmd.calls().iter().any(|c| c.starts_with("nvidia-smi")));

@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
+use super::cardwire::{Cardwire, CwDevice, CwDevices};
 use super::cmd::Cmd;
 use super::pci::{Gpu, Kind};
 use super::state::GpuState;
@@ -57,11 +58,14 @@ pub fn state() -> GpuState {
 }
 
 /// Answers from a table (keyed by the command line joined with spaces) and records every call.
+/// Also stands in for cardwired; its repair call is recorded as "cardwire refresh-gpu".
 #[derive(Default)]
 pub struct FakeCmd {
     installed: Vec<String>,
     outputs: HashMap<String, String>,
     calls: RefCell<Vec<String>>,
+    cw_devices: Option<CwDevices>,
+    cw_mode: (String, Vec<String>),
 }
 
 impl FakeCmd {
@@ -71,6 +75,21 @@ impl FakeCmd {
 
     pub fn out(mut self, cmdline: &str, output: &str) -> Self {
         self.outputs.insert(cmdline.into(), output.into());
+        self
+    }
+
+    /// cardwired running with these GPUs: (PCI address, discrete).
+    pub fn cardwire(mut self, gpus: &[(&str, bool)]) -> Self {
+        let devices = gpus
+            .iter()
+            .map(|(addr, discrete)| (addr.to_string(), CwDevice { discrete: *discrete, ..Default::default() }));
+        self.cw_devices = Some(devices.collect());
+        self
+    }
+
+    pub fn cardwire_devices(mut self, devices: CwDevices, mode: &str, modes: &[&str]) -> Self {
+        self.cw_devices = Some(devices);
+        self.cw_mode = (mode.into(), modes.iter().map(|m| m.to_string()).collect());
         self
     }
 
@@ -88,5 +107,19 @@ impl Cmd for FakeCmd {
 
     fn which(&self, name: &str) -> bool {
         self.installed.iter().any(|n| n == name)
+    }
+}
+
+impl Cardwire for FakeCmd {
+    fn devices(&self) -> Option<CwDevices> {
+        self.cw_devices.clone()
+    }
+
+    fn mode(&self) -> (String, Vec<String>) {
+        self.cw_mode.clone()
+    }
+
+    fn refresh_gpu(&self) {
+        self.calls.borrow_mut().push("cardwire refresh-gpu".into());
     }
 }

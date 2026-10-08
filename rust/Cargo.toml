@@ -2,7 +2,7 @@
 name = "asus-gpu-tray"
 version = "2.0.0-alpha.0"
 edition = "2021"
-rust-version = "1.82"
+rust-version = "1.90"
 description = "System tray icon that shows which GPU is rendering and switches GPU modes (Rust rewrite)"
 license = "GPL-3.0-or-later"
 repository = "https://github.com/jkocon/Asus_GPU_Tray"
@@ -10,8 +10,13 @@ publish = false
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+gettext-rs = "0.8.0"
+ksni = { version = "0.3.6", default-features = false, features = ["blocking", "async-io"] }
 libc = "0.2"
-serde_json = "1"
+resvg = "0.48"
+slint = "1.18"
+udev = "0.9.3"
+zbus = { version = "5.19", default-features = false, features = ["blocking-api", "async-io"] }
 
 [dev-dependencies]
 tempfile = "3"

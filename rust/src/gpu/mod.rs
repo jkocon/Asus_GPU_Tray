@@ -1,4 +1,5 @@
 pub mod cardwire;
+pub mod cardwire_dbus;
 pub mod cmd;
 pub mod i18n;
 pub mod journal;

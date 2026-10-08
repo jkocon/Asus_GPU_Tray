@@ -2,6 +2,7 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 
+use asus_gpu_tray::gpu::cardwire_dbus::DbusCardwire;
 use asus_gpu_tray::gpu::cmd::System;
 use asus_gpu_tray::gpu::labels::dump;
 use asus_gpu_tray::gpu::paths::Paths;
@@ -28,7 +29,10 @@ fn main() -> ExitCode {
     let paths = Paths::default();
     match Cli::parse().command {
         Some(Command::Dump) => {
-            print!("{}", dump(&read_state(&paths, &System, &mut CwRepair::default()), &paths));
+            print!(
+                "{}",
+                dump(&read_state(&paths, &DbusCardwire::connect(), &System, &mut CwRepair::default()), &paths)
+            );
             ExitCode::SUCCESS
         }
         Some(Command::Holders) => {

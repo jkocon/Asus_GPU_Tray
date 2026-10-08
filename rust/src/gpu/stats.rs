@@ -71,7 +71,12 @@ mod tests {
         assert_eq!(gpu_stats(&igpu(), &cmd), "");
         assert!(cmd.calls().is_empty());
         let awake = Gpu { power: "active".into(), ..dgpu() };
-        gpu_stats(&awake, &cmd);
+        let cmd = cmd.out(
+            "nvidia-smi --id=0000:01:00.0 --format=csv,noheader,nounits \
+             --query-gpu=temperature.gpu,power.draw,utilization.gpu,memory.used,memory.total",
+            "54, 38.12, 12, 1234, 4096",
+        );
+        assert_eq!(gpu_stats(&awake, &cmd), "54 °C · 38 W · 12 % · 1.2/4.0 GB");
         assert_eq!(cmd.calls().len(), 1);
     }
 }

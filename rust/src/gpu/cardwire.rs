@@ -1,10 +1,9 @@
-//! cardwire: GPU access modes (Integrated / Hybrid / Smart). Its CLI is the API for now.
+//! cardwire: GPU access modes (Integrated / Hybrid / Smart). State is read over D-Bus
+//! (see `cardwire_dbus`); the mode is changed with `cardwire set`, whose error messages the
+//! tray shows as they are.
 
 use std::collections::BTreeMap;
 
-use serde_json::Value;
-
-use super::cmd::Cmd;
 use super::paths::Paths;
 use super::pci::{detect_gpus, Kind};
 
@@ -23,46 +22,33 @@ pub struct CwDevice {
 /// PCI address -> cardwire's device info.
 pub type CwDevices = BTreeMap<String, CwDevice>;
 
-/// Python truthiness of a JSON value.
-fn truthy(v: Option<&Value>) -> bool {
-    match v {
-        None | Some(Value::Null) => false,
-        Some(Value::Bool(b)) => *b,
-        Some(Value::Number(n)) => n.as_f64() != Some(0.0),
-        Some(Value::String(s)) => !s.is_empty(),
-        Some(Value::Array(a)) => !a.is_empty(),
-        Some(Value::Object(o)) => !o.is_empty(),
-    }
+/// What the core needs from cardwired.
+pub trait Cardwire {
+    /// None when cardwired is not running.
+    fn devices(&self) -> Option<CwDevices>;
+    /// Current mode and the available ones (lower case, menu order); ("", []) when unknown.
+    fn mode(&self) -> (String, Vec<String>);
+    /// Make cardwired enumerate the GPUs again.
+    fn refresh_gpu(&self);
 }
 
-/// `cardwire list --json` -> devices; None when the output is not what cardwire prints.
-pub fn parse_list(json: &str) -> Option<CwDevices> {
-    let Value::Object(devices) = serde_json::from_str::<Value>(json).ok()? else { return None };
-    let mut out = CwDevices::new();
-    for d in devices.values() {
-        let pci = d.get("pci")?.as_str()?.to_string();
-        let text = |key: &str| d.get(key).and_then(Value::as_str).map(str::to_string);
-        out.insert(
-            pci,
-            CwDevice {
-                name: text("name"),
-                vendor: text("vendor"),
-                driver: text("driver").unwrap_or_default(),
-                blocked: truthy(d.get("blocked")),
-                discrete: truthy(d.get("discrete")),
-            },
-        );
+/// cardwired's mode number on D-Bus -> name (enum Modes in cardwire 0.12).
+pub fn mode_name(n: u32) -> String {
+    match n {
+        0 => "integrated",
+        1 => "hybrid",
+        2 => "manual",
+        3 => "smart",
+        _ => return format!("mode {n}"),
     }
-    Some(out)
+    .to_string()
 }
 
-/// None when cardwire is not available.
-pub fn devices(cmd: &dyn Cmd) -> Option<CwDevices> {
-    if !cmd.which("cardwire") {
-        return None;
-    }
-    let out = cmd.run(&["cardwire", "list", "--json"]);
-    parse_list(if out.is_empty() { "null" } else { &out })
+/// Known modes in menu order, then any others in cardwired's order.
+pub fn order_modes(modes: Vec<String>) -> Vec<String> {
+    let known = MODES.iter().filter(|m| modes.iter().any(|x| x.as_str() == **m)).map(|m| m.to_string());
+    let other = modes.iter().filter(|m| !MODES.contains(&m.as_str())).cloned();
+    known.chain(other).collect()
 }
 
 /// "NVIDIA GeForce RTX 3070 Laptop GPU" -> "RTX 3070"
@@ -72,24 +58,6 @@ pub fn short_name(name: &str) -> String {
         name = name.replace(word, "");
     }
     name.trim().to_string()
-}
-
-/// "Current Mode: Hybrid\nAvailable Mode: integrated, hybrid, smart" -> ("hybrid", [modes in menu order])
-pub fn parse_get(out: &str) -> (String, Vec<String>) {
-    let (mut mode, mut modes) = (String::new(), Vec::<String>::new());
-    for line in out.lines() {
-        let (key, value) = line.split_once(':').unwrap_or((line, ""));
-        match key.trim() {
-            "Current Mode" => mode = value.trim().to_lowercase(),
-            "Available Mode" => {
-                modes = value.split(',').map(|m| m.trim().to_lowercase()).filter(|m| !m.is_empty()).collect()
-            }
-            _ => {}
-        }
-    }
-    let known = MODES.iter().filter(|m| modes.iter().any(|x| x.as_str() == **m)).map(|m| m.to_string());
-    let other = modes.iter().filter(|m| !MODES.contains(&m.as_str())).cloned();
-    (mode, known.chain(other).collect())
 }
 
 /// cardwired can start before the NVIDIA driver is ready and then mistake the dGPU for an
@@ -106,24 +74,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_cardwire_get() {
-        let (mode, modes) = parse_get("Current Mode: Smart\nAvailable Mode: hybrid, manual, integrated");
-        assert_eq!(mode, "smart");
-        assert_eq!(modes, ["integrated", "hybrid", "manual"]);
-    }
-
-    #[test]
-    fn parse_cardwire_list() {
-        let json = r#"{"0": {"name": "AMD Radeon 680M", "pci": "0000:3a:00.0", "discrete": false,
-                              "vendor": "AMD", "driver": "amdgpu", "blocked": false},
-                       "1": {"name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU", "pci": "0000:01:00.0",
-                              "discrete": true, "vendor": "Nvidia", "driver": "nvidia", "blocked": true}}"#;
-        let cw = parse_list(json).unwrap();
-        assert_eq!(cw.len(), 2);
-        assert!(cw["0000:01:00.0"].blocked && cw["0000:01:00.0"].discrete);
-        assert_eq!(cw["0000:3a:00.0"].driver, "amdgpu");
-        assert_eq!(parse_list("null"), None);
-        assert_eq!(parse_list(r#"{"0": {"name": "no pci"}}"#), None);
+    fn modes() {
+        let modes = [1, 0, 2, 3].map(mode_name).to_vec();
+        assert_eq!(order_modes(modes), ["integrated", "hybrid", "smart", "manual"]);
+        assert_eq!(mode_name(7), "mode 7");
         assert_eq!(short_name("NVIDIA GeForce RTX 3050 Ti Laptop GPU"), "RTX 3050 Ti");
     }
 }

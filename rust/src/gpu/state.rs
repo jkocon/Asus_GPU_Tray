@@ -2,7 +2,7 @@
 
 use std::time::{Duration, Instant};
 
-use super::cardwire::{self, CwDevices};
+use super::cardwire::{self, Cardwire, CwDevices};
 use super::cmd::Cmd;
 use super::paths::{read, sorted_entries, Paths, LIVE_UNIT, REBOOT_UNIT};
 use super::pci::{detect_gpus, Gpu, Kind};
@@ -67,7 +67,13 @@ impl CwRepair {
     }
 
     /// Returns the devices to use: re-read after a repair attempt.
-    fn check(&mut self, paths: &Paths, cmd: &dyn Cmd, cw: Option<CwDevices>) -> Option<CwDevices> {
+    fn check(
+        &mut self,
+        paths: &Paths,
+        cardwire: &dyn Cardwire,
+        cmd: &dyn Cmd,
+        cw: Option<CwDevices>,
+    ) -> Option<CwDevices> {
         let missed = cw.as_ref().is_some_and(|c| !c.is_empty() && cardwire::missed_dgpu(paths, c));
         if !missed {
             self.count = 0;
@@ -78,12 +84,12 @@ impl CwRepair {
         }
         self.last = Some(Instant::now());
         if self.count == 0 {
-            cmd.run(&["cardwire", "debug", "refresh-gpu"]);
+            cardwire.refresh_gpu();
         } else if self.count <= CW_RESTARTS_MAX {
             cmd.run(&["systemctl", "--no-block", "restart", "cardwired.service"]);
         }
         self.count += 1;
-        cardwire::devices(cmd)
+        cardwire.devices()
     }
 
     #[cfg(test)]
@@ -92,10 +98,9 @@ impl CwRepair {
     }
 }
 
-pub fn read_state(paths: &Paths, cmd: &dyn Cmd, repair: &mut CwRepair) -> GpuState {
-    let cw = repair.check(paths, cmd, cardwire::devices(cmd));
-    let (cw_mode, cw_modes) =
-        if cw.is_some() { cardwire::parse_get(&cmd.run(&["cardwire", "get"])) } else { Default::default() };
+pub fn read_state(paths: &Paths, cardwire: &dyn Cardwire, cmd: &dyn Cmd, repair: &mut CwRepair) -> GpuState {
+    let cw = repair.check(paths, cardwire, cmd, cardwire.devices());
+    let (cw_mode, cw_modes) = if cw.is_some() { cardwire.mode() } else { Default::default() };
     let asus_egpu = paths.attr.join("egpu_connected").exists();
     let hw_mode = if !asus_egpu {
         ""
@@ -219,19 +224,18 @@ mod tests {
         std::fs::create_dir_all(tmp.path().join("drivers/nvidia")).unwrap();
         std::os::unix::fs::symlink(tmp.path().join("drivers/nvidia"), paths.pci.join("0000:01:00.0/driver")).unwrap();
         // cardwire took the dGPU for an integrated GPU
-        let cmd = FakeCmd::new(&["cardwire"])
-            .out("cardwire list --json", r#"{"0": {"pci": "0000:01:00.0", "discrete": false}}"#);
+        let cmd = FakeCmd::new(&[]).cardwire(&[("0000:01:00.0", false)]);
         let mut repair = CwRepair::default();
         for _ in 0..5 {
             repair.make_due();
-            read_state(&paths, &cmd, &mut repair);
+            read_state(&paths, &cmd, &cmd, &mut repair);
         }
         let repairs: Vec<String> = cmd
             .calls()
             .into_iter()
-            .filter(|c| c.starts_with("cardwire debug refresh-gpu") || c.starts_with("systemctl"))
+            .filter(|c| c.starts_with("cardwire refresh-gpu") || c.starts_with("systemctl"))
             .collect();
-        assert_eq!(repairs[0], "cardwire debug refresh-gpu");
+        assert_eq!(repairs[0], "cardwire refresh-gpu");
         assert_eq!(repairs[1..], vec!["systemctl --no-block restart cardwired.service"; CW_RESTARTS_MAX as usize]);
     }
 }
