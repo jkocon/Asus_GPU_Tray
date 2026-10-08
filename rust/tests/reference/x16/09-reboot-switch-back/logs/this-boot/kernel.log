@@ -1,0 +1,1458 @@
+paź 09 01:24:29.975710 cachyos kernel: Linux version 7.2.9-1-cachyos (linux-cachyos@cachyos) (clang version 23.1.1, LLD 23.1.1) #1 SMP PREEMPT_DYNAMIC Sat, 03 Oct 2026 18:34:55 +0000
+paź 09 01:24:29.975729 cachyos kernel: Command line: quiet nowatchdog splash rw rootflags=subvol=/@ root=UUID=8fb5a2b5-17cc-42f0-ac37-2ab7b045966f
+paź 09 01:24:29.975738 cachyos kernel: BIOS-provided physical RAM map:
+paź 09 01:24:29.975747 cachyos kernel: BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff]  System RAM
+paź 09 01:24:29.975753 cachyos kernel: BIOS-e820: [mem 0x00000000000a0000-0x00000000000fffff]  device reserved
+paź 09 01:24:29.975759 cachyos kernel: BIOS-e820: [mem 0x0000000000100000-0x0000000009afefff]  System RAM
+paź 09 01:24:29.975766 cachyos kernel: BIOS-e820: [mem 0x0000000009aff000-0x0000000009ffffff]  device reserved
+paź 09 01:24:29.975772 cachyos kernel: BIOS-e820: [mem 0x000000000a000000-0x000000000a1fffff]  System RAM
+paź 09 01:24:29.975778 cachyos kernel: BIOS-e820: [mem 0x000000000a200000-0x000000000a213fff]  ACPI NVS
+paź 09 01:24:29.975784 cachyos kernel: BIOS-e820: [mem 0x000000000a214000-0x00000000b12e7fff]  System RAM
+paź 09 01:24:29.975790 cachyos kernel: BIOS-e820: [mem 0x00000000b12e8000-0x00000000b3e41fff]  device reserved
+paź 09 01:24:29.975795 cachyos kernel: BIOS-e820: [mem 0x00000000b3e42000-0x00000000b3ecefff]  ACPI data
+paź 09 01:24:29.975801 cachyos kernel: BIOS-e820: [mem 0x00000000b3ecf000-0x00000000b91c9fff]  ACPI NVS
+paź 09 01:24:29.975807 cachyos kernel: BIOS-e820: [mem 0x00000000b91ca000-0x00000000ba3fdfff]  device reserved
+paź 09 01:24:29.975816 cachyos kernel: BIOS-e820: [mem 0x00000000ba3fe000-0x00000000ba3fefff]  System RAM
+paź 09 01:24:29.975822 cachyos kernel: BIOS-e820: [mem 0x00000000ba3ff000-0x00000000ba3fffff]  device reserved
+paź 09 01:24:29.975828 cachyos kernel: BIOS-e820: [mem 0x00000000ba400000-0x00000000bbffcfff]  System RAM
+paź 09 01:24:29.975834 cachyos kernel: BIOS-e820: [mem 0x00000000bbffd000-0x00000000bcffffff]  device reserved
+paź 09 01:24:29.975840 cachyos kernel: BIOS-e820: [gap 0x00000000bd000000-0x00000000bd7fffff]
+paź 09 01:24:29.975846 cachyos kernel: BIOS-e820: [mem 0x00000000bd800000-0x00000000bfffffff]  device reserved
+paź 09 01:24:29.975851 cachyos kernel: BIOS-e820: [gap 0x00000000c0000000-0x00000000dfffffff]
+paź 09 01:24:29.975857 cachyos kernel: BIOS-e820: [mem 0x00000000e0000000-0x00000000efffffff]  device reserved
+paź 09 01:24:29.975863 cachyos kernel: BIOS-e820: [gap 0x00000000f0000000-0x00000000fcffffff]
+paź 09 01:24:29.975868 cachyos kernel: BIOS-e820: [mem 0x00000000fd000000-0x00000000ffffffff]  device reserved
+paź 09 01:24:29.975874 cachyos kernel: BIOS-e820: [mem 0x0000000100000000-0x000000101e2fffff]  System RAM
+paź 09 01:24:29.975880 cachyos kernel: BIOS-e820: [gap 0x000000101e300000-0x000000101f33ffff]
+paź 09 01:24:29.975885 cachyos kernel: BIOS-e820: [mem 0x000000101f340000-0x00000010601fffff]  device reserved
+paź 09 01:24:29.975893 cachyos kernel: NX (Execute Disable) protection: active
+paź 09 01:24:29.975899 cachyos kernel: APIC: Static calls initialized
+paź 09 01:24:29.975904 cachyos kernel: efi: EFI v2.8 by American Megatrends
+paź 09 01:24:29.975910 cachyos kernel: efi: ACPI=0xb91b0000 ACPI 2.0=0xb91b0014 TPMFinalLog=0xb917b000 SMBIOS=0xba18e000 SMBIOS 3.0=0xba18d000 MEMATTR=0xab143018 ESRT=0xab148f98 TPMEventLog=0xb3e53018 RNG=0xb3e52018 
+paź 09 01:24:29.975916 cachyos kernel: random: crng init done
+paź 09 01:24:29.975922 cachyos kernel: efi: Remove mem60: MMIO range=[0xe0000000-0xefffffff] (256MB) from e820 map
+paź 09 01:24:29.975928 cachyos kernel: e820: remove [mem 0xe0000000-0xefffffff] device reserved
+paź 09 01:24:29.975934 cachyos kernel: efi: Remove mem61: MMIO range=[0xfd000000-0xfedfffff] (30MB) from e820 map
+paź 09 01:24:29.975940 cachyos kernel: e820: remove [mem 0xfd000000-0xfedfffff] device reserved
+paź 09 01:24:29.975946 cachyos kernel: efi: Not removing mem62: MMIO range=[0xfee00000-0xfee00fff] (4KB) from e820 map
+paź 09 01:24:29.975951 cachyos kernel: efi: Remove mem63: MMIO range=[0xfee01000-0xffffffff] (17MB) from e820 map
+paź 09 01:24:29.975957 cachyos kernel: e820: remove [mem 0xfee01000-0xffffffff] device reserved
+paź 09 01:24:29.975963 cachyos kernel: efi: Remove mem65: MMIO range=[0x1040000000-0x10601fffff] (514MB) from e820 map
+paź 09 01:24:29.975972 cachyos kernel: e820: remove [mem 0x1040000000-0x10601fffff] device reserved
+paź 09 01:24:29.975977 cachyos kernel: DMI: SMBIOS 3.4.0 present.
+paź 09 01:24:29.975983 cachyos kernel: DMI: ASUSTeK COMPUTER INC. ROG Flow X16 GV601RE_GV601RE/GV601RE, BIOS GV601RE.500.U4 10/28/2022
+paź 09 01:24:29.975989 cachyos kernel: DMI: Memory slots populated: 2/2
+paź 09 01:24:29.975994 cachyos kernel: tsc: Fast TSC calibration using PIT
+paź 09 01:24:29.976002 cachyos kernel: tsc: Detected 3193.944 MHz processor
+paź 09 01:24:29.976008 cachyos kernel: e820: update [mem 0x00000000-0x00000fff] System RAM ==> device reserved
+paź 09 01:24:29.976014 cachyos kernel: e820: remove [mem 0x000a0000-0x000fffff] System RAM
+paź 09 01:24:29.976021 cachyos kernel: last_pfn = 0x101e300 max_arch_pfn = 0x400000000
+paź 09 01:24:29.976027 cachyos kernel: MTRR map: 5 entries (3 fixed + 2 variable; max 20), built from 9 variable MTRRs
+paź 09 01:24:29.976033 cachyos kernel: x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+paź 09 01:24:29.976040 cachyos kernel: e820: update [mem 0xc0000000-0xffffffff] System RAM ==> device reserved
+paź 09 01:24:29.976046 cachyos kernel: last_pfn = 0xbbffd max_arch_pfn = 0x400000000
+paź 09 01:24:29.976053 cachyos kernel: esrt: Reserving ESRT space from 0x00000000ab148f98 to 0x00000000ab148fd0.
+paź 09 01:24:29.976061 cachyos kernel: e820: update [mem 0xab148000-0xab148fff] System RAM ==> device reserved
+paź 09 01:24:29.976067 cachyos kernel: Using GB pages for direct mapping
+paź 09 01:24:29.976076 cachyos kernel: Secure boot disabled
+paź 09 01:24:29.976082 cachyos kernel: RAMDISK: [mem 0x75e00000-0x7fffcfff]
+paź 09 01:24:29.976088 cachyos kernel: ACPI: Early table checksum verification disabled
+paź 09 01:24:29.976094 cachyos kernel: ACPI: RSDP 0x00000000B91B0014 000024 (v02 ALASKA)
+paź 09 01:24:29.976101 cachyos kernel: ACPI: XSDT 0x00000000B91AF728 000164 (v01 ALASKA A M I    01072009 AMI  01000013)
+paź 09 01:24:29.976107 cachyos kernel: ACPI: FACP 0x00000000B3EC2000 000114 (v06 ALASKA A M I    01072009 AMI  00010013)
+paź 09 01:24:29.976113 cachyos kernel: ACPI: DSDT 0x00000000B3EB0000 0111C9 (v02 ALASKA A M I    01072009 INTL 20200717)
+paź 09 01:24:29.976121 cachyos kernel: ACPI: FACS 0x00000000B9179000 000040
+paź 09 01:24:29.976127 cachyos kernel: ACPI: MSDM 0x00000000B3ECE000 000055 (v03 ALASKA A M I    01072009 ASUS 00000001)
+paź 09 01:24:29.976134 cachyos kernel: ACPI: SSDT 0x00000000B3ECD000 000573 (v01 AMD    ACDC     00000001 INTL 20200717)
+paź 09 01:24:29.976140 cachyos kernel: ACPI: SSDT 0x00000000B3ECC000 0001CC (v01 AMD    STD3     00000001 INTL 20200717)
+paź 09 01:24:29.976146 cachyos kernel: ACPI: SSDT 0x00000000B3EC4000 007F5B (v02 AMD    AmdTable 00000002 MSFT 02000002)
+paź 09 01:24:29.976152 cachyos kernel: ACPI: IVRS 0x00000000B3EC3000 0001A4 (v02 AMD    AmdTable 00000001 AMD  00000001)
+paź 09 01:24:29.976159 cachyos kernel: ACPI: FIDT 0x00000000B3EAF000 00009C (v01 ALASKA A M I    01072009 AMI  00010013)
+paź 09 01:24:29.976165 cachyos kernel: ACPI: ECDT 0x00000000B3EAE000 0000C1 (v01 ALASKA A M I    01072009 AMI. 00000005)
+paź 09 01:24:29.976173 cachyos kernel: ACPI: MCFG 0x00000000B3EAD000 00003C (v01 ALASKA A M I    01072009 MSFT 00010013)
+paź 09 01:24:29.976179 cachyos kernel: ACPI: HPET 0x00000000B3EAC000 000038 (v01 ALASKA A M I    01072009 AMI  00000005)
+paź 09 01:24:29.976185 cachyos kernel: ACPI: FPDT 0x00000000B3EAB000 000044 (v01 ALASKA A M I    01072009 AMI  01000013)
+paź 09 01:24:29.976191 cachyos kernel: ACPI: SSDT 0x00000000B3EA5000 005354 (v02 AMD    AmdTable 00000001 AMD  00000001)
+paź 09 01:24:29.976198 cachyos kernel: ACPI: CRAT 0x00000000B3EA4000 000EE8 (v01 AMD    AmdTable 00000001 AMD  00000001)
+paź 09 01:24:29.976204 cachyos kernel: ACPI: CDIT 0x00000000B3EA3000 000029 (v01 AMD    AmdTable 00000001 AMD  00000001)
+paź 09 01:24:29.976210 cachyos kernel: ACPI: VFCT 0x00000000B3E98000 00AE84 (v01 ALASKA A M I    00000001 AMD  31504F47)
+paź 09 01:24:29.976216 cachyos kernel: ACPI: BGRT 0x00000000B3E97000 000038 (v01 ALASKA A M I    01072009 AMI  00010013)
+paź 09 01:24:29.976223 cachyos kernel: ACPI: TPM2 0x00000000B3E96000 00004C (v04 ALASKA A M I    00000001 AMI  00000000)
+paź 09 01:24:29.976231 cachyos kernel: ACPI: SSDT 0x00000000B3E94000 001598 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976237 cachyos kernel: ACPI: SSDT 0x00000000B3E92000 00169E (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976243 cachyos kernel: ACPI: SSDT 0x00000000B3E91000 000024 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976249 cachyos kernel: ACPI: SSDT 0x00000000B3E8C000 004CE1 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976256 cachyos kernel: ACPI: SSDT 0x00000000B3E8A000 00123D (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976262 cachyos kernel: ACPI: SSDT 0x00000000B3E89000 000905 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976269 cachyos kernel: ACPI: SSDT 0x00000000B3E88000 0000D3 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976275 cachyos kernel: ACPI: SSDT 0x00000000B3E80000 007F27 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976283 cachyos kernel: ACPI: WSMT 0x00000000B3E7F000 000028 (v01 ALASKA A M I    01072009 AMI  00010013)
+paź 09 01:24:29.976289 cachyos kernel: ACPI: APIC 0x00000000B3E7E000 0000E8 (v03 ALASKA A M I    01072009 AMI  00010013)
+paź 09 01:24:29.976297 cachyos kernel: ACPI: SSDT 0x00000000B3E7B000 00227B (v01 AMD    AOD      00000001 INTL 20200717)
+paź 09 01:24:29.976303 cachyos kernel: ACPI: SSDT 0x00000000B3E7A000 0007CF (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976310 cachyos kernel: ACPI: SSDT 0x00000000B3E78000 00139E (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976316 cachyos kernel: ACPI: SSDT 0x00000000B3E77000 0007AD (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976322 cachyos kernel: ACPI: SSDT 0x00000000B3E6D000 009C62 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976329 cachyos kernel: ACPI: SSDT 0x00000000B3E67000 0054D6 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976335 cachyos kernel: ACPI: SSDT 0x00000000B3E66000 000939 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976343 cachyos kernel: ACPI: SSDT 0x00000000B3E65000 00008D (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976349 cachyos kernel: ACPI: SSDT 0x00000000B3E64000 0004D1 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976355 cachyos kernel: ACPI: SSDT 0x00000000B3E62000 001125 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976362 cachyos kernel: ACPI: SSDT 0x00000000B3E61000 000712 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976368 cachyos kernel: ACPI: SSDT 0x00000000B3E60000 000712 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976374 cachyos kernel: ACPI: SSDT 0x00000000B3E5E000 0013D3 (v01 AMD    AmdTable 00000001 INTL 20200717)
+paź 09 01:24:29.976380 cachyos kernel: ACPI: Reserving FACP table memory at [mem 0xb3ec2000-0xb3ec2113]
+paź 09 01:24:29.976386 cachyos kernel: ACPI: Reserving DSDT table memory at [mem 0xb3eb0000-0xb3ec11c8]
+paź 09 01:24:29.976394 cachyos kernel: ACPI: Reserving FACS table memory at [mem 0xb9179000-0xb917903f]
+paź 09 01:24:29.976400 cachyos kernel: ACPI: Reserving MSDM table memory at [mem 0xb3ece000-0xb3ece054]
+paź 09 01:24:29.976407 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3ecd000-0xb3ecd572]
+paź 09 01:24:29.976413 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3ecc000-0xb3ecc1cb]
+paź 09 01:24:29.976418 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3ec4000-0xb3ecbf5a]
+paź 09 01:24:29.976425 cachyos kernel: ACPI: Reserving IVRS table memory at [mem 0xb3ec3000-0xb3ec31a3]
+paź 09 01:24:29.976430 cachyos kernel: ACPI: Reserving FIDT table memory at [mem 0xb3eaf000-0xb3eaf09b]
+paź 09 01:24:29.976436 cachyos kernel: ACPI: Reserving ECDT table memory at [mem 0xb3eae000-0xb3eae0c0]
+paź 09 01:24:29.976443 cachyos kernel: ACPI: Reserving MCFG table memory at [mem 0xb3ead000-0xb3ead03b]
+paź 09 01:24:29.976448 cachyos kernel: ACPI: Reserving HPET table memory at [mem 0xb3eac000-0xb3eac037]
+paź 09 01:24:29.976454 cachyos kernel: ACPI: Reserving FPDT table memory at [mem 0xb3eab000-0xb3eab043]
+paź 09 01:24:29.976460 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3ea5000-0xb3eaa353]
+paź 09 01:24:29.976468 cachyos kernel: ACPI: Reserving CRAT table memory at [mem 0xb3ea4000-0xb3ea4ee7]
+paź 09 01:24:29.976478 cachyos kernel: ACPI: Reserving CDIT table memory at [mem 0xb3ea3000-0xb3ea3028]
+paź 09 01:24:29.976484 cachyos kernel: ACPI: Reserving VFCT table memory at [mem 0xb3e98000-0xb3ea2e83]
+paź 09 01:24:29.976490 cachyos kernel: ACPI: Reserving BGRT table memory at [mem 0xb3e97000-0xb3e97037]
+paź 09 01:24:29.976496 cachyos kernel: ACPI: Reserving TPM2 table memory at [mem 0xb3e96000-0xb3e9604b]
+paź 09 01:24:29.976501 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e94000-0xb3e95597]
+paź 09 01:24:29.976507 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e92000-0xb3e9369d]
+paź 09 01:24:29.976513 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e91000-0xb3e91023]
+paź 09 01:24:29.976519 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e8c000-0xb3e90ce0]
+paź 09 01:24:29.976525 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e8a000-0xb3e8b23c]
+paź 09 01:24:29.976531 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e89000-0xb3e89904]
+paź 09 01:24:29.976539 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e88000-0xb3e880d2]
+paź 09 01:24:29.976544 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e80000-0xb3e87f26]
+paź 09 01:24:29.976551 cachyos kernel: ACPI: Reserving WSMT table memory at [mem 0xb3e7f000-0xb3e7f027]
+paź 09 01:24:29.976556 cachyos kernel: ACPI: Reserving APIC table memory at [mem 0xb3e7e000-0xb3e7e0e7]
+paź 09 01:24:29.976562 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e7b000-0xb3e7d27a]
+paź 09 01:24:29.976568 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e7a000-0xb3e7a7ce]
+paź 09 01:24:29.976574 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e78000-0xb3e7939d]
+paź 09 01:24:29.976580 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e77000-0xb3e777ac]
+paź 09 01:24:29.976586 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e6d000-0xb3e76c61]
+paź 09 01:24:29.976592 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e67000-0xb3e6c4d5]
+paź 09 01:24:29.976598 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e66000-0xb3e66938]
+paź 09 01:24:29.976606 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e65000-0xb3e6508c]
+paź 09 01:24:29.976612 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e64000-0xb3e644d0]
+paź 09 01:24:29.976617 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e62000-0xb3e63124]
+paź 09 01:24:29.976623 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e61000-0xb3e61711]
+paź 09 01:24:29.976629 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e60000-0xb3e60711]
+paź 09 01:24:29.976635 cachyos kernel: ACPI: Reserving SSDT table memory at [mem 0xb3e5e000-0xb3e5f3d2]
+paź 09 01:24:29.976641 cachyos kernel: No NUMA configuration found
+paź 09 01:24:29.976647 cachyos kernel: Faking a node at [mem 0x0000000000000000-0x000000101e2fffff]
+paź 09 01:24:29.976653 cachyos kernel: NODE_DATA(0) allocated [mem 0x101e2d4f80-0x101e2fffff]
+paź 09 01:24:29.976659 cachyos kernel: ACPI: PM-Timer IO Port: 0x808
+paź 09 01:24:29.976665 cachyos kernel: ACPI: LAPIC_NMI (acpi_id[0xff] high edge lint[0x1])
+paź 09 01:24:29.976673 cachyos kernel: IOAPIC[0]: apic_id 33, version 33, address 0xfec00000, GSI 0-23
+paź 09 01:24:29.976679 cachyos kernel: IOAPIC[1]: apic_id 34, version 33, address 0xfec01000, GSI 24-55
+paź 09 01:24:29.976685 cachyos kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+paź 09 01:24:29.976691 cachyos kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 1 global_irq 1 low edge)
+paź 09 01:24:29.976698 cachyos kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 low level)
+paź 09 01:24:29.976704 cachyos kernel: ACPI: Using ACPI (MADT) for SMP configuration information
+paź 09 01:24:29.976710 cachyos kernel: ACPI: HPET id: 0x10228201 base: 0xfed00000
+paź 09 01:24:29.976716 cachyos kernel: e820: update [mem 0xab2ca000-0xab372fff] System RAM ==> device reserved
+paź 09 01:24:29.976722 cachyos kernel: CPU topo: Max. logical packages:   1
+paź 09 01:24:29.976728 cachyos kernel: CPU topo: Max. logical nodes:      1
+paź 09 01:24:29.976736 cachyos kernel: CPU topo: Num. nodes per package:  1
+paź 09 01:24:29.976741 cachyos kernel: CPU topo: Max. logical dies:       1
+paź 09 01:24:29.976748 cachyos kernel: CPU topo: Max. dies per package:   1
+paź 09 01:24:29.976753 cachyos kernel: CPU topo: Max. threads per core:   2
+paź 09 01:24:29.976760 cachyos kernel: CPU topo: Num. cores per package:     8
+paź 09 01:24:29.976765 cachyos kernel: CPU topo: Num. threads per package:  16
+paź 09 01:24:29.976771 cachyos kernel: CPU topo: Allowing 16 present CPUs plus 0 hotplug CPUs
+paź 09 01:24:29.976777 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+paź 09 01:24:29.976784 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0x000a0000-0x000fffff]
+paź 09 01:24:29.976790 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0x09aff000-0x09ffffff]
+paź 09 01:24:29.976796 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0x0a200000-0x0a213fff]
+paź 09 01:24:29.976804 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0xab148000-0xab148fff]
+paź 09 01:24:29.976810 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0xab2ca000-0xab372fff]
+paź 09 01:24:29.976816 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0xb12e8000-0xba3fdfff]
+paź 09 01:24:29.976822 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0xba3ff000-0xba3fffff]
+paź 09 01:24:29.976829 cachyos kernel: PM: hibernation: Registered nosave memory: [mem 0xbbffd000-0xffffffff]
+paź 09 01:24:29.976834 cachyos kernel: [gap 0xc0000000-0xfedfffff] available for PCI devices
+paź 09 01:24:29.976840 cachyos kernel: Booting paravirtualized kernel on bare hardware
+paź 09 01:24:29.976847 cachyos kernel: clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+paź 09 01:24:29.976853 cachyos kernel: Zone ranges:
+paź 09 01:24:29.976861 cachyos kernel:   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+paź 09 01:24:29.976867 cachyos kernel:   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+paź 09 01:24:29.976873 cachyos kernel:   Normal   [mem 0x0000000100000000-0x000000101e2fffff]
+paź 09 01:24:29.976879 cachyos kernel:   Device   empty
+paź 09 01:24:29.976885 cachyos kernel: Movable zone start for each node
+paź 09 01:24:29.976891 cachyos kernel: Early memory node ranges
+paź 09 01:24:29.976897 cachyos kernel:   node   0: [mem 0x0000000000001000-0x000000000009ffff]
+paź 09 01:24:29.976903 cachyos kernel:   node   0: [mem 0x0000000000100000-0x0000000009afefff]
+paź 09 01:24:29.976909 cachyos kernel:   node   0: [mem 0x000000000a000000-0x000000000a1fffff]
+paź 09 01:24:29.976915 cachyos kernel:   node   0: [mem 0x000000000a214000-0x00000000b12e7fff]
+paź 09 01:24:29.976923 cachyos kernel:   node   0: [mem 0x00000000ba3fe000-0x00000000ba3fefff]
+paź 09 01:24:29.976929 cachyos kernel:   node   0: [mem 0x00000000ba400000-0x00000000bbffcfff]
+paź 09 01:24:29.976935 cachyos kernel:   node   0: [mem 0x0000000100000000-0x000000101e2fffff]
+paź 09 01:24:29.976941 cachyos kernel: Initmem setup node 0 [mem 0x0000000000001000-0x000000101e2fffff]
+paź 09 01:24:29.976947 cachyos kernel: On node 0, zone DMA: 1 pages in unavailable ranges
+paź 09 01:24:29.976953 cachyos kernel: On node 0, zone DMA: 96 pages in unavailable ranges
+paź 09 01:24:29.976959 cachyos kernel: On node 0, zone DMA32: 1281 pages in unavailable ranges
+paź 09 01:24:29.976965 cachyos kernel: On node 0, zone DMA32: 20 pages in unavailable ranges
+paź 09 01:24:29.976972 cachyos kernel: On node 0, zone DMA32: 37142 pages in unavailable ranges
+paź 09 01:24:29.976978 cachyos kernel: On node 0, zone DMA32: 1 pages in unavailable ranges
+paź 09 01:24:29.976986 cachyos kernel: On node 0, zone Normal: 16387 pages in unavailable ranges
+paź 09 01:24:29.976992 cachyos kernel: On node 0, zone Normal: 7424 pages in unavailable ranges
+paź 09 01:24:29.976998 cachyos kernel: setup_percpu: NR_CPUS:8192 nr_cpumask_bits:16 nr_cpu_ids:16 nr_node_ids:1
+paź 09 01:24:29.977004 cachyos kernel: percpu: Embedded 63 pages/cpu s221184 r8192 d28672 u262144
+paź 09 01:24:29.977011 cachyos kernel: pcpu-alloc: s221184 r8192 d28672 u262144 alloc=1*2097152
+paź 09 01:24:29.977017 cachyos kernel: pcpu-alloc: [0] 00 01 02 03 04 05 06 07 [0] 08 09 10 11 12 13 14 15 
+paź 09 01:24:29.977023 cachyos kernel: Kernel command line: quiet nowatchdog splash rw rootflags=subvol=/@ root=UUID=8fb5a2b5-17cc-42f0-ac37-2ab7b045966f
+paź 09 01:24:29.977030 cachyos kernel: Unknown kernel command line parameters "splash", will be passed to user space.
+paź 09 01:24:29.977038 cachyos kernel: printk: log buffer data + meta data: 131072 + 557056 = 688128 bytes
+paź 09 01:24:29.977062 cachyos kernel: Dentry cache hash table entries: 8388608 (order: 14, 67108864 bytes, linear)
+paź 09 01:24:29.977069 cachyos kernel: Inode-cache hash table entries: 4194304 (order: 13, 33554432 bytes, linear)
+paź 09 01:24:29.977077 cachyos kernel: software IO TLB: area num 16.
+paź 09 01:24:29.977084 cachyos kernel: Fallback order for Node 0: 0 
+paź 09 01:24:29.977090 cachyos kernel: Built 1 zonelists, mobility grouping on.  Total pages: 16583792
+paź 09 01:24:29.977096 cachyos kernel: Policy zone: Normal
+paź 09 01:24:29.977102 cachyos kernel: mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+paź 09 01:24:29.977108 cachyos kernel: SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=16, Nodes=1
+paź 09 01:24:29.977116 cachyos kernel: ftrace: allocating 58324 entries in 228 pages
+paź 09 01:24:29.977123 cachyos kernel: ftrace: allocated 228 pages with 4 groups
+paź 09 01:24:29.977129 cachyos kernel: Dynamic Preempt: full
+paź 09 01:24:29.977135 cachyos kernel: rcu: Preemptible hierarchical RCU implementation.
+paź 09 01:24:29.977145 cachyos kernel: rcu:         RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=16.
+paź 09 01:24:29.977151 cachyos kernel: rcu:         RCU priority boosting: priority 1 delay 500 ms.
+paź 09 01:24:29.977157 cachyos kernel:         Trampoline variant of Tasks RCU enabled.
+paź 09 01:24:29.977164 cachyos kernel:         Rude variant of Tasks RCU enabled.
+paź 09 01:24:29.977170 cachyos kernel:         Tracing variant of Tasks RCU enabled.
+paź 09 01:24:29.977176 cachyos kernel: rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+paź 09 01:24:29.977184 cachyos kernel: rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=16
+paź 09 01:24:29.977190 cachyos kernel: RCU Tasks: Setting shift to 4 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=16.
+paź 09 01:24:29.977197 cachyos kernel: RCU Tasks Rude: Setting shift to 4 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=16.
+paź 09 01:24:29.977203 cachyos kernel: NR_IRQS: 524544, nr_irqs: 1096, preallocated irqs: 16
+paź 09 01:24:29.977209 cachyos kernel: rcu: srcu_init: Setting srcu_struct sizes based on contention.
+paź 09 01:24:29.977216 cachyos kernel: clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+paź 09 01:24:29.977222 cachyos kernel: kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+paź 09 01:24:29.977228 cachyos kernel: Console: colour dummy device 80x25
+paź 09 01:24:29.977234 cachyos kernel: printk: legacy console [tty0] enabled
+paź 09 01:24:29.977242 cachyos kernel: ACPI: Core revision 20260408
+paź 09 01:24:29.977248 cachyos kernel: clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 133484873504 ns
+paź 09 01:24:29.977254 cachyos kernel: APIC: Switch to symmetric I/O mode setup
+paź 09 01:24:29.977261 cachyos kernel: AMD-Vi: ivrs, add hid:AMDI0020, uid:\_SB.FUR0, rdevid:0xa0
+paź 09 01:24:29.977267 cachyos kernel: AMD-Vi: ivrs, add hid:AMDI0020, uid:\_SB.FUR1, rdevid:0xa0
+paź 09 01:24:29.977273 cachyos kernel: AMD-Vi: ivrs, add hid:AMDI0020, uid:\_SB.FUR2, rdevid:0xa0
+paź 09 01:24:29.977280 cachyos kernel: AMD-Vi: ivrs, add hid:AMDI0020, uid:\_SB.FUR3, rdevid:0xa0
+paź 09 01:24:29.977286 cachyos kernel: AMD-Vi: Using global IVHD EFR:0x246577efa2254afa, EFR2:0x0
+paź 09 01:24:29.977296 cachyos kernel: x2apic: IRQ remapping doesn't support X2APIC mode
+paź 09 01:24:29.977302 cachyos kernel: ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+paź 09 01:24:29.977309 cachyos kernel: clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x2e09f10fd4f, max_idle_ns: 440795254791 ns
+paź 09 01:24:29.977315 cachyos kernel: Calibrating delay loop (skipped), value calculated using timer frequency.. 6387.88 BogoMIPS (lpj=3193944)
+paź 09 01:24:29.977321 cachyos kernel: x86/cpu: User Mode Instruction Prevention (UMIP) activated
+paź 09 01:24:29.977328 cachyos kernel: LVT offset 1 assigned for vector 0xf9
+paź 09 01:24:29.977334 cachyos kernel: LVT offset 2 assigned for vector 0xf4
+paź 09 01:24:29.977340 cachyos kernel: Last level iTLB entries: 4KB 512, 2MB 512, 4MB 256
+paź 09 01:24:29.977346 cachyos kernel: Last level dTLB entries: 4KB 2048, 2MB 2048, 4MB 1024, 1GB 0
+paź 09 01:24:29.977354 cachyos kernel: process: using mwait in idle threads
+paź 09 01:24:29.977360 cachyos kernel: mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+paź 09 01:24:29.977367 cachyos kernel: Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+paź 09 01:24:29.977373 cachyos kernel: Transient Scheduler Attacks: Mitigation: Clear CPU buffers
+paź 09 01:24:29.977379 cachyos kernel: Spectre V2 : Mitigation: Retpolines
+paź 09 01:24:29.977385 cachyos kernel: Spectre V2 : User space: Mitigation: STIBP always-on protection
+paź 09 01:24:29.977392 cachyos kernel: Speculative Return Stack Overflow: Mitigation: Safe RET
+paź 09 01:24:29.977398 cachyos kernel: VMSCAPE: Mitigation: IBPB before exit to userspace
+paź 09 01:24:29.977404 cachyos kernel: Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+paź 09 01:24:29.977412 cachyos kernel: Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+paź 09 01:24:29.977418 cachyos kernel: Spectre V2 : Enabling Restricted Speculation for firmware calls
+paź 09 01:24:29.977424 cachyos kernel: Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+paź 09 01:24:29.977430 cachyos kernel: active return thunk: srso_alias_return_thunk
+paź 09 01:24:29.977437 cachyos kernel: x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+paź 09 01:24:29.977443 cachyos kernel: x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+paź 09 01:24:29.977449 cachyos kernel: x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+paź 09 01:24:29.977455 cachyos kernel: x86/fpu: Supporting XSAVE feature 0x200: 'Protection Keys User registers'
+paź 09 01:24:29.977461 cachyos kernel: x86/fpu: Supporting XSAVE feature 0x800: 'Control-flow User registers'
+paź 09 01:24:29.977469 cachyos kernel: x86/fpu: Supporting XSAVE feature 0x1000: 'Control-flow Kernel registers (KVM only)'
+paź 09 01:24:29.977475 cachyos kernel: x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+paź 09 01:24:29.977481 cachyos kernel: x86/fpu: xstate_offset[9]:  832, xstate_sizes[9]:    8
+paź 09 01:24:29.977487 cachyos kernel: x86/fpu: xstate_offset[11]:  840, xstate_sizes[11]:   16
+paź 09 01:24:29.977493 cachyos kernel: x86/fpu: xstate_offset[12]:  856, xstate_sizes[12]:   24
+paź 09 01:24:29.977500 cachyos kernel: x86/fpu: Enabled xstate features 0x1a07, context size is 880 bytes, using 'compacted' format.
+paź 09 01:24:29.977506 cachyos kernel: pid_max: default: 32768 minimum: 301
+paź 09 01:24:29.977512 cachyos kernel: landlock: Up and running.
+paź 09 01:24:29.977518 cachyos kernel: Yama: becoming mindful.
+paź 09 01:24:29.977526 cachyos kernel: LSM support for eBPF active
+paź 09 01:24:29.977532 cachyos kernel: Mount-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+paź 09 01:24:29.977538 cachyos kernel: Mountpoint-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+paź 09 01:24:29.977545 cachyos kernel: VFS: Finished mounting rootfs on nullfs
+paź 09 01:24:29.977551 cachyos kernel: smpboot: CPU0: AMD Ryzen 7 6800HS with Radeon Graphics (family: 0x19, model: 0x44, stepping: 0x1)
+paź 09 01:24:29.977557 cachyos kernel: Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+paź 09 01:24:29.977563 cachyos kernel: ... version:                   0
+paź 09 01:24:29.977570 cachyos kernel: ... bit width:                 48
+paź 09 01:24:29.977576 cachyos kernel: ... generic counters:          6
+paź 09 01:24:29.977584 cachyos kernel: ... generic bitmap:            000000000000003f
+paź 09 01:24:29.977590 cachyos kernel: ... fixed-purpose counters:    0
+paź 09 01:24:29.977596 cachyos kernel: ... fixed-purpose bitmap:      0000000000000000
+paź 09 01:24:29.977602 cachyos kernel: ... value mask:                0000ffffffffffff
+paź 09 01:24:29.977608 cachyos kernel: ... max period:                00007fffffffffff
+paź 09 01:24:29.977614 cachyos kernel: ... global_ctrl mask:          000000000000003f
+paź 09 01:24:29.977620 cachyos kernel: signal: max sigframe size: 3376
+paź 09 01:24:29.977626 cachyos kernel: rcu: Hierarchical SRCU implementation.
+paź 09 01:24:29.977633 cachyos kernel: rcu:         Max phase no-delay instances is 400.
+paź 09 01:24:29.977641 cachyos kernel: Timer migration: 2 hierarchy levels; 8 children per group; 2 crossnode level
+paź 09 01:24:29.977647 cachyos kernel: MCE: In-kernel MCE decoding enabled.
+paź 09 01:24:29.977653 cachyos kernel: smp: Bringing up secondary CPUs ...
+paź 09 01:24:29.977659 cachyos kernel: smpboot: x86: Booting SMP configuration:
+paź 09 01:24:29.977665 cachyos kernel: .... node  #0, CPUs:        #2  #4  #6  #8 #10 #12 #14  #1  #3  #5  #7  #9 #11 #13 #15
+paź 09 01:24:29.977672 cachyos kernel: Spectre V2 : Update user space SMT mitigation: STIBP always-on
+paź 09 01:24:29.977678 cachyos kernel: smp: Brought up 1 node, 16 CPUs
+paź 09 01:24:29.977684 cachyos kernel: smpboot: Total of 16 processors activated (102206.20 BogoMIPS)
+paź 09 01:24:29.977690 cachyos kernel: Memory: 64745348K/66335168K available (22591K kernel code, 2967K rwdata, 17052K rodata, 4836K init, 4136K bss, 1571572K reserved, 0K cma-reserved)
+paź 09 01:24:29.977698 cachyos kernel: devtmpfs: initialized
+paź 09 01:24:29.977704 cachyos kernel: x86/mm: Memory block size: 2048MB
+paź 09 01:24:29.977710 cachyos kernel: ACPI: PM: Registering ACPI NVS region [mem 0x0a200000-0x0a213fff] (81920 bytes)
+paź 09 01:24:29.977716 cachyos kernel: ACPI: PM: Registering ACPI NVS region [mem 0xb3ecf000-0xb91c9fff] (87011328 bytes)
+paź 09 01:24:29.977722 cachyos kernel: posixtimers hash table entries: 8192 (order: 5, 131072 bytes, linear)
+paź 09 01:24:29.977728 cachyos kernel: futex hash table entries: 4096 (262144 bytes on 1 NUMA nodes, total 256 KiB, linear).
+paź 09 01:24:29.977734 cachyos kernel: xor: automatically using best checksumming function   avx       
+paź 09 01:24:29.977740 cachyos kernel: PM: RTC time: 23:24:29, date: 2026-10-08
+paź 09 01:24:29.977746 cachyos kernel: NET: Registered PF_NETLINK/PF_ROUTE protocol family
+paź 09 01:24:29.977752 cachyos kernel: DMA: preallocated 4096 KiB GFP_KERNEL pool for atomic allocations
+paź 09 01:24:29.977760 cachyos kernel: DMA: preallocated 4096 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+paź 09 01:24:29.977766 cachyos kernel: DMA: preallocated 4096 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+paź 09 01:24:29.977773 cachyos kernel: audit: initializing netlink subsys (disabled)
+paź 09 01:24:29.977779 cachyos kernel: audit: type=2000 audit(1791501869.165:1): state=initialized audit_enabled=0 res=1
+paź 09 01:24:29.977785 cachyos kernel: thermal_sys: Registered thermal governor 'fair_share'
+paź 09 01:24:29.977791 cachyos kernel: thermal_sys: Registered thermal governor 'bang_bang'
+paź 09 01:24:29.977797 cachyos kernel: thermal_sys: Registered thermal governor 'step_wise'
+paź 09 01:24:29.977804 cachyos kernel: thermal_sys: Registered thermal governor 'user_space'
+paź 09 01:24:29.977811 cachyos kernel: thermal_sys: Registered thermal governor 'power_allocator'
+paź 09 01:24:29.977817 cachyos kernel: cpuidle: using governor ladder
+paź 09 01:24:29.977824 cachyos kernel: cpuidle: using governor menu
+paź 09 01:24:29.977829 cachyos kernel: Freeing SMP alternatives memory: 68K
+paź 09 01:24:29.977835 cachyos kernel: efi: Freeing EFI boot services memory: 131088K
+paź 09 01:24:29.977841 cachyos kernel: ACPI FADT declares the system doesn't support PCIe ASPM, so disable it
+paź 09 01:24:29.977848 cachyos kernel: acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+paź 09 01:24:29.977854 cachyos kernel: PCI: ECAM [mem 0xe0000000-0xefffffff] (base 0xe0000000) for domain 0000 [bus 00-ff]
+paź 09 01:24:29.977860 cachyos kernel: PCI: Using configuration type 1 for base access
+paź 09 01:24:29.977866 cachyos kernel: virt/tdx: TDX not supported by the host platform
+paź 09 01:24:29.977875 cachyos kernel: kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+paź 09 01:24:29.977881 cachyos kernel: HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+paź 09 01:24:29.977887 cachyos kernel: HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+paź 09 01:24:29.977893 cachyos kernel: HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+paź 09 01:24:29.977898 cachyos kernel: HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+paź 09 01:24:29.977904 cachyos kernel: raid6: using avx2x2 recovery algorithm
+paź 09 01:24:29.977910 cachyos kernel: raid6: skipped pq benchmark and selected avx2x4
+paź 09 01:24:29.977916 cachyos kernel: ACPI: Added _OSI(Module Device)
+paź 09 01:24:29.977922 cachyos kernel: ACPI: Added _OSI(Processor Device)
+paź 09 01:24:29.977928 cachyos kernel: ACPI: Added _OSI(Processor Aggregator Device)
+paź 09 01:24:29.977936 cachyos kernel: ACPI: 26 ACPI AML tables successfully acquired and loaded
+paź 09 01:24:29.977943 cachyos kernel: ACPI: EC: EC started
+paź 09 01:24:29.977949 cachyos kernel: ACPI: EC: interrupt blocked
+paź 09 01:24:29.977955 cachyos kernel: ACPI: EC: EC_CMD/EC_SC=0x66, EC_DATA=0x62
+paź 09 01:24:29.977961 cachyos kernel: ACPI: EC: Boot ECDT EC used to handle transactions
+paź 09 01:24:29.977967 cachyos kernel: ACPI: [Firmware Bug]: BIOS _OSI(Linux) query ignored
+paź 09 01:24:29.977976 cachyos kernel: ACPI: \_SB_: platform _OSC: OS support mask [006e7eff]
+paź 09 01:24:29.977989 cachyos kernel: ACPI: \_SB_: platform _OSC: OS control mask [006e7e7f]
+paź 09 01:24:29.977997 cachyos kernel: ACPI: USB4 _OSC: OS supports USB3+ DisplayPort+ PCIe+ XDomain+
+paź 09 01:24:29.978003 cachyos kernel: ACPI: USB4 _OSC: OS controls USB3+ DisplayPort+ PCIe+ XDomain+
+paź 09 01:24:29.978009 cachyos kernel: ACPI: Interpreter enabled
+paź 09 01:24:29.978016 cachyos kernel: ACPI: PM: (supports S0 S4 S5)
+paź 09 01:24:29.978022 cachyos kernel: ACPI: Using IOAPIC for interrupt routing
+paź 09 01:24:29.978030 cachyos kernel: PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+paź 09 01:24:29.978036 cachyos kernel: PCI: Using E820 reservations for host bridge windows
+paź 09 01:24:29.978042 cachyos kernel: ACPI: Enabled 5 GPEs in block 00 to 1F
+paź 09 01:24:29.978048 cachyos kernel: ACPI: \_SB_.PCI0.GPP1.P0NV: New power resource
+paź 09 01:24:29.978055 cachyos kernel: ACPI: \_SB_.PCI0.GPP0.M237: New power resource
+paź 09 01:24:29.978061 cachyos kernel: ACPI: \_SB_.PCI0.GPP0.SWUS.M237: New power resource
+paź 09 01:24:29.978067 cachyos kernel: ACPI: \_SB_.PCI0.GPP0.SWUS.SWDS.M237: New power resource
+paź 09 01:24:29.978076 cachyos kernel: ACPI: \_SB_.PCI0.GPP7.RPR2: New power resource
+paź 09 01:24:29.978082 cachyos kernel: ACPI: \_SB_.PCI0.GPP8.P0NV: New power resource
+paź 09 01:24:29.978090 cachyos kernel: ACPI: \_SB_.PCI0.GP11.PWRS: New power resource
+paź 09 01:24:29.978096 cachyos kernel: ACPI: \_SB_.PCI0.GP11: Overriding _PRW sleep state (S4) by S0 from power resources
+paź 09 01:24:29.978103 cachyos kernel: ACPI: \_SB_.PCI0.GP11.SWUS.PWRS: New power resource
+paź 09 01:24:29.978109 cachyos kernel: ACPI: \_SB_.PCI0.GP12.PWRS: New power resource
+paź 09 01:24:29.978116 cachyos kernel: ACPI: \_SB_.PCI0.GP12: Overriding _PRW sleep state (S4) by S0 from power resources
+paź 09 01:24:29.978124 cachyos kernel: ACPI: \_SB_.PCI0.GP12.SWUS.PWRS: New power resource
+paź 09 01:24:29.978130 cachyos kernel: ACPI: \_SB_.PCI0.GP17.PWRS: New power resource
+paź 09 01:24:29.978136 cachyos kernel: ACPI: \_SB_.PCI0.GP17.VGA_.PWRS: New power resource
+paź 09 01:24:29.978143 cachyos kernel: ACPI: \_SB_.PCI0.GP17.HDAU.PWRS: New power resource
+paź 09 01:24:29.978149 cachyos kernel: ACPI: \_SB_.PCI0.GP17.ACP_.PWRS: New power resource
+paź 09 01:24:29.978155 cachyos kernel: ACPI: \_SB_.PCI0.GP17.AZAL.PWRS: New power resource
+paź 09 01:24:29.978163 cachyos kernel: ACPI: \_SB_.PCI0.GP17.XHC0.PWRS: New power resource
+paź 09 01:24:29.978170 cachyos kernel: ACPI: \_SB_.PCI0.GP17.XHC0.RHUB.PRT4.BTPR: New power resource
+paź 09 01:24:29.978176 cachyos kernel: ACPI: \_SB_.PCI0.GP17.XHC1.PWRS: New power resource
+paź 09 01:24:29.978182 cachyos kernel: ACPI: \_SB_.PCI0.GP18.SATA.P0S0: New power resource
+paź 09 01:24:29.978189 cachyos kernel: ACPI: \_SB_.PCI0.GP18.SATA.P3S0: New power resource
+paź 09 01:24:29.978195 cachyos kernel: ACPI: \_SB_.PCI0.GP19.XHC2.PWRS: New power resource
+paź 09 01:24:29.978201 cachyos kernel: ACPI: \_SB_.PCI0.GP19.XHC3.PWRS: New power resource
+paź 09 01:24:29.978207 cachyos kernel: ACPI: \_SB_.PCI0.GP19.XHC4.PWRS: New power resource
+paź 09 01:24:29.978215 cachyos kernel: ACPI: \_SB_.PCI0.GP19.NHI0.PWRS: New power resource
+paź 09 01:24:29.978222 cachyos kernel: ACPI: \_SB_.PCI0.GP19.NHI0: Overriding _PRW sleep state (S4) by S0 from power resources
+paź 09 01:24:29.978228 cachyos kernel: ACPI: \_SB_.PCI0.GP19.NHI1.PWRS: New power resource
+paź 09 01:24:29.978234 cachyos kernel: ACPI: \_SB_.PCI0.GP19.NHI1: Overriding _PRW sleep state (S4) by S0 from power resources
+paź 09 01:24:29.978241 cachyos kernel: ACPI: \_SB_.PRWL: New power resource
+paź 09 01:24:29.978247 cachyos kernel: ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+paź 09 01:24:29.978490 cachyos kernel: acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+paź 09 01:24:29.978665 cachyos kernel: acpi PNP0A08:00: _OSC: OS now controls [PCIeHotplug SHPCHotplug PME AER PCIeCapability LTR DPC]
+paź 09 01:24:29.978835 cachyos kernel: acpi PNP0A08:00: FADT indicates ASPM is unsupported, using BIOS configuration
+paź 09 01:24:29.978844 cachyos kernel: PCI host bridge to bus 0000:00
+paź 09 01:24:29.979010 cachyos kernel: pci_bus 0000:00: root bus resource [io  0x0000-0x03af window]
+paź 09 01:24:29.979165 cachyos kernel: pci_bus 0000:00: root bus resource [io  0x03e0-0x0cf7 window]
+paź 09 01:24:29.979314 cachyos kernel: pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+paź 09 01:24:29.979461 cachyos kernel: pci_bus 0000:00: root bus resource [mem 0x000c0000-0x000dffff window]
+paź 09 01:24:29.979612 cachyos kernel: pci_bus 0000:00: root bus resource [mem 0xc0000000-0xdfffffff window]
+paź 09 01:24:29.979763 cachyos kernel: pci_bus 0000:00: root bus resource [mem 0x1040000000-0x7fffffffff window]
+paź 09 01:24:29.979909 cachyos kernel: pci_bus 0000:00: root bus resource [bus 00-ff]
+paź 09 01:24:29.980086 cachyos kernel: pci 0000:00:00.0: [1022:14b5] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.980262 cachyos kernel: pci 0000:00:00.2: [1022:14b6] type 00 class 0x080600 conventional PCI endpoint
+paź 09 01:24:29.980440 cachyos kernel: pci 0000:00:01.0: [1022:14b7] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.980613 cachyos kernel: pci 0000:00:01.1: [1022:14b8] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.980775 cachyos kernel: pci 0000:00:01.1: PCI bridge to [bus 01-05]
+paź 09 01:24:29.980932 cachyos kernel: pci 0000:00:01.1:   bridge window [io  0xf000-0xffff]
+paź 09 01:24:29.981092 cachyos kernel: pci 0000:00:01.1:   bridge window [mem 0xdc000000-0xdd0fffff]
+paź 09 01:24:29.981246 cachyos kernel: pci 0000:00:01.1:   bridge window [mem 0x7000000000-0x7801ffffff 64bit pref]
+paź 09 01:24:29.981405 cachyos kernel: pci 0000:00:01.1: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.981570 cachyos kernel: pci 0000:00:01.2: [1022:14ba] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.981758 cachyos kernel: pci 0000:00:01.2: PCI bridge to [bus 06]
+paź 09 01:24:29.981949 cachyos kernel: pci 0000:00:01.2:   bridge window [mem 0xdde00000-0xddefffff]
+paź 09 01:24:29.982138 cachyos kernel: pci 0000:00:01.2: enabling Extended Tags
+paź 09 01:24:29.982300 cachyos kernel: pci 0000:00:01.2: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.982466 cachyos kernel: pci 0000:00:02.0: [1022:14b7] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.982631 cachyos kernel: pci 0000:00:02.2: [1022:14ba] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.982787 cachyos kernel: pci 0000:00:02.2: PCI bridge to [bus 07]
+paź 09 01:24:29.982942 cachyos kernel: pci 0000:00:02.2:   bridge window [mem 0xddd00000-0xdddfffff]
+paź 09 01:24:29.983101 cachyos kernel: pci 0000:00:02.2: enabling Extended Tags
+paź 09 01:24:29.983262 cachyos kernel: pci 0000:00:02.2: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.983429 cachyos kernel: pci 0000:00:02.3: [1022:14ba] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.983586 cachyos kernel: pci 0000:00:02.3: PCI bridge to [bus 08]
+paź 09 01:24:29.983742 cachyos kernel: pci 0000:00:02.3:   bridge window [mem 0xddc00000-0xddcfffff]
+paź 09 01:24:29.983897 cachyos kernel: pci 0000:00:02.3: enabling Extended Tags
+paź 09 01:24:29.984055 cachyos kernel: pci 0000:00:02.3: removing 2.5GT/s downstream link speed restriction
+paź 09 01:24:29.984215 cachyos kernel: pci 0000:00:02.3: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.984381 cachyos kernel: pci 0000:00:02.4: [1022:14b8] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.984538 cachyos kernel: pci 0000:00:02.4: PCI bridge to [bus 09]
+paź 09 01:24:29.984698 cachyos kernel: pci 0000:00:02.4:   bridge window [mem 0xddb00000-0xddbfffff]
+paź 09 01:24:29.984854 cachyos kernel: pci 0000:00:02.4: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.985017 cachyos kernel: pci 0000:00:03.0: [1022:14b7] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.985176 cachyos kernel: pci 0000:00:04.0: [1022:14b7] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.985345 cachyos kernel: pci 0000:00:04.1: [1022:14cd] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.985507 cachyos kernel: pci 0000:00:04.1: PCI bridge to [bus 0a-39]
+paź 09 01:24:29.985673 cachyos kernel: pci 0000:00:04.1:   bridge window [io  0xc000-0xdfff]
+paź 09 01:24:29.985835 cachyos kernel: pci 0000:00:04.1:   bridge window [mem 0xc4000000-0xdbffffff]
+paź 09 01:24:29.986003 cachyos kernel: pci 0000:00:04.1:   bridge window [mem 0x7810000000-0x7837ffffff 64bit pref]
+paź 09 01:24:29.986174 cachyos kernel: pci 0000:00:04.1: enabling Extended Tags
+paź 09 01:24:29.986334 cachyos kernel: pci 0000:00:04.1: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.986489 cachyos kernel: pci 0000:00:08.0: [1022:14b7] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.986648 cachyos kernel: pci 0000:00:08.1: [1022:14b9] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.986803 cachyos kernel: pci 0000:00:08.1: PCI bridge to [bus 3a]
+paź 09 01:24:29.986957 cachyos kernel: pci 0000:00:08.1:   bridge window [io  0xe000-0xefff]
+paź 09 01:24:29.987114 cachyos kernel: pci 0000:00:08.1:   bridge window [mem 0xdd200000-0xdd6fffff]
+paź 09 01:24:29.987269 cachyos kernel: pci 0000:00:08.1:   bridge window [mem 0x7840000000-0x78501fffff 64bit pref]
+paź 09 01:24:29.987426 cachyos kernel: pci 0000:00:08.1: enabling Extended Tags
+paź 09 01:24:29.987581 cachyos kernel: pci 0000:00:08.1: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.987742 cachyos kernel: pci 0000:00:08.3: [1022:14b9] type 01 class 0x060400 PCIe Root Port
+paź 09 01:24:29.987897 cachyos kernel: pci 0000:00:08.3: PCI bridge to [bus 3b]
+paź 09 01:24:29.988051 cachyos kernel: pci 0000:00:08.3:   bridge window [mem 0xdd700000-0xddafffff]
+paź 09 01:24:29.988236 cachyos kernel: pci 0000:00:08.3: enabling Extended Tags
+paź 09 01:24:29.988407 cachyos kernel: pci 0000:00:08.3: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.988588 cachyos kernel: pci 0000:00:14.0: [1022:790b] type 00 class 0x0c0500 conventional PCI endpoint
+paź 09 01:24:29.988745 cachyos kernel: pci 0000:00:14.3: [1022:790e] type 00 class 0x060100 conventional PCI endpoint
+paź 09 01:24:29.988916 cachyos kernel: pci 0000:00:18.0: [1022:1679] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.989086 cachyos kernel: pci 0000:00:18.1: [1022:167a] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.989242 cachyos kernel: pci 0000:00:18.2: [1022:167b] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.989400 cachyos kernel: pci 0000:00:18.3: [1022:167c] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.989555 cachyos kernel: pci 0000:00:18.4: [1022:167d] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.989709 cachyos kernel: pci 0000:00:18.5: [1022:167e] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.989889 cachyos kernel: pci 0000:00:18.6: [1022:167f] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.990049 cachyos kernel: pci 0000:00:18.7: [1022:1680] type 00 class 0x060000 conventional PCI endpoint
+paź 09 01:24:29.990257 cachyos kernel: pci 0000:01:00.0: [10de:2523] type 00 class 0x030000 PCIe Legacy Endpoint
+paź 09 01:24:29.990426 cachyos kernel: pci 0000:01:00.0: BAR 0 [mem 0xdc000000-0xdcffffff]
+paź 09 01:24:29.990602 cachyos kernel: pci 0000:01:00.0: BAR 1 [mem 0x7000000000-0x70ffffffff 64bit pref]
+paź 09 01:24:29.990797 cachyos kernel: pci 0000:01:00.0: BAR 3 [mem 0x7100000000-0x7101ffffff 64bit pref]
+paź 09 01:24:29.990962 cachyos kernel: pci 0000:01:00.0: BAR 5 [io  0xf000-0xf07f]
+paź 09 01:24:29.991149 cachyos kernel: pci 0000:01:00.0: ROM [mem 0xdd000000-0xdd07ffff pref]
+paź 09 01:24:29.991549 cachyos kernel: pci 0000:01:00.0: PME# supported from D0 D3hot
+paź 09 01:24:29.991731 cachyos kernel: pci 0000:01:00.0: 126.024 Gb/s available PCIe bandwidth, limited by 16.0 GT/s PCIe x8 link at 0000:00:01.1 (capable of 252.048 Gb/s with 16.0 GT/s PCIe x16 link)
+paź 09 01:24:29.991899 cachyos kernel: pci 0000:01:00.1: [10de:228e] type 00 class 0x040300 PCIe Endpoint
+paź 09 01:24:29.992064 cachyos kernel: pci 0000:01:00.1: BAR 0 [mem 0xdd080000-0xdd083fff]
+paź 09 01:24:29.992228 cachyos kernel: pci 0000:00:01.1: PCI bridge to [bus 01-05]
+paź 09 01:24:29.992395 cachyos kernel: pci 0000:06:00.0: [144d:a808] type 00 class 0x010802 PCIe Endpoint
+paź 09 01:24:29.992564 cachyos kernel: pci 0000:06:00.0: BAR 0 [mem 0xdde00000-0xdde03fff 64bit]
+paź 09 01:24:29.992724 cachyos kernel: pci 0000:00:01.2: PCI bridge to [bus 06]
+paź 09 01:24:29.992889 cachyos kernel: pci 0000:07:00.0: [8086:2725] type 00 class 0x028000 PCIe Endpoint
+paź 09 01:24:29.993080 cachyos kernel: pci 0000:07:00.0: BAR 0 [mem 0xddd00000-0xddd03fff 64bit]
+paź 09 01:24:29.993244 cachyos kernel: pci 0000:07:00.0: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.993400 cachyos kernel: pci 0000:00:02.2: PCI bridge to [bus 07]
+paź 09 01:24:29.993565 cachyos kernel: pci 0000:08:00.0: [1217:8520] type 00 class 0x080501 PCIe Endpoint
+paź 09 01:24:29.993743 cachyos kernel: pci 0000:08:00.0: BAR 0 [mem 0xddc01000-0xddc01fff]
+paź 09 01:24:29.993907 cachyos kernel: pci 0000:08:00.0: BAR 1 [mem 0xddc00000-0xddc007ff]
+paź 09 01:24:29.994069 cachyos kernel: pci 0000:08:00.0: PME# supported from D3hot D3cold
+paź 09 01:24:29.994223 cachyos kernel: pci 0000:00:02.3: PCI bridge to [bus 08]
+paź 09 01:24:29.994386 cachyos kernel: pci 0000:09:00.0: [1344:5411] type 00 class 0x010802 PCIe Endpoint
+paź 09 01:24:29.994549 cachyos kernel: pci 0000:09:00.0: BAR 0 [mem 0xddb00000-0xddb03fff 64bit]
+paź 09 01:24:29.994712 cachyos kernel: pci 0000:00:02.4: PCI bridge to [bus 09]
+paź 09 01:24:29.994868 cachyos kernel: pci 0000:00:04.1: PCI bridge to [bus 0a-39]
+paź 09 01:24:29.995036 cachyos kernel: pci 0000:3a:00.0: [1002:1681] type 00 class 0x030000 PCIe Legacy Endpoint
+paź 09 01:24:29.995204 cachyos kernel: pci 0000:3a:00.0: BAR 0 [mem 0x7840000000-0x784fffffff 64bit pref]
+paź 09 01:24:29.995367 cachyos kernel: pci 0000:3a:00.0: BAR 2 [mem 0x7850000000-0x78501fffff 64bit pref]
+paź 09 01:24:29.995528 cachyos kernel: pci 0000:3a:00.0: BAR 4 [io  0xe000-0xe0ff]
+paź 09 01:24:29.995694 cachyos kernel: pci 0000:3a:00.0: BAR 5 [mem 0xdd600000-0xdd67ffff]
+paź 09 01:24:29.995857 cachyos kernel: pci 0000:3a:00.0: enabling Extended Tags
+paź 09 01:24:29.996019 cachyos kernel: pci 0000:3a:00.0: PME# supported from D1 D2 D3hot D3cold
+paź 09 01:24:29.996185 cachyos kernel: pci 0000:3a:00.1: [1002:1640] type 00 class 0x040300 PCIe Legacy Endpoint
+paź 09 01:24:29.996352 cachyos kernel: pci 0000:3a:00.1: BAR 0 [mem 0xdd6c8000-0xdd6cbfff]
+paź 09 01:24:29.996514 cachyos kernel: pci 0000:3a:00.1: enabling Extended Tags
+paź 09 01:24:29.996680 cachyos kernel: pci 0000:3a:00.1: PME# supported from D1 D2 D3hot D3cold
+paź 09 01:24:29.996845 cachyos kernel: pci 0000:3a:00.2: [1022:1649] type 00 class 0x108000 PCIe Endpoint
+paź 09 01:24:29.997008 cachyos kernel: pci 0000:3a:00.2: BAR 2 [mem 0xdd500000-0xdd5fffff]
+paź 09 01:24:29.997171 cachyos kernel: pci 0000:3a:00.2: BAR 5 [mem 0xdd6ce000-0xdd6cffff]
+paź 09 01:24:29.997332 cachyos kernel: pci 0000:3a:00.2: enabling Extended Tags
+paź 09 01:24:29.997500 cachyos kernel: pci 0000:3a:00.3: [1022:161d] type 00 class 0x0c0330 PCIe Endpoint
+paź 09 01:24:29.997666 cachyos kernel: pci 0000:3a:00.3: BAR 0 [mem 0xdd400000-0xdd4fffff 64bit]
+paź 09 01:24:29.997836 cachyos kernel: pci 0000:3a:00.3: enabling Extended Tags
+paź 09 01:24:29.998001 cachyos kernel: pci 0000:3a:00.3: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.998165 cachyos kernel: pci 0000:3a:00.4: [1022:161e] type 00 class 0x0c0330 PCIe Endpoint
+paź 09 01:24:29.998329 cachyos kernel: pci 0000:3a:00.4: BAR 0 [mem 0xdd300000-0xdd3fffff 64bit]
+paź 09 01:24:29.998493 cachyos kernel: pci 0000:3a:00.4: enabling Extended Tags
+paź 09 01:24:29.998655 cachyos kernel: pci 0000:3a:00.4: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.998829 cachyos kernel: pci 0000:3a:00.5: [1022:15e2] type 00 class 0x048000 PCIe Endpoint
+paź 09 01:24:29.998993 cachyos kernel: pci 0000:3a:00.5: BAR 0 [mem 0xdd680000-0xdd6bffff]
+paź 09 01:24:29.999156 cachyos kernel: pci 0000:3a:00.5: enabling Extended Tags
+paź 09 01:24:29.999318 cachyos kernel: pci 0000:3a:00.5: PME# supported from D0 D3hot D3cold
+paź 09 01:24:29.999486 cachyos kernel: pci 0000:3a:00.6: [1022:15e3] type 00 class 0x040300 PCIe Endpoint
+paź 09 01:24:29.999649 cachyos kernel: pci 0000:3a:00.6: BAR 0 [mem 0xdd6c0000-0xdd6c7fff]
+paź 09 01:24:29.999820 cachyos kernel: pci 0000:3a:00.6: enabling Extended Tags
+paź 09 01:24:29.999982 cachyos kernel: pci 0000:3a:00.6: PME# supported from D0 D3hot D3cold
+paź 09 01:24:30.000146 cachyos kernel: pci 0000:3a:00.7: [1022:15e4] type 00 class 0x118000 PCIe Endpoint
+paź 09 01:24:30.000309 cachyos kernel: pci 0000:3a:00.7: BAR 2 [mem 0xdd200000-0xdd2fffff]
+paź 09 01:24:30.000471 cachyos kernel: pci 0000:3a:00.7: BAR 5 [mem 0xdd6cc000-0xdd6cdfff]
+paź 09 01:24:30.000633 cachyos kernel: pci 0000:3a:00.7: enabling Extended Tags
+paź 09 01:24:30.000793 cachyos kernel: pci 0000:00:08.1: PCI bridge to [bus 3a]
+paź 09 01:24:30.000963 cachyos kernel: pci 0000:3b:00.0: [1022:161f] type 00 class 0x0c0330 PCIe Endpoint
+paź 09 01:24:30.001128 cachyos kernel: pci 0000:3b:00.0: BAR 0 [mem 0xdd900000-0xdd9fffff 64bit]
+paź 09 01:24:30.001292 cachyos kernel: pci 0000:3b:00.0: enabling Extended Tags
+paź 09 01:24:30.001455 cachyos kernel: pci 0000:3b:00.0: PME# supported from D0 D3hot D3cold
+paź 09 01:24:30.001629 cachyos kernel: pci 0000:3b:00.3: [1022:15d6] type 00 class 0x0c0330 PCIe Endpoint
+paź 09 01:24:30.001799 cachyos kernel: pci 0000:3b:00.3: BAR 0 [mem 0xdd800000-0xdd8fffff 64bit]
+paź 09 01:24:30.001966 cachyos kernel: pci 0000:3b:00.3: enabling Extended Tags
+paź 09 01:24:30.002199 cachyos kernel: pci 0000:3b:00.3: PME# supported from D0 D3hot D3cold
+paź 09 01:24:30.002453 cachyos kernel: pci 0000:3b:00.4: [1022:15d7] type 00 class 0x0c0330 PCIe Endpoint
+paź 09 01:24:30.002689 cachyos kernel: pci 0000:3b:00.4: BAR 0 [mem 0xdd700000-0xdd7fffff 64bit]
+paź 09 01:24:30.002868 cachyos kernel: pci 0000:3b:00.4: enabling Extended Tags
+paź 09 01:24:30.003039 cachyos kernel: pci 0000:3b:00.4: PME# supported from D0 D3hot D3cold
+paź 09 01:24:30.003207 cachyos kernel: pci 0000:3b:00.6: [1022:162f] type 00 class 0x0c0340 PCIe Endpoint
+paź 09 01:24:30.003372 cachyos kernel: pci 0000:3b:00.6: BAR 0 [mem 0xdda00000-0xdda7ffff 64bit]
+paź 09 01:24:30.003536 cachyos kernel: pci 0000:3b:00.6: enabling Extended Tags
+paź 09 01:24:30.003713 cachyos kernel: pci 0000:3b:00.6: PME# supported from D0 D3hot D3cold
+paź 09 01:24:30.003874 cachyos kernel: pci 0000:00:08.3: PCI bridge to [bus 3b]
+paź 09 01:24:30.003884 cachyos kernel: ACPI: PCI: Interrupt link LNKA configured for IRQ 0
+paź 09 01:24:30.003891 cachyos kernel: ACPI: PCI: Interrupt link LNKB configured for IRQ 0
+paź 09 01:24:30.003897 cachyos kernel: ACPI: PCI: Interrupt link LNKC configured for IRQ 0
+paź 09 01:24:30.003904 cachyos kernel: ACPI: PCI: Interrupt link LNKD configured for IRQ 0
+paź 09 01:24:30.003910 cachyos kernel: ACPI: PCI: Interrupt link LNKE configured for IRQ 0
+paź 09 01:24:30.003916 cachyos kernel: ACPI: PCI: Interrupt link LNKF configured for IRQ 0
+paź 09 01:24:30.003926 cachyos kernel: ACPI: PCI: Interrupt link LNKG configured for IRQ 0
+paź 09 01:24:30.003932 cachyos kernel: ACPI: PCI: Interrupt link LNKH configured for IRQ 0
+paź 09 01:24:30.003939 cachyos kernel: Low-power S0 idle used by default for system suspend
+paź 09 01:24:30.003945 cachyos kernel: ACPI: EC: interrupt unblocked
+paź 09 01:24:30.003952 cachyos kernel: ACPI: EC: event unblocked
+paź 09 01:24:30.003958 cachyos kernel: ACPI: EC: EC_CMD/EC_SC=0x66, EC_DATA=0x62
+paź 09 01:24:30.003965 cachyos kernel: ACPI: EC: GPE=0x9
+paź 09 01:24:30.003972 cachyos kernel: ACPI: \_SB_.PCI0.SBRG.EC0_: Boot ECDT EC initialization complete
+paź 09 01:24:30.003979 cachyos kernel: ACPI: \_SB_.PCI0.SBRG.EC0_: EC: Used to handle transactions and events
+paź 09 01:24:30.003988 cachyos kernel: iommu: Default domain type: Translated
+paź 09 01:24:30.003995 cachyos kernel: iommu: DMA domain TLB invalidation policy: lazy mode
+paź 09 01:24:30.004001 cachyos kernel: SCSI subsystem initialized
+paź 09 01:24:30.004008 cachyos kernel: libata version 3.00 loaded.
+paź 09 01:24:30.004015 cachyos kernel: ACPI: bus type USB registered
+paź 09 01:24:30.004021 cachyos kernel: usbcore: registered new interface driver usbfs
+paź 09 01:24:30.004028 cachyos kernel: usbcore: registered new interface driver hub
+paź 09 01:24:30.004035 cachyos kernel: usbcore: registered new device driver usb
+paź 09 01:24:30.004041 cachyos kernel: EDAC MC: Ver: 3.0.0
+paź 09 01:24:30.004048 cachyos kernel: efivars: Registered efivars operations
+paź 09 01:24:30.004056 cachyos kernel: NetLabel: Initializing
+paź 09 01:24:30.004063 cachyos kernel: NetLabel:  domain hash size = 128
+paź 09 01:24:30.004070 cachyos kernel: NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+paź 09 01:24:30.004076 cachyos kernel: NetLabel:  unlabeled traffic allowed by default
+paź 09 01:24:30.004083 cachyos kernel: mctp: management component transport protocol core
+paź 09 01:24:30.004089 cachyos kernel: NET: Registered PF_MCTP protocol family
+paź 09 01:24:30.004096 cachyos kernel: PCI: Using ACPI for IRQ routing
+paź 09 01:24:30.004102 cachyos kernel: PCI: pci_cache_line_size set to 64 bytes
+paź 09 01:24:30.004109 cachyos kernel: e820: register RAM buffer resource [mem 0x09aff000-0x0bffffff]
+paź 09 01:24:30.004117 cachyos kernel: e820: register RAM buffer resource [mem 0x0a200000-0x0bffffff]
+paź 09 01:24:30.004124 cachyos kernel: e820: register RAM buffer resource [mem 0xab148000-0xabffffff]
+paź 09 01:24:30.004130 cachyos kernel: e820: register RAM buffer resource [mem 0xab2ca000-0xabffffff]
+paź 09 01:24:30.004137 cachyos kernel: e820: register RAM buffer resource [mem 0xb12e8000-0xb3ffffff]
+paź 09 01:24:30.004144 cachyos kernel: e820: register RAM buffer resource [mem 0xba3ff000-0xbbffffff]
+paź 09 01:24:30.004150 cachyos kernel: e820: register RAM buffer resource [mem 0xbbffd000-0xbbffffff]
+paź 09 01:24:30.004157 cachyos kernel: e820: register RAM buffer resource [mem 0x101e300000-0x101fffffff]
+paź 09 01:24:30.004323 cachyos kernel: pci 0000:01:00.0: vgaarb: bridge control possible
+paź 09 01:24:30.004491 cachyos kernel: pci 0000:01:00.0: vgaarb: VGA device added: decodes=io+mem,owns=none,locks=none
+paź 09 01:24:30.004668 cachyos kernel: pci 0000:3a:00.0: vgaarb: setting as boot VGA device
+paź 09 01:24:30.004841 cachyos kernel: pci 0000:3a:00.0: vgaarb: bridge control possible
+paź 09 01:24:30.005005 cachyos kernel: pci 0000:3a:00.0: vgaarb: VGA device added: decodes=io+mem,owns=none,locks=none
+paź 09 01:24:30.005013 cachyos kernel: vgaarb: loaded
+paź 09 01:24:30.005020 cachyos kernel: hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+paź 09 01:24:30.005026 cachyos kernel: hpet0: 3 comparators, 32-bit 14.318180 MHz counter
+paź 09 01:24:30.005032 cachyos kernel: clocksource: Switched to clocksource tsc-early
+paź 09 01:24:30.005038 cachyos kernel: VFS: Disk quotas dquot_6.6.0
+paź 09 01:24:30.005045 cachyos kernel: VFS: Dquot-cache hash table entries: 512 (4096 bytes)
+paź 09 01:24:30.005233 cachyos kernel: acpi PNP0C01:00: Reserved [mem 0xe0000000-0xefffffff]
+paź 09 01:24:30.005435 cachyos kernel: acpi PNP0C02:00: Could not reserve [mem 0xfd000000-0xfdffffff]
+paź 09 01:24:30.005619 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0010-0x001f]
+paź 09 01:24:30.005799 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0022-0x003f]
+paź 09 01:24:30.005970 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0063]
+paź 09 01:24:30.006140 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0065]
+paź 09 01:24:30.006309 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0067-0x006f]
+paź 09 01:24:30.006478 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0072-0x007f]
+paź 09 01:24:30.006648 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0080]
+paź 09 01:24:30.006837 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0084-0x0086]
+paź 09 01:24:30.007009 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0088]
+paź 09 01:24:30.007179 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x008c-0x008e]
+paź 09 01:24:30.007348 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x0090-0x009f]
+paź 09 01:24:30.007517 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x00a2-0x00bf]
+paź 09 01:24:30.007692 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x00b1]
+paź 09 01:24:30.007884 cachyos kernel: acpi PNP0C02:01: Skipped [io  0x00e0-0x00ef]
+paź 09 01:24:30.008061 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x04d0-0x04d1]
+paź 09 01:24:30.008237 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x040b]
+paź 09 01:24:30.008424 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x04d6]
+paź 09 01:24:30.008599 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0c00-0x0c01]
+paź 09 01:24:30.009007 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0c14]
+paź 09 01:24:30.009658 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0c50-0x0c51]
+paź 09 01:24:30.009972 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0c52]
+paź 09 01:24:30.010160 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0c6c]
+paź 09 01:24:30.010344 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0c6f]
+paź 09 01:24:30.010528 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0cd0-0x0cd1]
+paź 09 01:24:30.010714 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0cd2-0x0cd3]
+paź 09 01:24:30.010963 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0cd4-0x0cd5]
+paź 09 01:24:30.011139 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0cd6-0x0cd7]
+paź 09 01:24:30.011310 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0cd8-0x0cdf]
+paź 09 01:24:30.011479 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0800-0x089f]
+paź 09 01:24:30.011648 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0b00-0x0b0f]
+paź 09 01:24:30.011824 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0b20-0x0b3f]
+paź 09 01:24:30.011994 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0900-0x090f]
+paź 09 01:24:30.012168 cachyos kernel: acpi PNP0C02:01: Reserved [io  0x0910-0x091f]
+paź 09 01:24:30.012337 cachyos kernel: acpi PNP0C02:01: Could not reserve [mem 0xfec00000-0xfec00fff]
+paź 09 01:24:30.012511 cachyos kernel: acpi PNP0C02:01: Could not reserve [mem 0xfec01000-0xfec01fff]
+paź 09 01:24:30.012688 cachyos kernel: acpi PNP0C02:01: Reserved [mem 0xfedc0000-0xfedc0fff]
+paź 09 01:24:30.012860 cachyos kernel: acpi PNP0C02:01: Reserved [mem 0xfee00000-0xfee00fff]
+paź 09 01:24:30.013031 cachyos kernel: acpi PNP0C02:01: Could not reserve [mem 0xfed80000-0xfed8ffff]
+paź 09 01:24:30.013201 cachyos kernel: acpi PNP0C02:01: Reserved [mem 0xfec10000-0xfec10fff]
+paź 09 01:24:30.013371 cachyos kernel: acpi PNP0C02:01: Reserved [mem 0xff000000-0xffffffff]
+paź 09 01:24:30.013383 cachyos kernel: pnp: PnP ACPI init
+paź 09 01:24:30.013390 cachyos kernel: pnp: PnP ACPI: found 0 devices
+paź 09 01:24:30.013397 cachyos kernel: clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+paź 09 01:24:30.013404 cachyos kernel: NET: Registered PF_INET protocol family
+paź 09 01:24:30.013410 cachyos kernel: IP idents hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+paź 09 01:24:30.013417 cachyos kernel: tcp_listen_portaddr_hash hash table entries: 32768 (order: 7, 524288 bytes, linear)
+paź 09 01:24:30.013424 cachyos kernel: Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+paź 09 01:24:30.013432 cachyos kernel: TCP established hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+paź 09 01:24:30.013439 cachyos kernel: TCP bind hash table entries: 65536 (order: 9, 2097152 bytes, linear)
+paź 09 01:24:30.013445 cachyos kernel: TCP: Hash tables configured (established 524288 bind 65536)
+paź 09 01:24:30.013452 cachyos kernel: MPTCP token hash table entries: 65536 (order: 9, 1572864 bytes, linear)
+paź 09 01:24:30.013459 cachyos kernel: UDP hash table entries: 32768 (order: 9, 2097152 bytes, linear)
+paź 09 01:24:30.013465 cachyos kernel: NET: Registered PF_UNIX/PF_LOCAL protocol family
+paź 09 01:24:30.013472 cachyos kernel: NET: Registered PF_XDP protocol family
+paź 09 01:24:30.013631 cachyos kernel: pci 0000:00:01.1: PCI bridge to [bus 01-05]
+paź 09 01:24:30.013796 cachyos kernel: pci 0000:00:01.1:   bridge window [io  0xf000-0xffff]
+paź 09 01:24:30.013956 cachyos kernel: pci 0000:00:01.1:   bridge window [mem 0xdc000000-0xdd0fffff]
+paź 09 01:24:30.014112 cachyos kernel: pci 0000:00:01.1:   bridge window [mem 0x7000000000-0x7801ffffff 64bit pref]
+paź 09 01:24:30.014266 cachyos kernel: pci 0000:00:01.2: PCI bridge to [bus 06]
+paź 09 01:24:30.014422 cachyos kernel: pci 0000:00:01.2:   bridge window [mem 0xdde00000-0xddefffff]
+paź 09 01:24:30.014581 cachyos kernel: pci 0000:00:02.2: PCI bridge to [bus 07]
+paź 09 01:24:30.014747 cachyos kernel: pci 0000:00:02.2:   bridge window [mem 0xddd00000-0xdddfffff]
+paź 09 01:24:30.014904 cachyos kernel: pci 0000:00:02.3: PCI bridge to [bus 08]
+paź 09 01:24:30.015058 cachyos kernel: pci 0000:00:02.3:   bridge window [mem 0xddc00000-0xddcfffff]
+paź 09 01:24:30.015212 cachyos kernel: pci 0000:00:02.4: PCI bridge to [bus 09]
+paź 09 01:24:30.015366 cachyos kernel: pci 0000:00:02.4:   bridge window [mem 0xddb00000-0xddbfffff]
+paź 09 01:24:30.015520 cachyos kernel: pci 0000:00:04.1: PCI bridge to [bus 0a-39]
+paź 09 01:24:30.015683 cachyos kernel: pci 0000:00:04.1:   bridge window [io  0xc000-0xdfff]
+paź 09 01:24:30.015840 cachyos kernel: pci 0000:00:04.1:   bridge window [mem 0xc4000000-0xdbffffff]
+paź 09 01:24:30.015994 cachyos kernel: pci 0000:00:04.1:   bridge window [mem 0x7810000000-0x7837ffffff 64bit pref]
+paź 09 01:24:30.016149 cachyos kernel: pci 0000:00:08.1: PCI bridge to [bus 3a]
+paź 09 01:24:30.016304 cachyos kernel: pci 0000:00:08.1:   bridge window [io  0xe000-0xefff]
+paź 09 01:24:30.016459 cachyos kernel: pci 0000:00:08.1:   bridge window [mem 0xdd200000-0xdd6fffff]
+paź 09 01:24:30.016613 cachyos kernel: pci 0000:00:08.1:   bridge window [mem 0x7840000000-0x78501fffff 64bit pref]
+paź 09 01:24:30.016782 cachyos kernel: pci 0000:00:08.3: PCI bridge to [bus 3b]
+paź 09 01:24:30.016937 cachyos kernel: pci 0000:00:08.3:   bridge window [mem 0xdd700000-0xddafffff]
+paź 09 01:24:30.017086 cachyos kernel: pci_bus 0000:00: resource 4 [io  0x0000-0x03af window]
+paź 09 01:24:30.017234 cachyos kernel: pci_bus 0000:00: resource 5 [io  0x03e0-0x0cf7 window]
+paź 09 01:24:30.017383 cachyos kernel: pci_bus 0000:00: resource 6 [io  0x0d00-0xffff window]
+paź 09 01:24:30.017529 cachyos kernel: pci_bus 0000:00: resource 7 [mem 0x000c0000-0x000dffff window]
+paź 09 01:24:30.017680 cachyos kernel: pci_bus 0000:00: resource 8 [mem 0xc0000000-0xdfffffff window]
+paź 09 01:24:30.017827 cachyos kernel: pci_bus 0000:00: resource 9 [mem 0x1040000000-0x7fffffffff window]
+paź 09 01:24:30.017993 cachyos kernel: pci_bus 0000:01: resource 0 [io  0xf000-0xffff]
+paź 09 01:24:30.018150 cachyos kernel: pci_bus 0000:01: resource 1 [mem 0xdc000000-0xdd0fffff]
+paź 09 01:24:30.018305 cachyos kernel: pci_bus 0000:01: resource 2 [mem 0x7000000000-0x7801ffffff 64bit pref]
+paź 09 01:24:30.018480 cachyos kernel: pci_bus 0000:06: resource 1 [mem 0xdde00000-0xddefffff]
+paź 09 01:24:30.018647 cachyos kernel: pci_bus 0000:07: resource 1 [mem 0xddd00000-0xdddfffff]
+paź 09 01:24:30.018826 cachyos kernel: pci_bus 0000:08: resource 1 [mem 0xddc00000-0xddcfffff]
+paź 09 01:24:30.018997 cachyos kernel: pci_bus 0000:09: resource 1 [mem 0xddb00000-0xddbfffff]
+paź 09 01:24:30.019163 cachyos kernel: pci_bus 0000:0a: resource 0 [io  0xc000-0xdfff]
+paź 09 01:24:30.019319 cachyos kernel: pci_bus 0000:0a: resource 1 [mem 0xc4000000-0xdbffffff]
+paź 09 01:24:30.019477 cachyos kernel: pci_bus 0000:0a: resource 2 [mem 0x7810000000-0x7837ffffff 64bit pref]
+paź 09 01:24:30.019645 cachyos kernel: pci_bus 0000:3a: resource 0 [io  0xe000-0xefff]
+paź 09 01:24:30.019806 cachyos kernel: pci_bus 0000:3a: resource 1 [mem 0xdd200000-0xdd6fffff]
+paź 09 01:24:30.019960 cachyos kernel: pci_bus 0000:3a: resource 2 [mem 0x7840000000-0x78501fffff 64bit pref]
+paź 09 01:24:30.020126 cachyos kernel: pci_bus 0000:3b: resource 1 [mem 0xdd700000-0xddafffff]
+paź 09 01:24:30.020297 cachyos kernel: pci 0000:01:00.1: extending delay after power-on from D3hot to 20 msec
+paź 09 01:24:30.020463 cachyos kernel: pci 0000:01:00.1: D0 power state depends on 0000:01:00.0
+paź 09 01:24:30.020627 cachyos kernel: pci 0000:3a:00.1: D0 power state depends on 0000:3a:00.0
+paź 09 01:24:30.020796 cachyos kernel: pci 0000:00:08.1: can't derive routing for PCI INT A
+paź 09 01:24:30.020951 cachyos kernel: pci 0000:00:08.1: PCI INT A: not connected
+paź 09 01:24:30.021106 cachyos kernel: pci 0000:00:08.3: can't derive routing for PCI INT A
+paź 09 01:24:30.021260 cachyos kernel: pci 0000:00:08.3: PCI INT A: not connected
+paź 09 01:24:30.021269 cachyos kernel: PCI: CLS 64 bytes, default 64
+paź 09 01:24:30.021422 cachyos kernel: pci 0000:00:00.2: AMD-Vi: IOMMU performance counters supported
+paź 09 01:24:30.021431 cachyos kernel: Trying to unpack rootfs image as initramfs...
+paź 09 01:24:30.021583 cachyos kernel: pci 0000:00:01.0: Adding to iommu group 0
+paź 09 01:24:30.021755 cachyos kernel: pci 0000:00:01.1: Adding to iommu group 1
+paź 09 01:24:30.021911 cachyos kernel: pci 0000:00:01.2: Adding to iommu group 2
+paź 09 01:24:30.022065 cachyos kernel: pci 0000:00:02.0: Adding to iommu group 3
+paź 09 01:24:30.022219 cachyos kernel: pci 0000:00:02.2: Adding to iommu group 4
+paź 09 01:24:30.022373 cachyos kernel: pci 0000:00:02.3: Adding to iommu group 5
+paź 09 01:24:30.022527 cachyos kernel: pci 0000:00:02.4: Adding to iommu group 6
+paź 09 01:24:30.022687 cachyos kernel: pci 0000:00:03.0: Adding to iommu group 7
+paź 09 01:24:30.022844 cachyos kernel: pci 0000:00:04.0: Adding to iommu group 8
+paź 09 01:24:30.023002 cachyos kernel: pci 0000:00:04.1: Adding to iommu group 8
+paź 09 01:24:30.023156 cachyos kernel: pci 0000:00:08.0: Adding to iommu group 9
+paź 09 01:24:30.023310 cachyos kernel: pci 0000:00:08.1: Adding to iommu group 10
+paź 09 01:24:30.023464 cachyos kernel: pci 0000:00:08.3: Adding to iommu group 11
+paź 09 01:24:30.023622 cachyos kernel: pci 0000:00:14.0: Adding to iommu group 12
+paź 09 01:24:30.023784 cachyos kernel: pci 0000:00:14.3: Adding to iommu group 12
+paź 09 01:24:30.023939 cachyos kernel: pci 0000:00:18.0: Adding to iommu group 13
+paź 09 01:24:30.024092 cachyos kernel: pci 0000:00:18.1: Adding to iommu group 13
+paź 09 01:24:30.024248 cachyos kernel: pci 0000:00:18.2: Adding to iommu group 13
+paź 09 01:24:30.024402 cachyos kernel: pci 0000:00:18.3: Adding to iommu group 13
+paź 09 01:24:30.024555 cachyos kernel: pci 0000:00:18.4: Adding to iommu group 13
+paź 09 01:24:30.024715 cachyos kernel: pci 0000:00:18.5: Adding to iommu group 13
+paź 09 01:24:30.024870 cachyos kernel: pci 0000:00:18.6: Adding to iommu group 13
+paź 09 01:24:30.025023 cachyos kernel: pci 0000:00:18.7: Adding to iommu group 13
+paź 09 01:24:30.025186 cachyos kernel: pci 0000:01:00.0: Adding to iommu group 14
+paź 09 01:24:30.025352 cachyos kernel: pci 0000:01:00.1: Adding to iommu group 14
+paź 09 01:24:30.025516 cachyos kernel: pci 0000:06:00.0: Adding to iommu group 15
+paź 09 01:24:30.025696 cachyos kernel: pci 0000:07:00.0: Adding to iommu group 16
+paź 09 01:24:30.025860 cachyos kernel: pci 0000:08:00.0: Adding to iommu group 17
+paź 09 01:24:30.026023 cachyos kernel: pci 0000:09:00.0: Adding to iommu group 18
+paź 09 01:24:30.026184 cachyos kernel: pci 0000:3a:00.0: Adding to iommu group 19
+paź 09 01:24:30.026346 cachyos kernel: pci 0000:3a:00.1: Adding to iommu group 20
+paź 09 01:24:30.026509 cachyos kernel: pci 0000:3a:00.2: Adding to iommu group 21
+paź 09 01:24:30.026677 cachyos kernel: pci 0000:3a:00.3: Adding to iommu group 22
+paź 09 01:24:30.026848 cachyos kernel: pci 0000:3a:00.4: Adding to iommu group 23
+paź 09 01:24:30.027025 cachyos kernel: pci 0000:3a:00.5: Adding to iommu group 24
+paź 09 01:24:30.027189 cachyos kernel: pci 0000:3a:00.6: Adding to iommu group 25
+paź 09 01:24:30.027352 cachyos kernel: pci 0000:3a:00.7: Adding to iommu group 26
+paź 09 01:24:30.027516 cachyos kernel: pci 0000:3b:00.0: Adding to iommu group 27
+paź 09 01:24:30.027682 cachyos kernel: pci 0000:3b:00.3: Adding to iommu group 28
+paź 09 01:24:30.027847 cachyos kernel: pci 0000:3b:00.4: Adding to iommu group 29
+paź 09 01:24:30.028012 cachyos kernel: pci 0000:3b:00.6: Adding to iommu group 30
+paź 09 01:24:30.028023 cachyos kernel: AMD-Vi: Extended features (0x246577efa2254afa, 0x0): PPR NX GT [5] IA GA PC GA_vAPIC
+paź 09 01:24:30.028030 cachyos kernel: AMD-Vi: Interrupt remapping enabled
+paź 09 01:24:30.028037 cachyos kernel: AMD-Vi: Virtual APIC enabled
+paź 09 01:24:30.028044 cachyos kernel: PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+paź 09 01:24:30.028050 cachyos kernel: software IO TLB: mapped [mem 0x00000000a679f000-0x00000000aa79f000] (64MB)
+paź 09 01:24:30.028057 cachyos kernel: LVT offset 0 assigned for vector 0x400
+paź 09 01:24:30.028063 cachyos kernel: perf: AMD IBS detected (0x000003fd)
+paź 09 01:24:30.028070 cachyos kernel: perf/amd_iommu: Detected AMD IOMMU #0 (2 banks, 4 counters/bank).
+paź 09 01:24:30.028076 cachyos kernel: Initialise system trusted keyrings
+paź 09 01:24:30.028085 cachyos kernel: Key type blacklist registered
+paź 09 01:24:30.028091 cachyos kernel: workingset: timestamp_bits=36 (anon: 31) max_order=24 bucket_order=0 (anon: 0)
+paź 09 01:24:30.028098 cachyos kernel: fuse: init (API version 7.45)
+paź 09 01:24:30.028104 cachyos kernel: integrity: Platform Keyring initialized
+paź 09 01:24:30.028111 cachyos kernel: integrity: Machine keyring initialized
+paź 09 01:24:30.028118 cachyos kernel: Key type asymmetric registered
+paź 09 01:24:30.028124 cachyos kernel: Asymmetric key parser 'x509' registered
+paź 09 01:24:30.028131 cachyos kernel: Block layer SCSI generic (bsg) driver version 0.4 loaded (major 245)
+paź 09 01:24:30.028137 cachyos kernel: io scheduler mq-deadline registered
+paź 09 01:24:30.028146 cachyos kernel: io scheduler kyber registered
+paź 09 01:24:30.028152 cachyos kernel: Adaptive Deadline I/O Scheduler 3.3.0 by Masahito Suzuki
+paź 09 01:24:30.028159 cachyos kernel: io scheduler adios registered
+paź 09 01:24:30.028165 cachyos kernel: io scheduler bfq registered
+paź 09 01:24:30.028172 cachyos kernel: ledtrig-cpu: registered to indicate activity on CPUs
+paź 09 01:24:30.028326 cachyos kernel: pcieport 0000:00:01.1: PME: Signaling with IRQ 30
+paź 09 01:24:30.028479 cachyos kernel: pcieport 0000:00:01.1: AER: enabled with IRQ 30
+paź 09 01:24:30.028641 cachyos kernel: pcieport 0000:00:01.1: pciehp: Slot #0 AttnBtn- PwrCtrl- MRL- AttnInd- PwrInd- HotPlug+ Surprise- Interlock- NoCompl+ IbPresDis- LLActRep+
+paź 09 01:24:30.028805 cachyos kernel: pcieport 0000:00:01.2: PME: Signaling with IRQ 31
+paź 09 01:24:30.028960 cachyos kernel: pcieport 0000:00:01.2: AER: enabled with IRQ 31
+paź 09 01:24:30.029113 cachyos kernel: pcieport 0000:00:02.2: PME: Signaling with IRQ 32
+paź 09 01:24:30.029265 cachyos kernel: pcieport 0000:00:02.2: AER: enabled with IRQ 32
+paź 09 01:24:30.029421 cachyos kernel: pcieport 0000:00:02.3: PME: Signaling with IRQ 33
+paź 09 01:24:30.029576 cachyos kernel: pcieport 0000:00:02.3: AER: enabled with IRQ 33
+paź 09 01:24:30.029736 cachyos kernel: pcieport 0000:00:02.4: PME: Signaling with IRQ 34
+paź 09 01:24:30.029890 cachyos kernel: pcieport 0000:00:02.4: AER: enabled with IRQ 34
+paź 09 01:24:30.030050 cachyos kernel: pcieport 0000:00:04.1: PME: Signaling with IRQ 35
+paź 09 01:24:30.030204 cachyos kernel: pcieport 0000:00:04.1: AER: enabled with IRQ 35
+paź 09 01:24:30.030363 cachyos kernel: pcieport 0000:00:04.1: pciehp: Slot #0 AttnBtn- PwrCtrl- MRL- AttnInd- PwrInd- HotPlug+ Surprise+ Interlock- NoCompl+ IbPresDis- LLActRep+
+paź 09 01:24:30.030518 cachyos kernel: pcieport 0000:00:08.1: PME: Signaling with IRQ 36
+paź 09 01:24:30.030687 cachyos kernel: pcieport 0000:00:08.3: PME: Signaling with IRQ 37
+paź 09 01:24:30.030846 cachyos kernel: pcieport 0000:00:08.3: AER: enabled with IRQ 37
+paź 09 01:24:30.030855 cachyos kernel: ACPI: AC: AC Adapter [AC0] (on-line)
+paź 09 01:24:30.030862 cachyos kernel: input: Lid Switch as /devices/pci0000:00/0000:00:14.3/PNP0C09:00/PNP0C0D:00/input/input0
+paź 09 01:24:30.030872 cachyos kernel: ACPI: button: Lid Switch [LID]
+paź 09 01:24:30.030878 cachyos kernel: input: Power Button as /devices/platform/PNP0C0C:00/input/input1
+paź 09 01:24:30.030885 cachyos kernel: ACPI: button: Power Button [PWRB]
+paź 09 01:24:30.030891 cachyos kernel: input: Sleep Button as /devices/platform/PNP0C0E:00/input/input2
+paź 09 01:24:30.030898 cachyos kernel: ACPI: button: Sleep Button [SLPB]
+paź 09 01:24:30.030905 cachyos kernel: Monitor-Mwait will be used to enter C-1 state
+paź 09 01:24:30.030912 cachyos kernel: ACPI: Enabled processor.bm_check_disable for AMD cpuidle
+paź 09 01:24:30.030919 cachyos kernel: Estimated ratio of average max frequency by base frequency (times 1024): 1277
+paź 09 01:24:30.031093 cachyos kernel: acpi LNXTHERM:00: registered as thermal_zone0
+paź 09 01:24:30.031105 cachyos kernel: ACPI: thermal: Thermal Zone [THRM] (74 C)
+paź 09 01:24:30.031267 cachyos kernel: acpi LNXTHERM:01: registered as thermal_zone1
+paź 09 01:24:30.031277 cachyos kernel: ACPI: thermal: Thermal Zone [TZ01] (20 C)
+paź 09 01:24:30.031283 cachyos kernel: Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+paź 09 01:24:30.031290 cachyos kernel: Non-volatile memory driver v1.3
+paź 09 01:24:30.031296 cachyos kernel: ACPI: battery: Slot [BAT0] (battery present)
+paź 09 01:24:30.031303 cachyos kernel: Freeing initrd memory: 165876K
+paź 09 01:24:30.031458 cachyos kernel: tpm_crb_acpi MSFT0101:00: Disabling hwrng
+paź 09 01:24:30.031471 cachyos kernel: ACPI: bus type drm_connector registered
+paź 09 01:24:30.031635 cachyos kernel: xhci_hcd 0000:3a:00.3: xHCI Host Controller
+paź 09 01:24:30.031808 cachyos kernel: xhci_hcd 0000:3a:00.3: new USB bus registered, assigned bus number 1
+paź 09 01:24:30.031972 cachyos kernel: xhci_hcd 0000:3a:00.3: hcc params 0x0120ffc5 hci version 0x120 quirks 0x0000000200000010
+paź 09 01:24:30.032136 cachyos kernel: xhci_hcd 0000:3a:00.3: xHCI Host Controller
+paź 09 01:24:30.032300 cachyos kernel: xhci_hcd 0000:3a:00.3: new USB bus registered, assigned bus number 2
+paź 09 01:24:30.032464 cachyos kernel: xhci_hcd 0000:3a:00.3: Host supports USB 3.1 Enhanced SuperSpeed
+paź 09 01:24:30.032654 cachyos kernel: usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 7.02
+paź 09 01:24:30.033110 cachyos kernel: usb usb1: Product: xHCI Host Controller
+paź 09 01:24:30.033255 cachyos kernel: usb usb1: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.033587 cachyos kernel: hub 1-0:1.0: USB hub found
+paź 09 01:24:30.033781 cachyos kernel: hub 1-0:1.0: 4 ports detected
+paź 09 01:24:30.033967 cachyos kernel: usb usb2: We don't know the algorithms for LPM for this host, disabling LPM.
+paź 09 01:24:30.034156 cachyos kernel: usb usb2: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 7.02
+paź 09 01:24:30.034444 cachyos kernel: usb usb2: Product: xHCI Host Controller
+paź 09 01:24:30.034586 cachyos kernel: usb usb2: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.034919 cachyos kernel: hub 2-0:1.0: USB hub found
+paź 09 01:24:30.035109 cachyos kernel: hub 2-0:1.0: 2 ports detected
+paź 09 01:24:30.035275 cachyos kernel: xhci_hcd 0000:3a:00.4: xHCI Host Controller
+paź 09 01:24:30.035441 cachyos kernel: xhci_hcd 0000:3a:00.4: new USB bus registered, assigned bus number 3
+paź 09 01:24:30.035607 cachyos kernel: xhci_hcd 0000:3a:00.4: hcc params 0x0120ffc5 hci version 0x120 quirks 0x0000000200000010
+paź 09 01:24:30.035776 cachyos kernel: xhci_hcd 0000:3a:00.4: xHCI Host Controller
+paź 09 01:24:30.035940 cachyos kernel: xhci_hcd 0000:3a:00.4: new USB bus registered, assigned bus number 4
+paź 09 01:24:30.036104 cachyos kernel: xhci_hcd 0000:3a:00.4: Host supports USB 3.1 Enhanced SuperSpeed
+paź 09 01:24:30.036289 cachyos kernel: usb usb3: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 7.02
+paź 09 01:24:30.036577 cachyos kernel: usb usb3: Product: xHCI Host Controller
+paź 09 01:24:30.036723 cachyos kernel: usb usb3: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.037061 cachyos kernel: hub 3-0:1.0: USB hub found
+paź 09 01:24:30.037249 cachyos kernel: hub 3-0:1.0: 3 ports detected
+paź 09 01:24:30.037434 cachyos kernel: usb usb4: We don't know the algorithms for LPM for this host, disabling LPM.
+paź 09 01:24:30.037622 cachyos kernel: usb usb4: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 7.02
+paź 09 01:24:30.037923 cachyos kernel: usb usb4: Product: xHCI Host Controller
+paź 09 01:24:30.038064 cachyos kernel: usb usb4: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.038398 cachyos kernel: hub 4-0:1.0: USB hub found
+paź 09 01:24:30.038589 cachyos kernel: hub 4-0:1.0: 2 ports detected
+paź 09 01:24:30.038761 cachyos kernel: xhci_hcd 0000:3b:00.0: xHCI Host Controller
+paź 09 01:24:30.038929 cachyos kernel: xhci_hcd 0000:3b:00.0: new USB bus registered, assigned bus number 5
+paź 09 01:24:30.039095 cachyos kernel: xhci_hcd 0000:3b:00.0: USB0 root hub has no ports
+paź 09 01:24:30.039260 cachyos kernel: xhci_hcd 0000:3b:00.0: hcc params 0x0110ffc5 hci version 0x120 quirks 0x0000000200000010
+paź 09 01:24:30.039441 cachyos kernel: usb usb5: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 7.02
+paź 09 01:24:30.039739 cachyos kernel: usb usb5: Product: xHCI Host Controller
+paź 09 01:24:30.039882 cachyos kernel: usb usb5: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.040214 cachyos kernel: hub 5-0:1.0: USB hub found
+paź 09 01:24:30.040400 cachyos kernel: hub 5-0:1.0: 1 port detected
+paź 09 01:24:30.040566 cachyos kernel: xhci_hcd 0000:3b:00.3: xHCI Host Controller
+paź 09 01:24:30.040738 cachyos kernel: xhci_hcd 0000:3b:00.3: new USB bus registered, assigned bus number 6
+paź 09 01:24:30.040908 cachyos kernel: xhci_hcd 0000:3b:00.3: hcc params 0x0110ffc5 hci version 0x120 quirks 0x0000000200000010
+paź 09 01:24:30.041072 cachyos kernel: xhci_hcd 0000:3b:00.3: xHCI Host Controller
+paź 09 01:24:30.041241 cachyos kernel: xhci_hcd 0000:3b:00.3: new USB bus registered, assigned bus number 7
+paź 09 01:24:30.041407 cachyos kernel: xhci_hcd 0000:3b:00.3: Host supports USB 3.1 Enhanced SuperSpeed
+paź 09 01:24:30.041587 cachyos kernel: usb usb6: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 7.02
+paź 09 01:24:30.041884 cachyos kernel: usb usb6: Product: xHCI Host Controller
+paź 09 01:24:30.042028 cachyos kernel: usb usb6: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.042355 cachyos kernel: hub 6-0:1.0: USB hub found
+paź 09 01:24:30.042541 cachyos kernel: hub 6-0:1.0: 1 port detected
+paź 09 01:24:30.042726 cachyos kernel: usb usb7: We don't know the algorithms for LPM for this host, disabling LPM.
+paź 09 01:24:30.042907 cachyos kernel: usb usb7: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 7.02
+paź 09 01:24:30.043194 cachyos kernel: usb usb7: Product: xHCI Host Controller
+paź 09 01:24:30.043339 cachyos kernel: usb usb7: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.043681 cachyos kernel: hub 7-0:1.0: USB hub found
+paź 09 01:24:30.043871 cachyos kernel: hub 7-0:1.0: 1 port detected
+paź 09 01:24:30.044036 cachyos kernel: xhci_hcd 0000:3b:00.4: xHCI Host Controller
+paź 09 01:24:30.044201 cachyos kernel: xhci_hcd 0000:3b:00.4: new USB bus registered, assigned bus number 8
+paź 09 01:24:30.044370 cachyos kernel: xhci_hcd 0000:3b:00.4: hcc params 0x0110ffc5 hci version 0x120 quirks 0x0000000200000010
+paź 09 01:24:30.044534 cachyos kernel: xhci_hcd 0000:3b:00.4: xHCI Host Controller
+paź 09 01:24:30.044702 cachyos kernel: xhci_hcd 0000:3b:00.4: new USB bus registered, assigned bus number 9
+paź 09 01:24:30.044869 cachyos kernel: xhci_hcd 0000:3b:00.4: Host supports USB 3.1 Enhanced SuperSpeed
+paź 09 01:24:30.045051 cachyos kernel: usb usb8: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 7.02
+paź 09 01:24:30.045338 cachyos kernel: usb usb8: Product: xHCI Host Controller
+paź 09 01:24:30.045478 cachyos kernel: usb usb8: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.045866 cachyos kernel: hub 8-0:1.0: USB hub found
+paź 09 01:24:30.046143 cachyos kernel: hub 8-0:1.0: 1 port detected
+paź 09 01:24:30.046341 cachyos kernel: usb usb9: We don't know the algorithms for LPM for this host, disabling LPM.
+paź 09 01:24:30.046539 cachyos kernel: usb usb9: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 7.02
+paź 09 01:24:30.046842 cachyos kernel: usb usb9: Product: xHCI Host Controller
+paź 09 01:24:30.046987 cachyos kernel: usb usb9: Manufacturer: Linux 7.2.9-1-cachyos xhci-hcd
+paź 09 01:24:30.047315 cachyos kernel: hub 9-0:1.0: USB hub found
+paź 09 01:24:30.047501 cachyos kernel: hub 9-0:1.0: 1 port detected
+paź 09 01:24:30.047510 cachyos kernel: usbcore: registered new interface driver usbserial_generic
+paź 09 01:24:30.047517 cachyos kernel: usbserial: USB Serial support registered for generic
+paź 09 01:24:30.047523 cachyos kernel: i8042: PNP: No PS/2 controller found.
+paź 09 01:24:30.047692 cachyos kernel: rtc_cmos PNP0B00:00: RTC can wake from S4
+paź 09 01:24:30.047853 cachyos kernel: rtc_cmos PNP0B00:00: registered as rtc0
+paź 09 01:24:30.048012 cachyos kernel: rtc_cmos PNP0B00:00: setting system clock to 2026-10-08T23:24:29 UTC (1791501869)
+paź 09 01:24:30.048171 cachyos kernel: rtc_cmos PNP0B00:00: alarms up to one month, y3k, 114 bytes nvram
+paź 09 01:24:30.048344 cachyos kernel: simple-framebuffer simple-framebuffer.0: [drm] Registered 1 planes with drm panic
+paź 09 01:24:30.048353 cachyos kernel: [drm] Initialized simpledrm 1.0.0 for simple-framebuffer.0 on minor 0
+paź 09 01:24:30.048360 cachyos kernel: fbcon: Deferring console take-over
+paź 09 01:24:30.048528 cachyos kernel: simple-framebuffer simple-framebuffer.0: [drm] fb0: simpledrmdrmfb frame buffer device
+paź 09 01:24:30.048540 cachyos kernel: hid: raw HID events driver (C) Jiri Kosina
+paź 09 01:24:30.048546 cachyos kernel: usbcore: registered new interface driver usbhid
+paź 09 01:24:30.048553 cachyos kernel: usbhid: USB HID core driver
+paź 09 01:24:30.048560 cachyos kernel: drop_monitor: Initializing network drop monitor service
+paź 09 01:24:30.048566 cachyos kernel: NET: Registered PF_INET6 protocol family
+paź 09 01:24:30.048573 cachyos kernel: Segment Routing with IPv6
+paź 09 01:24:30.048579 cachyos kernel: RPL Segment Routing with IPv6
+paź 09 01:24:30.048585 cachyos kernel: In-situ OAM (IOAM) with IPv6
+paź 09 01:24:30.048594 cachyos kernel: NET: Registered PF_PACKET protocol family
+paź 09 01:24:30.048600 cachyos kernel: x86/amd: Previous system reset reason [0x00080800]: software wrote 0x6 to reset control register 0xCF9
+paź 09 01:24:30.048607 cachyos kernel: microcode: Current revision: 0x0a404108
+paź 09 01:24:30.048613 cachyos kernel: microcode: Updated early from: 0x0a404102
+paź 09 01:24:30.048620 cachyos kernel: resctrl: L3 allocation detected
+paź 09 01:24:30.048627 cachyos kernel: resctrl: MB allocation detected
+paź 09 01:24:30.048633 cachyos kernel: resctrl: L3 monitoring detected
+paź 09 01:24:30.048640 cachyos kernel: IPI shorthand broadcast: enabled
+paź 09 01:24:30.048647 cachyos kernel: Piece-Of-Cake (POC) CPU Selector 2.6.3 by Masahito Suzuki [CTZ: HW (TZCNT), PTSelect: HW (PDEP)]
+paź 09 01:24:30.048655 cachyos kernel: sched_clock: Marking stable (700888038, 1431291)->(719166663, -16847334)
+paź 09 01:24:30.048663 cachyos kernel: registered taskstats version 1
+paź 09 01:24:30.048670 cachyos kernel: Loading compiled-in X.509 certificates
+paź 09 01:24:30.048681 cachyos kernel: Loaded X.509 cert 'Build time autogenerated kernel key: fd81c265e6dfe40e1d1d526e9b429de2c9225eb3'
+paź 09 01:24:30.048687 cachyos kernel: zswap: loaded using pool zstd
+paź 09 01:24:30.048694 cachyos kernel: Demotion targets for Node 0: null
+paź 09 01:24:30.048700 cachyos kernel: Key type .fscrypt registered
+paź 09 01:24:30.048707 cachyos kernel: Key type fscrypt-provisioning registered
+paź 09 01:24:30.048714 cachyos kernel: Btrfs loaded, zoned=yes, fsverity=yes
+paź 09 01:24:30.048722 cachyos kernel: Key type big_key registered
+paź 09 01:24:30.048728 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048735 cachyos kernel: integrity: Loaded X.509 cert 'ASUSTeK Notebook SW Key Certificate: b8e581e4df77a5bb4282d5ccfc00c071'
+paź 09 01:24:30.048742 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048748 cachyos kernel: integrity: Loaded X.509 cert 'ASUSTeK MotherBoard SW Key Certificate: da83b990422ebc8c441f8d8b039a65a2'
+paź 09 01:24:30.048755 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048761 cachyos kernel: integrity: Loaded X.509 cert 'Microsoft Corporation UEFI CA 2011: 13adbf4309bd82709c8cd54f316ed522988a1bd4'
+paź 09 01:24:30.048768 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048774 cachyos kernel: integrity: Loaded X.509 cert 'Microsoft Windows Production PCA 2011: a92902398e16c49778cd90f99e4f9ae17c55af53'
+paź 09 01:24:30.048782 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048788 cachyos kernel: integrity: Loaded X.509 cert 'Canonical Ltd. Master Certificate Authority: ad91990bc22ab1f517048c23b6655a268e345a63'
+paź 09 01:24:30.048795 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048801 cachyos kernel: integrity: Loaded X.509 cert 'Microsoft UEFI CA 2023: 81aa6b3244c935bce0d6628af39827421e32497d'
+paź 09 01:24:30.048808 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048814 cachyos kernel: integrity: Loaded X.509 cert 'Microsoft Option ROM UEFI CA 2023: 514fbf937fa46fb57bf07af8bed84b3b864b1711'
+paź 09 01:24:30.048821 cachyos kernel: integrity: Loading X.509 certificate: UEFI:db
+paź 09 01:24:30.048827 cachyos kernel: integrity: Loaded X.509 cert 'Microsoft Corporation: Windows UEFI CA 2023: aefc5fbbbe055d8f8daa585473499417ab5a5272'
+paź 09 01:24:30.048834 cachyos kernel: PM:   Magic number: 14:441:453
+paź 09 01:24:30.048842 cachyos kernel: RAS: Correctable Errors collector initialized.
+paź 09 01:24:30.048848 cachyos kernel: clk: Disabling unused clocks
+paź 09 01:24:30.048855 cachyos kernel: PM: genpd: Disabling unused power domains
+paź 09 01:24:30.048862 cachyos kernel: Freeing unused decrypted memory: 2028K
+paź 09 01:24:30.048868 cachyos kernel: Freeing unused kernel image (initmem) memory: 4836K
+paź 09 01:24:30.048875 cachyos kernel: Write protecting the kernel read-only data: 43008k
+paź 09 01:24:30.048881 cachyos kernel: Freeing unused kernel image (text/rodata gap) memory: 1984K
+paź 09 01:24:30.048888 cachyos kernel: Freeing unused kernel image (rodata/data gap) memory: 1380K
+paź 09 01:24:30.048894 cachyos kernel: x86/mm: Checked W+X mappings: passed, no W+X pages found.
+paź 09 01:24:30.048902 cachyos kernel: rodata_test: all tests were successful
+paź 09 01:24:30.048909 cachyos kernel: Run /init as init process
+paź 09 01:24:30.048915 cachyos kernel:   with arguments:
+paź 09 01:24:30.048923 cachyos kernel:     /init
+paź 09 01:24:30.048929 cachyos kernel:     splash
+paź 09 01:24:30.048935 cachyos kernel:   with environment:
+paź 09 01:24:30.048942 cachyos kernel:     HOME=/
+paź 09 01:24:30.048948 cachyos kernel:     TERM=linux
+paź 09 01:24:30.048955 cachyos systemd[1]: Successfully made /usr/ read-only.
+paź 09 01:24:30.049154 cachyos kernel: usb 3-1: new full-speed USB device number 2 using xhci_hcd
+paź 09 01:24:30.049346 cachyos kernel: usb 1-3: new full-speed USB device number 2 using xhci_hcd
+paź 09 01:24:30.049601 cachyos kernel: usb 6-1: new high-speed USB device number 2 using xhci_hcd
+paź 09 01:24:30.049801 cachyos kernel: usb 5-1: new high-speed USB device number 2 using xhci_hcd
+paź 09 01:24:30.049993 cachyos kernel: usb 3-1: New USB device found, idVendor=046d, idProduct=c547, bcdDevice= 4.02
+paź 09 01:24:30.050187 cachyos kernel: usb 5-1: New USB device found, idVendor=0408, idProduct=30c3, bcdDevice= 0.01
+paź 09 01:24:30.050378 cachyos kernel: usb 1-3: New USB device found, idVendor=0b05, idProduct=19b6, bcdDevice= 0.02
+paź 09 01:24:30.050629 cachyos kernel: usb 6-1: New USB device found, idVendor=05e3, idProduct=0610, bcdDevice=69.41
+paź 09 01:24:30.050944 cachyos kernel: usb 5-1: Product: USB2.0 HD UVC WebCam
+paź 09 01:24:30.051097 cachyos kernel: usb 5-1: Manufacturer: Quanta
+paź 09 01:24:30.051668 cachyos kernel: usb 6-1: Product: USB2.1 Hub
+paź 09 01:24:30.051877 cachyos kernel: usb 6-1: Manufacturer: GenesysLogic
+paź 09 01:24:30.052183 cachyos kernel: usb 3-1: Product: USB Receiver
+paź 09 01:24:30.052333 cachyos kernel: usb 3-1: Manufacturer: Logitech
+paź 09 01:24:30.052639 cachyos kernel: usb 1-3: Product: N-KEY Device
+paź 09 01:24:30.052800 cachyos kernel: usb 1-3: Manufacturer: ASUSTeK Computer Inc.
+paź 09 01:24:30.052810 cachyos kernel: input: Logitech USB Receiver as /devices/pci0000:00/0000:00:08.1/0000:3a:00.4/usb3/3-1/3-1:1.0/0003:046D:C547.0001/input/input3
+paź 09 01:24:30.053021 cachyos kernel: hid-generic 0003:046D:C547.0001: input,hidraw0: USB HID v1.11 Mouse [Logitech USB Receiver] on usb-0000:3a:00.4-1/input0
+paź 09 01:24:30.053032 cachyos kernel: input: Logitech USB Receiver Keyboard as /devices/pci0000:00/0000:00:08.1/0000:3a:00.4/usb3/3-1/3-1:1.1/0003:046D:C547.0002/input/input5
+paź 09 01:24:30.053039 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.0/0003:0B05:19B6.0003/input/input4
+paź 09 01:24:30.053257 cachyos kernel: hub 6-1:1.0: USB hub found
+paź 09 01:24:30.053476 cachyos kernel: hub 6-1:1.0: 4 ports detected
+paź 09 01:24:30.053489 cachyos systemd[1]: systemd 262-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +LIBARCHIVE)
+paź 09 01:24:30.053498 cachyos systemd[1]: Detected architecture x86-64.
+paź 09 01:24:30.053505 cachyos systemd[1]: Running in initrd.
+paź 09 01:24:30.053513 cachyos systemd[1]: Initializing machine ID from random generator.
+paź 09 01:24:30.053520 cachyos systemd[1]: Queued start job for default target Initrd Default Target.
+paź 09 01:24:30.053528 cachyos systemd[1]: Expecting device /dev/disk/by-uuid/8fb5a2b5-17cc-42f0-ac37-2ab7b045966f...
+paź 09 01:24:30.053535 cachyos systemd[1]: Reached target Path Units.
+paź 09 01:24:30.053544 cachyos systemd[1]: Reached target Slice Units.
+paź 09 01:24:30.053551 cachyos systemd[1]: Reached target Swaps.
+paź 09 01:24:30.053557 cachyos systemd[1]: Reached target Timer Units.
+paź 09 01:24:30.053564 cachyos systemd[1]: Listening on Journal Socket (/dev/log).
+paź 09 01:24:30.053572 cachyos systemd[1]: Listening on Journal Sockets.
+paź 09 01:24:30.053579 cachyos systemd[1]: TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:30.053587 cachyos systemd[1]: Listening on udev Kernel Socket.
+paź 09 01:24:30.053594 cachyos systemd[1]: Listening on udev Varlink Socket.
+paź 09 01:24:30.053602 cachyos systemd[1]: Reached target Socket Units.
+paź 09 01:24:30.053609 cachyos systemd[1]: Starting Create List of Static Device Nodes...
+paź 09 01:24:30.053616 cachyos systemd[1]: Starting Journal Service...
+paź 09 01:24:30.053624 cachyos systemd[1]: Starting Load Kernel Modules...
+paź 09 01:24:30.053631 cachyos systemd[1]: TPM PCR OS Separator skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:30.053638 cachyos systemd[1]: TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:30.053645 cachyos systemd[1]: Starting Create Static Device Nodes in /dev...
+paź 09 01:24:30.053652 cachyos systemd[1]: Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:30.053661 cachyos systemd[1]: TPM PCR NvPCR Initialization Separator skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:30.053670 cachyos systemd[1]: Starting Coldplug All udev Devices...
+paź 09 01:24:30.053681 cachyos systemd[1]: Starting Virtual Console Setup...
+paź 09 01:24:30.053688 cachyos systemd[1]: Finished Create List of Static Device Nodes.
+paź 09 01:24:30.053695 cachyos systemd[1]: Finished Load Kernel Modules.
+paź 09 01:24:30.053702 cachyos systemd[1]: Finished Create Static Device Nodes in /dev.
+paź 09 01:24:30.053709 cachyos systemd[1]: Reached target Preparation for Local File Systems.
+paź 09 01:24:30.053716 cachyos systemd[1]: Reached target Local File Systems.
+paź 09 01:24:30.053723 cachyos systemd[1]: Starting Rule-based Manager for Device Events and Files...
+paź 09 01:24:30.053730 cachyos systemd[1]: Finished Virtual Console Setup.
+paź 09 01:24:30.053758 cachyos systemd-journald[195]: Collecting audit messages is disabled.
+paź 09 01:24:30.054052 cachyos kernel: usb 7-1: new SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+paź 09 01:24:30.054285 cachyos kernel: hid-generic 0003:046D:C547.0002: input,hidraw1: USB HID v1.11 Keyboard [Logitech USB Receiver] on usb-0000:3a:00.4-1/input1
+paź 09 01:24:30.054300 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device Consumer Control as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.0/0003:0B05:19B6.0003/input/input6
+paź 09 01:24:30.054512 cachyos kernel: hid-generic 0003:046D:C547.0004: hiddev96,hidraw2: USB HID v1.11 Device [Logitech USB Receiver] on usb-0000:3a:00.4-1/input2
+paź 09 01:24:30.054775 cachyos kernel: usb 7-1: New USB device found, idVendor=05e3, idProduct=0625, bcdDevice=69.41
+paź 09 01:24:30.055187 cachyos kernel: usb 7-1: Product: USB3.2 Hub
+paź 09 01:24:30.055388 cachyos kernel: usb 7-1: Manufacturer: GenesysLogic
+paź 09 01:24:30.055399 cachyos systemd[1]: Started Rule-based Manager for Device Events and Files.
+paź 09 01:24:30.055630 cachyos kernel: hub 7-1:1.0: USB hub found
+paź 09 01:24:30.055851 cachyos kernel: hub 7-1:1.0: 4 ports detected
+paź 09 01:24:30.055861 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.0/0003:0B05:19B6.0003/input/input7
+paź 09 01:24:30.055868 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.0/0003:0B05:19B6.0003/input/input8
+paź 09 01:24:30.056074 cachyos kernel: logitech-djreceiver 0003:046D:C547.0001: hidraw0: USB HID v1.11 Mouse [Logitech USB Receiver] on usb-0000:3a:00.4-1/input0
+paź 09 01:24:30.056281 cachyos kernel: hid-generic 0003:0B05:19B6.0003: input,hiddev97,hidraw3: USB HID v1.10 Device [ASUSTeK Computer Inc. N-KEY Device] on usb-0000:3a:00.3-3/input0
+paź 09 01:24:30.056496 cachyos kernel: hid-generic 0003:0B05:19B6.0005: hiddev98,hidraw4: USB HID v1.10 Device [ASUSTeK Computer Inc. N-KEY Device] on usb-0000:3a:00.3-3/input1
+paź 09 01:24:30.057669 cachyos systemd[1]: Started Journal Service.
+paź 09 01:24:30.062673 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.2/0003:0B05:19B6.0006/input/input9
+paź 09 01:24:30.064678 cachyos kernel: ACPI: video: Video Device [VGA] (multi-head: yes  rom: no  post: no)
+paź 09 01:24:30.065675 cachyos kernel: input: Video Bus as /devices/pci0000:00/0000:00:08.1/acpi.video_bus.0/input/input10
+paź 09 01:24:30.167719 cachyos kernel: hid-generic 0003:0B05:19B6.0006: input,hidraw5: USB HID v1.10 Keyboard [ASUSTeK Computer Inc. N-KEY Device] on usb-0000:3a:00.3-3/input2
+paź 09 01:24:30.236698 cachyos kernel: logitech-djreceiver 0003:046D:C547.0002: hidraw1: USB HID v1.11 Keyboard [Logitech USB Receiver] on usb-0000:3a:00.4-1/input1
+paź 09 01:24:30.268675 cachyos kernel: Key type psk registered
+paź 09 01:24:30.280684 cachyos kernel: usb 1-4: new full-speed USB device number 3 using xhci_hcd
+paź 09 01:24:30.280769 cachyos kernel: nvme 0000:06:00.0: platform quirk: setting simple suspend
+paź 09 01:24:30.280936 cachyos kernel: nvme 0000:09:00.0: platform quirk: setting simple suspend
+paź 09 01:24:30.281077 cachyos kernel: nvme nvme1: pci function 0000:09:00.0
+paź 09 01:24:30.281192 cachyos kernel: nvme nvme0: pci function 0000:06:00.0
+paź 09 01:24:30.287672 cachyos kernel: logitech-djreceiver 0003:046D:C547.0004: hiddev96,hidraw2: USB HID v1.11 Device [Logitech USB Receiver] on usb-0000:3a:00.4-1/input2
+paź 09 01:24:30.288188 cachyos kernel: nvme nvme0: missing or invalid SUBNQN field.
+paź 09 01:24:30.288557 cachyos kernel: nvme nvme0: D3 entry latency set to 8 seconds
+paź 09 01:24:30.292021 cachyos kernel: asus 0003:0B05:19B6.0003: Fixing up Asus N-Key report descriptor
+paź 09 01:24:30.293686 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.0/0003:0B05:19B6.0003/input/input11
+paź 09 01:24:30.293695 cachyos kernel: nvme nvme0: passthrough uses implicit buffer lengths
+paź 09 01:24:30.306687 cachyos kernel: usb 6-1.1: new high-speed USB device number 3 using xhci_hcd
+paź 09 01:24:30.306818 cachyos kernel: nvme nvme0: 16/0/0 default/read/poll queues
+paź 09 01:24:30.323680 cachyos kernel:  nvme0n1: p1 p2 p3
+paź 09 01:24:30.339720 cachyos kernel: nvme nvme1: passthrough uses implicit buffer lengths
+paź 09 01:24:30.341353 cachyos kernel: logitech-djreceiver 0003:046D:C547.0004: device of type eQUAD Lightspeed 1.2 (0x11) connected on slot 1
+paź 09 01:24:30.341862 cachyos kernel: input: Logitech Wireless Mouse PID:409f Keyboard as /devices/pci0000:00/0000:00:08.1/0000:3a:00.4/usb3/3-1/3-1:1.2/0003:046D:C547.0004/0003:046D:409F.0007/input/input12
+paź 09 01:24:30.342686 cachyos kernel: asus 0003:0B05:19B6.0005: hiddev97,hidraw3: USB HID v1.10 Device [ASUSTeK Computer Inc. N-KEY Device] on usb-0000:3a:00.3-3/input1
+paź 09 01:24:30.343667 cachyos kernel: nvme nvme1: allocated 64 MiB host memory buffer (1 segment).
+paź 09 01:24:30.345698 cachyos kernel: asus 0003:0B05:19B6.0003: input,hiddev98,hidraw4: USB HID v1.10 Device [ASUSTeK Computer Inc. N-KEY Device] on usb-0000:3a:00.3-3/input0
+paź 09 01:24:30.371706 cachyos kernel: nvme nvme1: 8/0/0 default/read/poll queues
+paź 09 01:24:30.382706 cachyos kernel: input: Logitech Wireless Mouse PID:409f Mouse as /devices/pci0000:00/0000:00:08.1/0000:3a:00.4/usb3/3-1/3-1:1.2/0003:046D:C547.0004/0003:046D:409F.0007/input/input13
+paź 09 01:24:30.383679 cachyos kernel:  nvme1n1: p1 p2
+paź 09 01:24:30.388668 cachyos kernel: sdhci-pci 0000:08:00.0: SDHCI controller found [1217:8520] (rev 1)
+paź 09 01:24:30.388840 cachyos kernel: sdhci-pci 0000:08:00.0: enabling device (0000 -> 0002)
+paź 09 01:24:30.402690 cachyos kernel: mmc0: SDHCI controller on PCI [0000:08:00.0] using ADMA
+paź 09 01:24:30.417671 cachyos kernel: usb 6-1.1: New USB device found, idVendor=05e3, idProduct=0610, bcdDevice=69.42
+paź 09 01:24:30.422138 cachyos kernel: usb 6-1.1: Product: USB2.1 Hub
+paź 09 01:24:30.422523 cachyos kernel: usb 6-1.1: Manufacturer: GenesysLogic
+paź 09 01:24:30.424670 cachyos kernel: tsc: Refined TSC clocksource calibration: 3193.970 MHz
+paź 09 01:24:30.424691 cachyos kernel: clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x2e0a09e69b6, max_idle_ns: 440795300661 ns
+paź 09 01:24:30.424707 cachyos kernel: clocksource: Switched to clocksource tsc
+paź 09 01:24:30.425672 cachyos kernel: usb 1-4: New USB device found, idVendor=8087, idProduct=0032, bcdDevice= 0.00
+paź 09 01:24:30.450742 cachyos kernel: hid-generic 0003:046D:409F.0007: input,hidraw5: USB HID v1.11 Keyboard [Logitech Wireless Mouse PID:409f] on usb-0000:3a:00.4-1/input2:1
+paź 09 01:24:30.451201 cachyos kernel: input: ASUSTeK Computer Inc. N-KEY Device as /devices/pci0000:00/0000:00:08.1/0000:3a:00.3/usb1/1-3/1-3:1.2/0003:0B05:19B6.0006/input/input17
+paź 09 01:24:30.457710 cachyos kernel: hub 6-1.1:1.0: USB hub found
+paź 09 01:24:30.458295 cachyos kernel: hub 6-1.1:1.0: 4 ports detected
+paź 09 01:24:30.489923 cachyos kernel: usb 7-1.1: new SuperSpeed Plus Gen 2x1 USB device number 3 using xhci_hcd
+paź 09 01:24:30.502721 cachyos kernel: usb 7-1.1: New USB device found, idVendor=05e3, idProduct=0625, bcdDevice=69.42
+paź 09 01:24:30.506520 cachyos kernel: usb 7-1.1: Product: USB3.2 Hub
+paź 09 01:24:30.506926 cachyos kernel: usb 7-1.1: Manufacturer: GenesysLogic
+paź 09 01:24:30.532714 cachyos kernel: asus 0003:0B05:19B6.0006: input,hidraw6: USB HID v1.10 Keyboard [ASUSTeK Computer Inc. N-KEY Device] on usb-0000:3a:00.3-3/input2
+paź 09 01:24:30.553672 cachyos kernel: hub 7-1.1:1.0: USB hub found
+paź 09 01:24:30.554070 cachyos kernel: hub 7-1.1:1.0: 4 ports detected
+paź 09 01:24:30.650708 cachyos kernel: usb 6-1.3: new full-speed USB device number 4 using xhci_hcd
+paź 09 01:24:30.666699 cachyos kernel: input: Logitech G502 X LS as /devices/pci0000:00/0000:00:08.1/0000:3a:00.4/usb3/3-1/3-1:1.2/0003:046D:C547.0004/0003:046D:409F.0007/input/input18
+paź 09 01:24:30.687692 cachyos kernel: logitech-hidpp-device 0003:046D:409F.0007: input,hidraw5: USB HID v1.11 Keyboard [Logitech G502 X LS] on usb-0000:3a:00.4-1/input2:1
+paź 09 01:24:30.758754 cachyos kernel: usb 6-1.3: New USB device found, idVendor=0b05, idProduct=1970, bcdDevice= 0.03
+paź 09 01:24:30.773125 cachyos kernel: usb 6-1.3: Product: ITE Device(8910)
+paź 09 01:24:30.773388 cachyos kernel: usb 6-1.3: Manufacturer: ITE Tech. Inc.
+paź 09 01:24:30.815714 cachyos kernel: asus 0003:0B05:1970.0008: hiddev99,hidraw7: USB HID v1.10 Device [ITE Tech. Inc. ITE Device(8910)] on usb-0000:3b:00.3-1.3/input0
+paź 09 01:24:30.818705 cachyos kernel: usb 7-1.2: new SuperSpeed USB device number 4 using xhci_hcd
+paź 09 01:24:30.829675 cachyos kernel: usb 7-1.2: New USB device found, idVendor=0bda, idProduct=8153, bcdDevice=31.00
+paź 09 01:24:30.829859 cachyos kernel: usb 7-1.2: Int endpoint with wBytesPerInterval of 8 in config 2 interface 0 altsetting 0 ep 0x83: setting to 16
+paź 09 01:24:30.830126 cachyos kernel: usb 7-1.2: Product: USB 10/100/1000 LAN
+paź 09 01:24:30.830237 cachyos kernel: usb 7-1.2: Manufacturer: Realtek
+paź 09 01:24:30.931702 cachyos kernel: usb 7-1.4: new SuperSpeed USB device number 5 using xhci_hcd
+paź 09 01:24:30.943714 cachyos kernel: usb 7-1.4: New USB device found, idVendor=05e3, idProduct=0764, bcdDevice= 0.01
+paź 09 01:24:30.945990 cachyos kernel: usb 7-1.4: Product: USB Storage
+paź 09 01:24:30.946145 cachyos kernel: usb 7-1.4: Manufacturer: Generic
+paź 09 01:24:31.136672 cachyos kernel: BTRFS: device fsid 8fb5a2b5-17cc-42f0-ac37-2ab7b045966f devid 1 transid 27270 /dev/nvme1n1p2 (259:6) scanned by mount (291)
+paź 09 01:24:31.136715 cachyos kernel: BTRFS info (device nvme1n1p2): first mount of filesystem 8fb5a2b5-17cc-42f0-ac37-2ab7b045966f
+paź 09 01:24:31.136732 cachyos kernel: BTRFS info (device nvme1n1p2): using crc32c checksum algorithm
+paź 09 01:24:31.144666 cachyos kernel: BTRFS info (device nvme1n1p2): enabling ssd optimizations
+paź 09 01:24:31.144685 cachyos kernel: BTRFS info (device nvme1n1p2): turning on async discard
+paź 09 01:24:31.144692 cachyos kernel: BTRFS info (device nvme1n1p2): enabling free space tree
+paź 09 01:24:32.494926 cachyos kernel: clocksource: Watchdog remote CPU 5 read timed out
+paź 09 01:24:33.545667 cachyos kernel: usb-storage 7-1.4:1.0: USB Mass Storage device detected
+paź 09 01:24:33.545902 cachyos kernel: scsi host0: usb-storage 7-1.4:1.0
+paź 09 01:24:33.546057 cachyos kernel: usbcore: registered new interface driver usb-storage
+paź 09 01:24:33.547676 cachyos kernel: usbcore: registered new interface driver uas
+paź 09 01:24:33.550681 cachyos kernel: amdgpu: vga_switcheroo: detected switching method \_SB_.PCI0.GP17.VGA_.ATPX handle
+paź 09 01:24:33.551678 cachyos kernel: amdgpu: ATPX version 1, functions 0x00000001
+paź 09 01:24:33.551696 cachyos kernel: amdgpu: ATPX Hybrid Graphics
+paź 09 01:24:33.558671 cachyos kernel: amdgpu: Virtual CRAT table created for CPU
+paź 09 01:24:33.558687 cachyos kernel: amdgpu: Topology: Add CPU node
+paź 09 01:24:33.559673 cachyos kernel: amdgpu 0000:3a:00.0: enabling device (0006 -> 0007)
+paź 09 01:24:33.559886 cachyos kernel: amdgpu 0000:3a:00.0: initializing kernel modesetting (YELLOW_CARP 0x1002:0x1681 0x1043:0x116D 0xC8).
+paź 09 01:24:33.560018 cachyos kernel: amdgpu 0000:3a:00.0: register mmio base: 0xDD600000
+paź 09 01:24:33.560145 cachyos kernel: amdgpu 0000:3a:00.0: register mmio size: 524288
+paź 09 01:24:33.562678 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 0 <common_v1_0_0> (nv_common)
+paź 09 01:24:33.562969 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 1 <gmc_v10_0_0> (gmc_v10_0)
+paź 09 01:24:33.563230 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 2 <ih_v5_0_0> (navi10_ih)
+paź 09 01:24:33.563406 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 3 <psp_v13_0_0> (psp)
+paź 09 01:24:33.563530 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 4 <smu_v13_0_0> (smu)
+paź 09 01:24:33.563655 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 5 <dce_v1_0_0> (dm)
+paź 09 01:24:33.563787 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 6 <gfx_v10_0_0> (gfx_v10_0)
+paź 09 01:24:33.563909 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 7 <sdma_v5_2_0> (sdma_v5_2)
+paź 09 01:24:33.564032 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 8 <vcn_v3_0_0> (vcn_v3_0)
+paź 09 01:24:33.564154 cachyos kernel: amdgpu 0000:3a:00.0: detected ip block number 9 <jpeg_v3_0_0> (jpeg_v3_0)
+paź 09 01:24:33.564277 cachyos kernel: amdgpu 0000:3a:00.0: Fetched VBIOS from VFCT
+paź 09 01:24:33.564400 cachyos kernel: amdgpu 0000:3a:00.0: [drm] ATOM BIOS: 113-REMBRANDT-X37, build: 606368  , ver: 032.017.000.055.000000, 2022/04/12
+paź 09 01:24:33.587711 cachyos kernel: amdgpu 0000:3a:00.0: vgaarb: deactivate vga console
+paź 09 01:24:33.588214 cachyos kernel: amdgpu 0000:3a:00.0: Trusted Memory Zone (TMZ) feature disabled as experimental (default)
+paź 09 01:24:33.588506 cachyos kernel: amdgpu 0000:3a:00.0: vm size is 262144 GB, 4 levels, block size is 9-bit, fragment size is 9-bit
+paź 09 01:24:33.588796 cachyos kernel: amdgpu 0000:3a:00.0: VRAM: 512M 0x000000F400000000 - 0x000000F41FFFFFFF (512M used)
+paź 09 01:24:33.588921 cachyos kernel: amdgpu 0000:3a:00.0: GART: 1024M 0x0000000000000000 - 0x000000003FFFFFFF
+paź 09 01:24:33.589046 cachyos kernel: amdgpu 0000:3a:00.0: [drm] Detected VRAM RAM=512M, BAR=512M
+paź 09 01:24:33.589169 cachyos kernel: amdgpu 0000:3a:00.0: [drm] RAM width 128bits DDR5
+paź 09 01:24:33.589297 cachyos kernel: amdgpu 0000:3a:00.0:  512M of VRAM memory ready
+paź 09 01:24:33.589422 cachyos kernel: amdgpu 0000:3a:00.0:  31772M of GTT memory ready.
+paź 09 01:24:33.589545 cachyos kernel: amdgpu 0000:3a:00.0: [drm] GART: num cpu pages 262144, num gpu pages 262144
+paź 09 01:24:33.589667 cachyos kernel: amdgpu 0000:3a:00.0: [drm] PCIE GART of 1024M enabled (table at 0x000000F41FC00000).
+paź 09 01:24:33.589797 cachyos kernel: amdgpu 0000:3a:00.0: [drm] Loading DMUB firmware via PSP: version=0x0400004C
+paź 09 01:24:33.589920 cachyos kernel: amdgpu 0000:3a:00.0: [drm] use_doorbell being set to: [true]
+paź 09 01:24:33.590043 cachyos kernel: amdgpu 0000:3a:00.0: [VCN instance 0] Found VCN firmware Version ENC: 1.33 DEC: 4 VEP: 0 Revision: 14
+paź 09 01:24:33.612807 cachyos kernel: amdgpu 0000:3a:00.0: reserve 0xa00000 from 0xf41e000000 for PSP TMR
+paź 09 01:24:33.757814 cachyos kernel: amdgpu 0000:3a:00.0: RAS: optional ras ta ucode is not available
+paź 09 01:24:33.767815 cachyos kernel: amdgpu 0000:3a:00.0: RAP: optional rap ta ucode is not available
+paź 09 01:24:33.768335 cachyos kernel: amdgpu 0000:3a:00.0: SECUREDISPLAY: optional securedisplay ta ucode is not available
+paź 09 01:24:33.768847 cachyos kernel: amdgpu 0000:3a:00.0: smu driver if version = 0x00000004, smu fw if version = 0x00000004, smu fw program = 4, smu fw version = 0x04453200 (69.50.0)
+paź 09 01:24:33.771763 cachyos kernel: amdgpu 0000:3a:00.0: SMU is initialized successfully!
+paź 09 01:24:33.773768 cachyos kernel: amdgpu 0000:3a:00.0: [drm] Display Core v3.2.384 initialized on DCN 3.1.2
+paź 09 01:24:33.774103 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DP-HDMI FRL PCON supported
+paź 09 01:24:33.775762 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DMUB hardware initialized: version=0x0400004C
+paź 09 01:24:33.778703 cachyos kernel: workqueue: name exceeds WQ_NAME_LEN. Truncating to: hdmi_frl_status_polling_workque
+paź 09 01:24:33.863128 cachyos kernel: amdgpu 0000:3a:00.0: [drm] eDP-1: PSR support 0, DC PSR ver 0, sink PSR ver 1 DPCD caps 0x20 su_y_granularity 0
+paź 09 01:24:33.863568 cachyos kernel: amdgpu 0000:3a:00.0: [drm] HDMI-A-1: PSR support 0, DC PSR ver -1, sink PSR ver 0 DPCD caps 0x0 su_y_granularity 0
+paź 09 01:24:33.863884 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DP-1: PSR support 0, DC PSR ver -1, sink PSR ver 0 DPCD caps 0x0 su_y_granularity 0
+paź 09 01:24:33.864166 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DP-2: PSR support 0, DC PSR ver -1, sink PSR ver 0 DPCD caps 0x0 su_y_granularity 0
+paź 09 01:24:33.864444 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DP-3: PSR support 0, DC PSR ver -1, sink PSR ver 0 DPCD caps 0x0 su_y_granularity 0
+paź 09 01:24:33.864730 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DP-4: PSR support 0, DC PSR ver -1, sink PSR ver 0 DPCD caps 0x0 su_y_granularity 0
+paź 09 01:24:33.864857 cachyos kernel: amdgpu 0000:3a:00.0: [drm] DP-5: PSR support 0, DC PSR ver -1, sink PSR ver 0 DPCD caps 0x0 su_y_granularity 0
+paź 09 01:24:33.864981 cachyos kernel: amdgpu 0000:3a:00.0: kiq ring mec 2 pipe 1 q 0
+paź 09 01:24:33.870669 cachyos kernel: kfd kfd: Allocated 3969056 bytes on gart
+paź 09 01:24:33.870900 cachyos kernel: kfd kfd: Total number of KFD nodes to be created: 1
+paź 09 01:24:33.871163 cachyos kernel: amdgpu: Virtual CRAT table created for GPU
+paź 09 01:24:33.872691 cachyos kernel: amdgpu: Topology: Add GPU node [0x1002:0x1681]
+paź 09 01:24:33.872720 cachyos kernel: kfd kfd: added device 1002:1681
+paź 09 01:24:33.872947 cachyos kernel: amdgpu 0000:3a:00.0: SE 1, SH per SE 2, CU per SH 6, active_cu_number 12
+paź 09 01:24:33.873247 cachyos kernel: amdgpu 0000:3a:00.0: ring gfx_0.0.0 uses VM inv eng 0 on hub 0
+paź 09 01:24:33.873539 cachyos kernel: amdgpu 0000:3a:00.0: ring gfx_0.1.0 uses VM inv eng 1 on hub 0
+paź 09 01:24:33.873833 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.0.0 uses VM inv eng 4 on hub 0
+paź 09 01:24:33.874116 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.1.0 uses VM inv eng 5 on hub 0
+paź 09 01:24:33.874299 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.2.0 uses VM inv eng 6 on hub 0
+paź 09 01:24:33.874423 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.3.0 uses VM inv eng 7 on hub 0
+paź 09 01:24:33.874545 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.0.1 uses VM inv eng 8 on hub 0
+paź 09 01:24:33.874670 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.1.1 uses VM inv eng 9 on hub 0
+paź 09 01:24:33.874797 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.2.1 uses VM inv eng 10 on hub 0
+paź 09 01:24:33.874920 cachyos kernel: amdgpu 0000:3a:00.0: ring comp_1.3.1 uses VM inv eng 11 on hub 0
+paź 09 01:24:33.875042 cachyos kernel: amdgpu 0000:3a:00.0: ring kiq_0.2.1.0 uses VM inv eng 12 on hub 0
+paź 09 01:24:33.875164 cachyos kernel: amdgpu 0000:3a:00.0: ring sdma0 uses VM inv eng 13 on hub 0
+paź 09 01:24:33.875285 cachyos kernel: amdgpu 0000:3a:00.0: ring vcn_dec_0 uses VM inv eng 0 on hub 8
+paź 09 01:24:33.875407 cachyos kernel: amdgpu 0000:3a:00.0: ring vcn_enc_0.0 uses VM inv eng 1 on hub 8
+paź 09 01:24:33.875528 cachyos kernel: amdgpu 0000:3a:00.0: ring vcn_enc_0.1 uses VM inv eng 4 on hub 8
+paź 09 01:24:33.875653 cachyos kernel: amdgpu 0000:3a:00.0: ring jpeg_dec uses VM inv eng 5 on hub 8
+paź 09 01:24:33.875781 cachyos kernel: amdgpu 0000:3a:00.0: Runtime PM not available
+paź 09 01:24:33.875904 cachyos kernel: amdgpu 0000:3a:00.0: [drm] Using custom brightness curve
+paź 09 01:24:33.876026 cachyos kernel: amdgpu 0000:3a:00.0: [drm] Registered 4 planes with drm panic
+paź 09 01:24:33.880708 cachyos kernel: [drm] Initialized amdgpu 3.64.0 for 0000:3a:00.0 on minor 1
+paź 09 01:24:33.895695 cachyos kernel: fbcon: amdgpudrmfb (fb0) is primary device
+paź 09 01:24:33.895729 cachyos kernel: fbcon: Deferring console take-over
+paź 09 01:24:33.895746 cachyos kernel: amdgpu 0000:3a:00.0: [drm] fb0: amdgpudrmfb frame buffer device
+paź 09 01:24:35.338987 cachyos-x8664 systemd-journald[195]: Received SIGTERM from PID 1 (systemd).
+paź 09 01:24:35.339210 cachyos-x8664 kernel: scsi 0:0:0:0: Direct-Access     Generic  MassStorageClass 0001 PQ: 0 ANSI: 6
+paź 09 01:24:35.339377 cachyos-x8664 kernel: sd 0:0:0:0: [sda] Media removed, stopped polling
+paź 09 01:24:35.339536 cachyos-x8664 kernel: sd 0:0:0:0: [sda] Attached SCSI removable disk
+paź 09 01:24:35.339546 cachyos-x8664 systemd[1]: systemd 262-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +LIBARCHIVE)
+paź 09 01:24:35.339554 cachyos-x8664 systemd[1]: Detected architecture x86-64.
+paź 09 01:24:35.339561 cachyos-x8664 systemd[1]: Hostname set to <cachyos-x8664>.
+paź 09 01:24:35.339569 cachyos-x8664 systemd[1]: bpf-restrict-fs: LSM BPF program attached
+paź 09 01:24:35.339575 cachyos-x8664 kernel: zram: Added device: zram0
+paź 09 01:24:35.339581 cachyos-x8664 systemd[1]: initrd-switch-root.service: Deactivated successfully.
+paź 09 01:24:35.339590 cachyos-x8664 systemd[1]: Stopped Switch Root.
+paź 09 01:24:35.339598 cachyos-x8664 systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+paź 09 01:24:35.339607 cachyos-x8664 systemd[1]: Created slice Slice /system/dirmngr.
+paź 09 01:24:35.339613 cachyos-x8664 systemd[1]: Created slice Slice /system/getty.
+paź 09 01:24:35.339621 cachyos-x8664 systemd[1]: Created slice Slice /system/gpg-agent.
+paź 09 01:24:35.339629 cachyos-x8664 systemd[1]: Created slice Slice /system/gpg-agent-browser.
+paź 09 01:24:35.339636 cachyos-x8664 systemd[1]: Created slice Slice /system/gpg-agent-extra.
+paź 09 01:24:35.339642 cachyos-x8664 systemd[1]: Created slice Slice /system/gpg-agent-ssh.
+paź 09 01:24:35.339648 cachyos-x8664 systemd[1]: Created slice Slice /system/keyboxd.
+paź 09 01:24:35.339656 cachyos-x8664 systemd[1]: Created slice Slice /system/modprobe.
+paź 09 01:24:35.339665 cachyos-x8664 systemd[1]: Created slice Slice /system/netbird.
+paź 09 01:24:35.339675 cachyos-x8664 systemd[1]: Created slice Slice /system/systemd-fsck.
+paź 09 01:24:35.339683 cachyos-x8664 systemd[1]: Created slice Slice /system/systemd-zram-setup.
+paź 09 01:24:35.339689 cachyos-x8664 systemd[1]: Created slice User and Session Slice.
+paź 09 01:24:35.339695 cachyos-x8664 systemd[1]: Dispatch Password Requests to Console Directory Watch skipped, unmet condition check ConditionPathExists=!/run/plymouth/pid
+paź 09 01:24:35.339701 cachyos-x8664 systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+paź 09 01:24:35.339709 cachyos-x8664 systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+paź 09 01:24:35.339715 cachyos-x8664 systemd[1]: Expecting device /dev/disk/by-uuid/2C6C-56FD...
+paź 09 01:24:35.339721 cachyos-x8664 systemd[1]: Expecting device /dev/disk/by-uuid/8fb5a2b5-17cc-42f0-ac37-2ab7b045966f...
+paź 09 01:24:35.339727 cachyos-x8664 systemd[1]: Expecting device /dev/zram0...
+paź 09 01:24:35.339734 cachyos-x8664 systemd[1]: Reached target Local dm-clone Devices.
+paź 09 01:24:35.339742 cachyos-x8664 systemd[1]: Reached target Login Prompts.
+paź 09 01:24:35.339748 cachyos-x8664 systemd[1]: Reached target Image Downloads.
+paź 09 01:24:35.339756 cachyos-x8664 systemd[1]: Stopped target Switch Root.
+paź 09 01:24:35.339761 cachyos-x8664 systemd[1]: Stopped target Initrd File Systems.
+paź 09 01:24:35.339767 cachyos-x8664 systemd[1]: Stopped target Initrd Root File System.
+paź 09 01:24:35.339773 cachyos-x8664 systemd[1]: Reached target Local Integrity Protected Volumes.
+paź 09 01:24:35.339781 cachyos-x8664 systemd[1]: Reached target Preparation for Network.
+paź 09 01:24:35.339789 cachyos-x8664 systemd[1]: Reached target Remote File Systems.
+paź 09 01:24:35.339797 cachyos-x8664 systemd[1]: Reached target Slice Units.
+paź 09 01:24:35.339803 cachyos-x8664 systemd[1]: Reached target Local Verity Protected Volumes.
+paź 09 01:24:35.339810 cachyos-x8664 systemd[1]: Listening on Device-mapper event daemon FIFOs.
+paź 09 01:24:35.339816 cachyos-x8664 systemd[1]: Listening on LVM2 poll daemon socket.
+paź 09 01:24:35.339822 cachyos-x8664 systemd[1]: Listening on Query the User Interactively for a Password.
+paź 09 01:24:35.339829 cachyos-x8664 systemd[1]: Listening on Process Core Dump Socket.
+paź 09 01:24:35.339835 cachyos-x8664 systemd[1]: Listening on Credential Encryption/Decryption.
+paź 09 01:24:35.339842 cachyos-x8664 systemd[1]: Listening on Disk Encryption Enrollment Service Socket.
+paź 09 01:24:35.339847 cachyos-x8664 systemd[1]: Listening on Factory Reset Management.
+paź 09 01:24:35.339853 cachyos-x8664 systemd[1]: Listening on Hostname Service Socket.
+paź 09 01:24:35.339859 cachyos-x8664 systemd[1]: Listening on Console Output Muting Service Socket.
+paź 09 01:24:35.339867 cachyos-x8664 systemd[1]: TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:35.339873 cachyos-x8664 systemd[1]: Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+paź 09 01:24:35.339879 cachyos-x8664 systemd[1]: Listening on Disk Repartitioning Service Socket.
+paź 09 01:24:35.339885 cachyos-x8664 systemd[1]: Listening on Resolve Monitor Varlink Socket.
+paź 09 01:24:35.339890 cachyos-x8664 systemd[1]: Listening on Resolve Service Varlink Socket.
+paź 09 01:24:35.339896 cachyos-x8664 systemd[1]: Listening on Simple Block Device Backed Storage Provider.
+paź 09 01:24:35.339902 cachyos-x8664 systemd[1]: Listening on Simple File System Backed Storage Provider.
+paź 09 01:24:35.339909 cachyos-x8664 systemd[1]: Listening on System Install Tool.
+paź 09 01:24:35.339916 cachyos-x8664 systemd[1]: Listening on System Updates.
+paź 09 01:24:35.339922 cachyos-x8664 systemd[1]: Listening on udev Varlink Socket.
+paź 09 01:24:35.339928 cachyos-x8664 systemd[1]: Listening on User Database Manager Socket.
+paź 09 01:24:35.339935 cachyos-x8664 systemd[1]: Mounting Huge Pages File System...
+paź 09 01:24:35.339940 cachyos-x8664 systemd[1]: Mounting POSIX Message Queue File System...
+paź 09 01:24:35.339947 cachyos-x8664 systemd[1]: Mounting Kernel Debug File System...
+paź 09 01:24:35.339953 cachyos-x8664 systemd[1]: Mounting Kernel Trace File System...
+paź 09 01:24:35.339959 cachyos-x8664 systemd[1]: Starting Create List of Static Device Nodes...
+paź 09 01:24:35.339964 cachyos-x8664 systemd[1]: Starting Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+paź 09 01:24:35.339972 cachyos-x8664 systemd[1]: Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+paź 09 01:24:35.339978 cachyos-x8664 systemd[1]: Mounting Kernel Configuration File System...
+paź 09 01:24:35.339984 cachyos-x8664 systemd[1]: Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+paź 09 01:24:35.339990 cachyos-x8664 systemd[1]: Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+paź 09 01:24:35.339996 cachyos-x8664 systemd[1]: Mounting FUSE Control File System...
+paź 09 01:24:35.340002 cachyos-x8664 systemd[1]: plymouth-switch-root.service: Deactivated successfully.
+paź 09 01:24:35.340008 cachyos-x8664 systemd[1]: Stopped Plymouth switch root service.
+paź 09 01:24:35.340014 cachyos-x8664 systemd[1]: Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+paź 09 01:24:35.340021 cachyos-x8664 systemd[1]: Starting Journal Service...
+paź 09 01:24:35.340027 cachyos-x8664 systemd[1]: Starting Load Kernel Modules...
+paź 09 01:24:35.340033 cachyos-x8664 systemd[1]: TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:35.340039 cachyos-x8664 systemd[1]: TPM PCR OS Separator skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:35.340045 cachyos-x8664 systemd[1]: Starting Remount Root and Kernel File Systems...
+paź 09 01:24:35.340052 cachyos-x8664 systemd[1]: Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:35.340058 cachyos-x8664 systemd[1]: TPM PCR NvPCR Initialization Separator skipped, unmet condition check ConditionPathExists=/etc/initrd-release
+paź 09 01:24:35.340064 cachyos-x8664 systemd[1]: Reached target Local Encrypted Volumes.
+paź 09 01:24:35.340070 cachyos-x8664 systemd[1]: TPM NvPCR Product ID Measurement skipped, unmet condition check ConditionSecurity=measured-os
+paź 09 01:24:35.340077 cachyos-x8664 systemd[1]: Starting Load udev Rules from Credentials...
+paź 09 01:24:35.340083 cachyos-x8664 systemd[1]: Starting Coldplug All udev Devices...
+paź 09 01:24:35.340089 cachyos-x8664 systemd[1]: Finished Create List of Static Device Nodes.
+paź 09 01:24:35.340095 cachyos-x8664 systemd[1]: Mounted Huge Pages File System.
+paź 09 01:24:35.340101 cachyos-x8664 systemd[1]: Mounted POSIX Message Queue File System.
+paź 09 01:24:35.340107 cachyos-x8664 systemd[1]: Mounted Kernel Debug File System.
+paź 09 01:24:35.340113 cachyos-x8664 systemd[1]: Mounted Kernel Trace File System.
+paź 09 01:24:35.340119 cachyos-x8664 systemd[1]: Mounted Kernel Configuration File System.
+paź 09 01:24:35.340125 cachyos-x8664 systemd[1]: Mounted FUSE Control File System.
+paź 09 01:24:35.340132 cachyos-x8664 systemd[1]: Starting Create Static Device Nodes in /dev gracefully...
+paź 09 01:24:35.340138 cachyos-x8664 systemd[1]: Finished Load udev Rules from Credentials.
+paź 09 01:24:35.340158 cachyos-x8664 systemd-journald[420]: Collecting audit messages is disabled.
+paź 09 01:24:35.340172 cachyos-x8664 kernel: Asymmetric key parser 'pkcs8' registered
+paź 09 01:24:35.340179 cachyos-x8664 kernel: i2c_dev: i2c /dev entries driver
+paź 09 01:24:35.340725 cachyos-x8664 systemd[1]: Started Journal Service.
+paź 09 01:24:35.342676 cachyos-x8664 kernel: device-mapper: uevent: version 1.0.3
+paź 09 01:24:35.342693 cachyos-x8664 kernel: device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+paź 09 01:24:35.430668 cachyos-x8664 kernel: BTRFS info (device nvme1n1p2 state M): use zstd compression, level 1
+paź 09 01:24:35.660674 cachyos-x8664 kernel: zram0: detected capacity change from 0 to 130140160
+paź 09 01:24:35.733683 cachyos-x8664 kernel: acpi-tad ACPI000E:00: Missing _PRW
+paź 09 01:24:35.735360 cachyos-x8664 kernel: acpi-tad ACPI000E:00: registered as rtc1
+paź 09 01:24:35.743167 cachyos-x8664 kernel: pcie_mp2_amd 0000:3a:00.7: enabling device (0000 -> 0002)
+paź 09 01:24:35.747757 cachyos-x8664 kernel: piix4_smbus 0000:00:14.0: SMBus Host Controller at 0xb00, revision 0
+paź 09 01:24:35.748703 cachyos-x8664 kernel: piix4_smbus 0000:00:14.0: Using register 0x02 for SMBus port selection
+paź 09 01:24:35.760684 cachyos-x8664 kernel: piix4_smbus 0000:00:14.0: Auxiliary SMBus Host Controller at 0xb20
+paź 09 01:24:35.774683 cachyos-x8664 kernel: ACPI: bus type thunderbolt registered
+paź 09 01:24:35.808679 cachyos-x8664 kernel: [drm] pre_validate_dsc:1746 MST_DSC dsc precompute is not needed
+paź 09 01:24:35.822675 cachyos-x8664 kernel: ccp 0000:3a:00.2: enabling device (0000 -> 0002)
+paź 09 01:24:35.823572 cachyos-x8664 kernel: input: PC Speaker as /devices/platform/pcspkr/input/input19
+paź 09 01:24:35.823591 cachyos-x8664 kernel: cfg80211: Loading compiled-in X.509 certificates for regulatory database
+paź 09 01:24:35.823605 cachyos-x8664 kernel: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+paź 09 01:24:35.823739 cachyos-x8664 kernel: Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+paź 09 01:24:35.823769 cachyos-x8664 kernel: RAPL PMU: API unit is 2^-32 Joules, 2 fixed counters, 163840 ms ovfl timer
+paź 09 01:24:35.823790 cachyos-x8664 kernel: RAPL PMU: hw unit of domain package 2^-16 Joules
+paź 09 01:24:35.823802 cachyos-x8664 kernel: RAPL PMU: hw unit of domain core 2^-16 Joules
+paź 09 01:24:35.824668 cachyos-x8664 kernel: ccp 0000:3a:00.2: tee enabled
+paź 09 01:24:35.826443 cachyos-x8664 kernel: ccp 0000:3a:00.2: psp enabled
+paź 09 01:24:35.832678 cachyos-x8664 kernel: input: ASUE120D:00 04F3:31FB Mouse as /devices/platform/AMDI0010:01/i2c-1/i2c-ASUE120D:00/0018:04F3:31FB.0009/input/input20
+paź 09 01:24:35.832699 cachyos-x8664 kernel: input: ASUE120D:00 04F3:31FB Touchpad as /devices/platform/AMDI0010:01/i2c-1/i2c-ASUE120D:00/0018:04F3:31FB.0009/input/input21
+paź 09 01:24:35.832709 cachyos-x8664 kernel: hid-generic 0018:04F3:31FB.0009: input,hidraw8: I2C HID v1.00 Mouse [ASUE120D:00 04F3:31FB] on i2c-ASUE120D:00
+paź 09 01:24:35.844680 cachyos-x8664 kernel: i2c_hid_acpi i2c-ELAN9008:00: i2c_hid_get_input: IRQ triggered but there's no data
+paź 09 01:24:35.844957 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 Touchscreen as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input22
+paź 09 01:24:35.844974 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input23
+paź 09 01:24:35.844984 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input24
+paź 09 01:24:35.844995 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 Stylus as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input25
+paź 09 01:24:35.845008 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input27
+paź 09 01:24:35.845686 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input28
+paź 09 01:24:35.845709 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input29
+paź 09 01:24:35.852685 cachyos-x8664 kernel: mousedev: PS/2 mouse device common for all mice
+paź 09 01:24:35.877671 cachyos-x8664 kernel: mc: Linux media interface: v0.10
+paź 09 01:24:35.887810 cachyos-x8664 kernel: Bluetooth: Core ver 2.22
+paź 09 01:24:35.887855 cachyos-x8664 kernel: hid-generic 0018:04F3:2FC2.000A: input,hidraw9: I2C HID v1.00 Device [ELAN9008:00 04F3:2FC2] on i2c-ELAN9008:00
+paź 09 01:24:35.889824 cachyos-x8664 kernel: NET: Registered PF_BLUETOOTH protocol family
+paź 09 01:24:35.889841 cachyos-x8664 kernel: Bluetooth: HCI device and connection manager initialized
+paź 09 01:24:35.889853 cachyos-x8664 kernel: Bluetooth: HCI socket layer initialized
+paź 09 01:24:35.889864 cachyos-x8664 kernel: Bluetooth: L2CAP socket layer initialized
+paź 09 01:24:35.889875 cachyos-x8664 kernel: Bluetooth: SCO socket layer initialized
+paź 09 01:24:35.905675 cachyos-x8664 kernel: usbcore: registered new device driver r8152-cfgselector
+paź 09 01:24:35.905760 cachyos-x8664 kernel: videodev: Linux video capture interface: v2.00
+paź 09 01:24:35.921683 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: enabling device (0000 -> 0002)
+paź 09 01:24:35.935678 cachyos-x8664 kernel: snd_pci_acp6x 0000:3a:00.5: enabling device (0000 -> 0002)
+paź 09 01:24:35.938669 cachyos-x8664 kernel: usbcore: registered new interface driver btusb
+paź 09 01:24:35.941680 cachyos-x8664 kernel: Bluetooth: hci0: Firmware timestamp 2026.5 buildtype 1 build 82122
+paź 09 01:24:35.941706 cachyos-x8664 kernel: Bluetooth: hci0: Firmware SHA1: 0x2925677d
+paź 09 01:24:35.941721 cachyos-x8664 kernel: Bluetooth: hci0: No dsm support to set reset delay
+paź 09 01:24:35.950868 cachyos-x8664 kernel: Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
+paź 09 01:24:35.950901 cachyos-x8664 kernel: Bluetooth: hci0: Boot Address: 0x100800
+paź 09 01:24:35.950914 cachyos-x8664 kernel: Bluetooth: hci0: Firmware Version: 202-5.26
+paź 09 01:24:35.950927 cachyos-x8664 kernel: Bluetooth: hci0: Firmware already loaded
+paź 09 01:24:35.951671 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: Detected crf-id 0x400410, cnv-id 0x400410 wfpm id 0x80000000
+paź 09 01:24:35.952806 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: PCI dev 2725/0024, rev=0x420, rfid=0x10d000
+paź 09 01:24:35.953321 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: Detected Intel(R) Wi-Fi 6E AX210 160MHz
+paź 09 01:24:35.958678 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: loaded firmware version 89.d2579d43.0 ty-a0-gf-a0-89.ucode op_mode iwlmvm
+paź 09 01:24:35.963681 cachyos-x8664 kernel: Bluetooth: hci0: Fseq status: Success (0x00)
+paź 09 01:24:35.963709 cachyos-x8664 kernel: Bluetooth: hci0: Fseq executed: 00.00.02.41
+paź 09 01:24:35.963723 cachyos-x8664 kernel: Bluetooth: hci0: Fseq BT Top: 00.00.02.41
+paź 09 01:24:35.974683 cachyos-x8664 kernel: nvidia: loading out-of-tree module taints kernel.
+paź 09 01:24:35.983680 cachyos-x8664 kernel: asus_nb_wmi: Identified laptop model 'ASUS ROG FLOW X16'
+paź 09 01:24:35.983723 cachyos-x8664 kernel: asus_wmi: Initialization: 0x1
+paź 09 01:24:35.983743 cachyos-x8664 kernel: asus_wmi: BIOS WMI version: 9.0
+paź 09 01:24:35.983777 cachyos-x8664 kernel: asus_wmi: SFUN value: 0x21
+paź 09 01:24:35.985220 cachyos-x8664 kernel: asus-nb-wmi asus-nb-wmi: Detected ATK, not ASUSWMI, use DSTS
+paź 09 01:24:35.986688 cachyos-x8664 kernel: pps_core: LinuxPPS API ver. 1 registered
+paź 09 01:24:35.986718 cachyos-x8664 kernel: pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+paź 09 01:24:36.002677 cachyos-x8664 kernel: asus-nb-wmi asus-nb-wmi: Using throttle_thermal_policy for platform_profile support
+paź 09 01:24:36.021677 cachyos-x8664 kernel: input: Asus WMI hotkeys as /devices/platform/asus-nb-wmi/input/input31
+paź 09 01:24:36.029669 cachyos-x8664 kernel: input: ASUE120D:00 04F3:31FB Mouse as /devices/platform/AMDI0010:01/i2c-1/i2c-ASUE120D:00/0018:04F3:31FB.0009/input/input32
+paź 09 01:24:36.029700 cachyos-x8664 kernel: input: ASUE120D:00 04F3:31FB Touchpad as /devices/platform/AMDI0010:01/i2c-1/i2c-ASUE120D:00/0018:04F3:31FB.0009/input/input33
+paź 09 01:24:36.030668 cachyos-x8664 kernel: hid-multitouch 0018:04F3:31FB.0009: input,hidraw8: I2C HID v1.00 Mouse [ASUE120D:00 04F3:31FB] on i2c-ASUE120D:00
+paź 09 01:24:36.037678 cachyos-x8664 kernel: Adding 65070076k swap on /dev/zram0.  Priority:100 extents:1 across:65070076k SSDsc
+paź 09 01:24:36.041665 cachyos-x8664 kernel: r8152-cfgselector 7-1.2: reset SuperSpeed USB device number 4 using xhci_hcd
+paź 09 01:24:36.046680 cachyos-x8664 kernel: PTP clock support registered
+paź 09 01:24:36.081679 cachyos-x8664 kernel: ACPI: battery: new hook: ASUS Battery Extension
+paź 09 01:24:36.102677 cachyos-x8664 kernel: kvm_amd: TSC scaling supported
+paź 09 01:24:36.102707 cachyos-x8664 kernel: kvm_amd: Nested Virtualization enabled
+paź 09 01:24:36.102729 cachyos-x8664 kernel: kvm_amd: Nested Paging enabled
+paź 09 01:24:36.102748 cachyos-x8664 kernel: kvm_amd: LBR virtualization supported
+paź 09 01:24:36.102767 cachyos-x8664 kernel: kvm_amd: Virtual VMLOAD VMSAVE supported
+paź 09 01:24:36.102784 cachyos-x8664 kernel: kvm_amd: Virtual GIF supported
+paź 09 01:24:36.105679 cachyos-x8664 kernel: usbcore: registered new interface driver r8152
+paź 09 01:24:36.107664 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: enabling device (0000 -> 0002)
+paź 09 01:24:36.107965 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: Disabling MSI
+paź 09 01:24:36.108135 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: Handle vga_switcheroo audio client
+paź 09 01:24:36.108327 cachyos-x8664 kernel: snd_hda_intel 0000:3a:00.1: enabling device (0000 -> 0002)
+paź 09 01:24:36.108557 cachyos-x8664 kernel: snd_hda_intel 0000:3a:00.1: Handle vga_switcheroo audio client
+paź 09 01:24:36.108843 cachyos-x8664 kernel: nvidia-nvlink: Nvlink Core is being initialized, major device number 508
+paź 09 01:24:36.109678 cachyos-x8664 kernel: 
+paź 09 01:24:36.109701 cachyos-x8664 kernel: uvcvideo 5-1:1.0: Found UVC 1.10 device USB2.0 HD UVC WebCam (0408:30c3)
+paź 09 01:24:36.114672 cachyos-x8664 kernel: usbcore: registered new interface driver cdc_ether
+paź 09 01:24:36.114701 cachyos-x8664 kernel: nvidia 0000:01:00.0: enabling device (0000 -> 0003)
+paź 09 01:24:36.117685 cachyos-x8664 kernel: nvidia 0000:01:00.0: vgaarb: VGA decodes changed: olddecodes=io+mem,decodes=none:owns=none
+paź 09 01:24:36.117898 cachyos-x8664 kernel: usbcore: registered new interface driver r8153_ecm
+paź 09 01:24:36.118687 cachyos-x8664 kernel: uvcvideo 5-1:1.2: Found UVC 1.50 device USB2.0 HD UVC WebCam (0408:30c3)
+paź 09 01:24:36.121678 cachyos-x8664 kernel: usbcore: registered new interface driver uvcvideo
+paź 09 01:24:36.215701 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input38
+paź 09 01:24:36.215743 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 UNKNOWN as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input39
+paź 09 01:24:36.215756 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 UNKNOWN as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input40
+paź 09 01:24:36.215764 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 Stylus as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input41
+paź 09 01:24:36.215772 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 UNKNOWN as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input43
+paź 09 01:24:36.215780 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 UNKNOWN as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input44
+paź 09 01:24:36.215788 cachyos-x8664 kernel: input: ELAN9008:00 04F3:2FC2 UNKNOWN as /devices/platform/AMDI0010:00/i2c-0/i2c-ELAN9008:00/0018:04F3:2FC2.000A/input/input45
+paź 09 01:24:36.250711 cachyos-x8664 kernel: hid-multitouch 0018:04F3:2FC2.000A: input,hidraw9: I2C HID v1.00 Device [ELAN9008:00 04F3:2FC2] on i2c-ELAN9008:00
+paź 09 01:24:36.304495 cachyos-x8664 systemd-journald[420]: Received client request to flush runtime journal.
+paź 09 01:24:37.806701 cachyos-x8664 kernel: NVRM: GPU0 nvAssertOkFailedNoLog: Assertion failed: Invalid data passed [NV_ERR_INVALID_DATA] (0x00000025) returned from PlatformRequestHandler failed to get target temp from SBIOS @ platform_request_handler_ctrl.c:2175
+paź 09 01:24:37.806802 cachyos-x8664 kernel: NVRM: GPU0 nvAssertOkFailedNoLog: Assertion failed: Invalid data passed [NV_ERR_INVALID_DATA] (0x00000025) returned from PlatformRequestHandler failed to get platform power mode from SBIOS @ platform_request_handler_ctrl.c:2118
+paź 09 01:24:37.927672 cachyos-x8664 kernel: NVRM: loading NVIDIA UNIX Open Kernel Module for x86_64  615.71.09  Release Build  (notroot@)  Sat Oct  3 18:52:37 UTC 2026
+paź 09 01:24:37.931370 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=3 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input34
+paź 09 01:24:37.931487 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=7 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input35
+paź 09 01:24:37.931668 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=8 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input36
+paź 09 01:24:37.931710 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=9 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input37
+paź 09 01:24:37.940672 cachyos-x8664 kernel: snd_hda_intel 0000:3a:00.1: bound 0000:3a:00.0 (ops amdgpu_dm_audio_component_bind_ops [amdgpu])
+paź 09 01:24:37.942203 cachyos-x8664 kernel: intel_rapl_common: Found RAPL domain package
+paź 09 01:24:37.942507 cachyos-x8664 kernel: intel_rapl_common: Found RAPL domain core
+paź 09 01:24:37.952683 cachyos-x8664 kernel: input: HD-Audio Generic HDMI/DP,pcm=3 as /devices/pci0000:00/0000:00:08.1/0000:3a:00.1/sound/card1/input47
+paź 09 01:24:37.959681 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0: ALC285: picked fixup  for PCI SSID 1043:1f92
+paź 09 01:24:37.960107 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0: autoconfig for ALC285: line_outs=2 (0x14/0x17/0x0/0x0/0x0) type:speaker
+paź 09 01:24:37.960520 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:    speaker_outs=0 (0x0/0x0/0x0/0x0/0x0)
+paź 09 01:24:37.960890 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:    hp_outs=1 (0x21/0x0/0x0/0x0/0x0)
+paź 09 01:24:37.961172 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:    mono: mono_out=0x0
+paź 09 01:24:38.036990 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:    inputs:
+paź 09 01:24:38.037490 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:      Internal Mic=0x12
+paź 09 01:24:38.037873 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:      Internal Mic=0x13
+paź 09 01:24:38.038165 cachyos-x8664 kernel: snd_hda_codec_alc269 hdaudioC2D0:      Mic=0x19
+paź 09 01:24:38.038477 cachyos-x8664 kernel: amd_atl: AMD Address Translation Library initialized
+paź 09 01:24:38.038588 cachyos-x8664 kernel: nvidia-modeset: Loading NVIDIA UNIX Open Kernel Mode Setting Driver for x86_64  615.71.09  Release Build  (notroot@)  Sat Oct  3 18:52:32 UTC 2026
+paź 09 01:24:38.038698 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Loading driver
+paź 09 01:24:38.044677 cachyos-x8664 kernel: [drm] Initialized nvidia-drm 0.0.0 for 0000:01:00.0 on minor 0
+paź 09 01:24:38.044698 cachyos-x8664 kernel: nvidia 0000:01:00.0: [drm] Cannot find any crtc or sizes
+paź 09 01:24:38.132674 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_UMAC_PD_NOTIFICATION: 0x20
+paź 09 01:24:38.133110 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_LMAC2_PD_NOTIFICATION: 0x1f
+paź 09 01:24:38.133442 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_AUTH_KEY_0: 0x90
+paź 09 01:24:38.133802 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: CNVI_SCU_SEQ_DATA_DW9: 0x0
+paź 09 01:24:38.134128 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: Detected RF GF, rfid=0x10d000
+paź 09 01:24:38.219782 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: base HW address: a0:d3:65:bd:82:06
+paź 09 01:24:38.235971 cachyos-x8664 kernel: r8152 7-1.2:1.0 enp59s0f3u1u2: renamed from eth0
+paź 09 01:24:38.246681 cachyos-x8664 kernel: Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+paź 09 01:24:38.246714 cachyos-x8664 kernel: Bluetooth: BNEP filters: protocol multicast
+paź 09 01:24:38.246727 cachyos-x8664 kernel: Bluetooth: BNEP socket layer initialized
+paź 09 01:24:38.247679 cachyos-x8664 kernel: Bluetooth: MGMT ver 1.23
+paź 09 01:24:38.265679 cachyos-x8664 kernel: NET: Registered PF_ALG protocol family
+paź 09 01:24:38.574677 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_UMAC_PD_NOTIFICATION: 0x20
+paź 09 01:24:38.574957 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_LMAC2_PD_NOTIFICATION: 0x1f
+paź 09 01:24:38.575097 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_AUTH_KEY_0: 0x90
+paź 09 01:24:38.575231 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: CNVI_SCU_SEQ_DATA_DW9: 0x0
+paź 09 01:24:38.736679 cachyos-x8664 kernel: input: HD-Audio Generic Mic as /devices/pci0000:00/0000:00:08.1/0000:3a:00.6/sound/card2/input48
+paź 09 01:24:38.736704 cachyos-x8664 kernel: input: HD-Audio Generic Headphone as /devices/pci0000:00/0000:00:08.1/0000:3a:00.6/sound/card2/input49
+paź 09 01:24:38.932704 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_UMAC_PD_NOTIFICATION: 0x20
+paź 09 01:24:38.933343 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_LMAC2_PD_NOTIFICATION: 0x1f
+paź 09 01:24:38.933823 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: WFPM_AUTH_KEY_0: 0x90
+paź 09 01:24:38.934111 cachyos-x8664 kernel: iwlwifi 0000:07:00.0: CNVI_SCU_SEQ_DATA_DW9: 0x0
+paź 09 01:24:39.130669 cachyos-x8664 kernel: tun: Universal TUN/TAP device driver, 1.6
+paź 09 01:24:40.252676 cachyos-x8664 kernel: Bluetooth: RFCOMM TTY layer initialized
+paź 09 01:24:40.252738 cachyos-x8664 kernel: Bluetooth: RFCOMM socket layer initialized
+paź 09 01:24:40.252775 cachyos-x8664 kernel: Bluetooth: RFCOMM ver 1.11
+paź 09 01:24:44.985683 cachyos-x8664 kernel: wireguard: WireGuard 1.0.0 loaded. See www.wireguard.com for information.
+paź 09 01:24:44.985742 cachyos-x8664 kernel: wireguard: Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+paź 09 01:24:45.749700 cachyos-x8664 kernel: hid-generic 0020:1022:0001.000B: hidraw10: SENSOR HUB HID v0.00 Device [hid-amdsfh 1022:0001] on pcie_mp2_amd
+paź 09 01:24:45.754682 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: hidraw10: SENSOR HUB HID v0.00 Device [hid-amdsfh 1022:0001] on pcie_mp2_amd
+paź 09 01:24:45.779672 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)
+paź 09 01:24:45.859672 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)
+paź 09 01:24:45.859892 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)
+paź 09 01:24:45.860024 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)
+paź 09 01:24:45.860151 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)
+paź 09 01:24:46.162674 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)
+paź 09 01:24:46.356683 cachyos-x8664 kernel: block nvme1n1: No UUID available providing old NGUID
+paź 09 01:24:47.001680 cachyos-x8664 kernel: warning: `kdeconnectd' uses wireless extensions which will stop working for Wi-Fi 7 hardware; use nl80211
+paź 09 01:24:49.810671 cachyos-x8664 kernel: hid-sensor-hub 0020:1022:0001.000B: Event data for report 1 was too short (15 vs 14)

@@ -1,0 +1,2 @@
+MUX -> built-in dGPU (reboot): finish with --after-boot
+Outcome: back to Hybrid after one reboot; KWin pinned to the iGPU again (env file written).

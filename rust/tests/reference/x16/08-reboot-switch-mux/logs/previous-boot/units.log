@@ -1,0 +1,7 @@
+paź 09 01:21:19.464578 cachyos-x8664 systemd[1]: Started Schedule GPU mode AsusMuxDgpu and reboot.
+paź 09 01:21:19.628268 cachyos-x8664 asus-gpu-switch-reboot[8289]: Scheduled mode AsusMuxDgpu, rebooting
+paź 09 01:21:19.631457 cachyos-x8664 systemd[1]: asus-gpu-switch@AsusMuxDgpu.service: Deactivated successfully.
+paź 09 01:21:19.745256 cachyos-x8664 systemd[1]: Stopping Cardwire Daemon...
+paź 09 01:21:21.775471 cachyos-x8664 systemd[1]: cardwired.service: Deactivated successfully.
+paź 09 01:21:21.775804 cachyos-x8664 systemd[1]: Stopped Cardwire Daemon.
+paź 09 01:21:21.776001 cachyos-x8664 systemd[1]: cardwired.service: Consumed 606ms CPU time over 7min 5.505s wall clock time, 402.2M memory peak.

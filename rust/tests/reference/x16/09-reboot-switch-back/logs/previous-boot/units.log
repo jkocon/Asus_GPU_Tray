@@ -1,0 +1,4 @@
+paź 09 01:23:55.725145 cachyos-x8664 systemd[1]: Stopping Cardwire Daemon...
+paź 09 01:23:56.177832 cachyos-x8664 systemd[1]: cardwired.service: Deactivated successfully.
+paź 09 01:23:56.178123 cachyos-x8664 systemd[1]: Stopped Cardwire Daemon.
+paź 09 01:23:56.178289 cachyos-x8664 systemd[1]: cardwired.service: Consumed 407ms CPU time over 1min 42.830s wall clock time, 401.6M memory peak.
