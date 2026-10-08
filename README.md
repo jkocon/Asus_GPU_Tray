@@ -98,7 +98,7 @@ login. To start it right away, run `python3 /usr/local/lib/asus-gpu-tray/asus_gp
 ### One-time KDE Plasma setup for switching without a reboot
 
 The NVIDIA driver can only let go of the card when no process has it open. The compositor normally
-does, so KWin has to be kept on the iGPU. The setup has three parts:
+does, so KWin has to be kept on the iGPU. The setup has two parts:
 
 1. **A stable name for the iGPU.** Use your iGPU's PCI address, shown as `iGPU:` in
    `python3 asus_gpu_tray.py --dump`:
@@ -108,27 +108,21 @@ does, so KWin has to be kept on the iGPU. The setup has three parts:
    SUBSYSTEM=="drm", KERNEL=="card[0-9]*", KERNELS=="0000:3a:00.0", SYMLINK+="dri/asus-igpu-card"
    ```
 
-2. **KWin uses only that GPU:**
+2. **KWin uses only that GPU and does not load NVIDIA's EGL driver.** Without the second part, EGL
+   still opens `/dev/nvidia0`. This applies to the compositor only; games still get the NVIDIA GPU.
+   Both are skipped in MUX mode, where the panel is wired to the dGPU and KWin on the iGPU would
+   show a black screen:
 
    ```bash
-   # ~/.config/plasma-workspace/env/asus-gpu-tray-kwin.sh
-   [ -e /dev/dri/asus-igpu-card ] && export KWIN_DRM_DEVICES=/dev/dri/asus-igpu-card
-   ```
-
-3. **KWin does not load NVIDIA's EGL driver.** Without this, EGL still opens `/dev/nvidia0`. This
-   applies to the compositor only; games still get the NVIDIA GPU:
-
-   ```ini
-   # ~/.config/systemd/user/plasma-kwin_wayland.service.d/asus-gpu-tray.conf
-   [Service]
-   Environment=__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+   install -Dm644 kde/asus-gpu-tray-kwin.sh ~/.config/plasma-workspace/env/asus-gpu-tray-kwin.sh
+   install -Dm644 kde/asus-gpu-tray.conf ~/.config/systemd/user/plasma-kwin_wayland.service.d/asus-gpu-tray.conf
    ```
 
 Then run `sudo udevadm control --reload && sudo udevadm trigger -s drm` and log in again.
 
 With Plasma Login Manager, `install.sh` also installs a systemd user environment generator
 (`/etc/systemd/user-environment-generators/60-asus-gpu-tray-greeter`) that applies the same two
-settings to the login screen once `/dev/dri/asus-igpu-card` exists. Without it, a NVIDIA driver
+settings to the login screen once `/dev/dri/asus-igpu-card` exists, also not in MUX mode. Without it, a NVIDIA driver
 that hangs at boot also hangs the login screen on a black screen.
 
 `KWIN_DRM_DEVICES` is colon-separated, so a `/dev/dri/by-path/pci-…` path cannot be used, which is

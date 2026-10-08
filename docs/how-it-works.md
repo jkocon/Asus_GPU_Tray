@@ -247,6 +247,11 @@ boot
 
 The unit also runs when only a blacklist from an older version is left behind, and removes it.
 
+In MUX mode the panel is wired to the dGPU, so KWin must not be kept on the iGPU: on 2026-10-09
+the first MUX boot with `KWIN_DRM_DEVICES` pointing at the iGPU showed only a black screen (KWin:
+"There are no outputs"). The KWin settings (`kde/asus-gpu-tray-kwin.sh`, `kde/asus-gpu-tray.conf`
+and the login screen's generator) check `gpu_mux_mode` and stay out of the way when it is 0.
+
 **Current design (2026-10-04, later):** the boot-time switch no longer blacklists NVIDIA. The
 driver comes up on the current card as on any boot, and `asus-gpu-switch-apply` runs
 `asus-gpu-switch-live` before the login screen starts. It stops the boot splash first (it went
