@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# Phase 0 of the Rust rewrite: record how the current (shell) switch scripts behave, as the
+# reference the Rust root helpers are compared with. One run per scenario:
+#
+#   rust/tools/record-reference <scenario> [note]     snapshot, wait while you switch, snapshot + logs
+#   rust/tools/record-reference --after-boot <scenario>
+#                                                     finish a scenario that ended in a reboot
+#   rust/tools/record-reference --list                the scenarios to record
+#
+# Output: rust/tests/reference/x16/<scenario>/ (before/, after/, logs/, notes.txt). Runs as your
+# user and changes nothing. It never runs lspci or nvidia-smi and never opens a GPU device: only
+# kernel-cached sysfs files, the journal and D-Bus properties, so it does not wake the dGPU.
+set -euo pipefail
+
+HERE=$(cd "$(dirname "$0")" && pwd)
+OUT_ROOT=${OUT_ROOT:-"$HERE/../tests/reference/x16"}
+ATTR=/sys/class/firmware-attributes/asus-armoury/attributes
+STATE=/var/lib/asus-gpu-tray
+UNITS=(-u 'asus-gpu-live@*' -u 'asus-gpu-switch@*' -u asus-gpu-switch-apply.service -u cardwired.service)
+
+SCENARIOS="\
+01-hybrid-to-xg          Hybrid -> XG Mobile (live), no app on the GPU
+02-xg-to-hybrid          XG Mobile -> built-in dGPU (live), no app on the GPU
+03-to-xg-app-holds       Hybrid -> XG Mobile with an app holding the NVIDIA card (answer the kill question)
+04-to-hybrid-app-holds   XG Mobile -> built-in dGPU with an app holding the card
+05-undock-now            XG Mobile: 'Undock now (close all GPU apps)'
+06-dock-question         On the built-in dGPU: connect and lock the XG Mobile, answer the offer
+07-clean-unlock          XG Mobile active, nothing on the GPU: unlock the dock (dGPU should come back live)
+08-reboot-switch-mux     Switch to the MUX mode (reboot): finish with --after-boot
+09-reboot-switch-back    MUX -> built-in dGPU (reboot): finish with --after-boot
+10-on-battery            Hybrid <-> XG Mobile on battery (charger unplugged)
+11-cardwire-integrated-xg  XG Mobile active: cardwire Integrated, then Hybrid
+12-unlock-in-use         LAST, save your work: unlock the XG Mobile while an app uses it (emergency reboot)"
+
+die() { echo "record-reference: $*" >&2; exit 1; }
+
+# The Rust build when there is one, else the Python tray.
+dump_state() {
+    local rust="$HERE/../target/release/asus-gpu-tray"
+    if [[ -x $rust ]]; then "$rust" "$1"; else python3 "$HERE/../../asus_gpu_tray.py" "--$1"; fi
+}
+
+driver_of() {
+    local link
+    link=$(readlink -f "$1/driver" 2>/dev/null) && [[ -n $link ]] && echo "${link##*/}" || echo -
+}
+
+# Everything that describes the GPU state, without waking anything.
+snapshot() {
+    local dir=$1 dev f
+    mkdir -p "$dir"
+    date '+%F %T.%N %z' > "$dir/time"
+    dump_state dump > "$dir/dump.txt" 2>&1 || true
+    dump_state holders > "$dir/holders.txt" 2>&1 || true
+    for f in egpu_connected egpu_enable gpu_mux_mode dgpu_disable pending_reboot; do
+        printf '%s=%s\n' "$f" "$(cat "$ATTR/$f/current_value" 2>/dev/null || echo '-')"
+    done > "$dir/asus-armoury.txt"
+    for dev in /sys/bus/pci/devices/*; do
+        [[ $(cat "$dev/class" 2>/dev/null) == 0x03* ]] || continue
+        printf '%s vendor=%s device=%s driver=%s runtime_status=%s power_state=%s d3cold_allowed=%s\n' \
+            "${dev##*/}" "$(cat "$dev/vendor")" "$(cat "$dev/device")" \
+            "$(driver_of "$dev")" \
+            "$(cat "$dev/power/runtime_status" 2>/dev/null || echo -)" \
+            "$(cat "$dev/power_state" 2>/dev/null || echo -)" \
+            "$(cat "$dev/d3cold_allowed" 2>/dev/null || echo -)"
+    done > "$dir/pci-gpus.txt"
+    ls -l /dev/nvidia* /dev/dri 2>/dev/null > "$dir/dev-nodes.txt" || true
+    busctl --system get-property org.opengamingcollective.cardwire /org/opengamingcollective/cardwire \
+        org.opengamingcollective.cardwire.Mode Mode > "$dir/cardwire-mode.txt" 2>&1 || true
+    for f in "$STATE"/*; do [[ -f $f ]] && { echo "== ${f##*/}"; cat "$f"; echo; }; done > "$dir/state-files.txt" 2>&1 || true
+    {
+        uname -r
+        cat /proc/driver/nvidia/version 2>/dev/null || echo "nvidia module not loaded"
+        systemctl is-active cardwired.service nvidia-powerd.service 2>/dev/null || true
+    } > "$dir/system.txt"
+}
+
+logs() {
+    local dir=$1 since=$2 boot=${3:-0}
+    mkdir -p "$dir"
+    journalctl -b "$boot" --since "@$since" "${UNITS[@]}" -o short-precise --no-pager > "$dir/units.log" 2>&1 || true
+    journalctl -b "$boot" --since "@$since" -k -o short-precise --no-pager > "$dir/kernel.log" 2>&1 || true
+    cp -f "$STATE/live-progress" "$dir/live-progress" 2>/dev/null || true
+    cp -f "$STATE/live-result" "$dir/live-result" 2>/dev/null || true
+}
+
+case ${1:-} in
+    --list | -l)
+        echo "$SCENARIOS"
+        exit 0
+        ;;
+    --after-boot)
+        name=${2:-}
+        out="$OUT_ROOT/$name"
+        [[ -n $name && -f $out/start ]] || die "no started scenario '$name' (run it without --after-boot first)"
+        since=$(cat "$out/start")
+        snapshot "$out/after"
+        logs "$out/logs/previous-boot" "$since" -1
+        logs "$out/logs/this-boot" "$since" 0
+        echo "Recorded $out (after the reboot)."
+        exit 0
+        ;;
+    "" | -h | --help)
+        sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+        echo
+        echo "$SCENARIOS"
+        exit 0
+        ;;
+esac
+
+name=$1
+note=${2:-}
+grep -q "^$name " <<< "$SCENARIOS" || echo "note: '$name' is not in --list; recording it anyway"
+out="$OUT_ROOT/$name"
+[[ -e $out ]] && die "$out exists - remove it to record again"
+mkdir -p "$out"
+grep "^$name " <<< "$SCENARIOS" | sed 's/^[^ ]* *//' > "$out/notes.txt" || true
+[[ -n $note ]] && echo "$note" >> "$out/notes.txt"
+date +%s > "$out/start"
+snapshot "$out/before"
+echo "Before: recorded. Now do the scenario in the tray:"
+sed 's/^/    /' "$out/notes.txt"
+echo "Press Enter when it is over (window closed, notification shown)."
+echo "If it ends in a reboot, run afterwards: $0 --after-boot $name"
+read -r
+snapshot "$out/after"
+logs "$out/logs" "$(cat "$out/start")"
+echo "Recorded $out"
+# The result file is only from this scenario when it changed after the start.
+if [[ -f $STATE/live-result && $(stat -c %Y "$STATE/live-result") -ge $(cat "$out/start") ]]; then
+    sed 's/^/    live switch result: /' "$STATE/live-result"
+fi

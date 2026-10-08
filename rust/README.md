@@ -8,7 +8,7 @@ use until the Rust binary replaces them step by step. Plan and phases:
 
 | Phase | State |
 |---|---|
-| 0. Freeze the behaviour | started: `tests/reference/x16-hybrid-dump.txt` (X16, Hybrid, XG Mobile not connected) |
+| 0. Freeze the behaviour | `tests/reference/x16-hybrid-dump.txt`; switch recordings with `tools/record-reference` still to do (needs the XG Mobile) |
 | 1. Core library (`src/gpu/`) | done: detection, state, labels, cardwire over D-Bus, processes, kernel-log parsing, `dump`, `holders` |
 | 2. Tray (`src/tray/`) | first cut: icon, menu, dialogs, switch flows; to be tested on the X16 with the XG Mobile |
 | 3. Root helpers | not started |
@@ -54,6 +54,13 @@ src/tray/          the tray (ksni icon and menu, slint windows, software rendere
   events.rs        kernel log, cardwired signals, udev PCI events
   settings.rs, lock.rs, notify.rs
 ```
+
+## Phase 0 recordings
+
+`tools/record-reference --list` shows the scenarios. For each one: run
+`tools/record-reference <scenario>`, do it in the tray, press Enter. Scenarios that end in a
+reboot are finished with `--after-boot <scenario>`. Results go to `tests/reference/x16/`. The
+script only reads (sysfs, journal, D-Bus) and never wakes the dGPU.
 
 ## Trying the tray on the X16
 
