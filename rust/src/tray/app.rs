@@ -48,8 +48,7 @@ fn xg_gone_text() -> String {
     tr("The XG Mobile was disconnected while it was the active GPU. Unlocking it disconnects the GPU \
         at once, and it stays gone until a reboot, also after you connect it again. Apps that were \
         using it may stop responding.\n\n\
-        Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile. (Unlocking \
-        works without a reboot only when nothing at all uses the GPU, system services included.)")
+        Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile.")
 }
 
 /// The NVIDIA driver wedges after losing a GPU, and a normal shutdown then hangs in it.
@@ -433,9 +432,10 @@ impl App {
             return;
         }
         let new_lost: Vec<Gpu> = lost.iter().filter(|g| !st.lost_asked.contains(&g.addr)).cloned().collect();
+        st.lost_asked.extend(new_lost.iter().map(|g| g.addr.clone()));
         let me = self.clone();
-        if !new_lost.is_empty() {
-            st.lost_asked.extend(new_lost.iter().map(|g| g.addr.clone()));
+        // An unlocked or vanished XG Mobile has its own flow (on_xg_unlocked), which offers the reboot too.
+        if !new_lost.is_empty() && !(xg_unlocked(s) || xg_gone(s)) {
             spawn(async move { me.ask_reboot_lost(new_lost).await });
         } else if st.undock_pending {
             st.undock_pending = false;

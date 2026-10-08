@@ -8,8 +8,11 @@ use super::paths::{read, Paths};
 use super::pci::Gpu;
 use super::state::GpuState;
 
-/// What journalctl -k is filtered with (grep -E syntax).
-pub const GPU_LOST_RE: &str = "fallen off the bus|Unable to change power state from D3cold to D0";
+/// What journalctl -k is filtered with (grep -E syntax). "non-zero usage count": the GPU went away
+/// while the driver still had users (XG Mobile unlocked or its power unplugged while active) - the
+/// driver is wedged, also when the card shows up again.
+pub const GPU_LOST_RE: &str =
+    "fallen off the bus|Unable to change power state from D3cold to D0|with non-zero usage count";
 
 fn is_word(b: u8) -> bool {
     b.is_ascii_alphanumeric() || b == b'_'
@@ -86,11 +89,21 @@ mod tests {
     const XID: &str =
         "1759600000.5 host kernel: NVRM: Xid (PCI:0000:01:00): 79, pid='<unknown>', GPU has fallen off the bus.";
     const D3: &str = "1759600001.0 host kernel: nvidia 0000:01:00.0: Unable to change power state from D3cold to D0, device inaccessible";
+    const USAGE: &str =
+        "1759600002.0 host kernel: NVRM: Attempting to remove device 0000:01:00.0 with non-zero usage count!";
+
+    #[test]
+    fn pattern_matches_every_kind_of_loss() {
+        for line in [XID, D3, USAGE] {
+            assert!(GPU_LOST_RE.split('|').any(|alt| line.contains(alt)), "{line}");
+        }
+    }
 
     #[test]
     fn parse() {
         assert_eq!(parse_gpu_lost(XID), Some(("0000:01:00".into(), 1759600000.5)));
         assert_eq!(parse_gpu_lost(D3), Some(("0000:01:00".into(), 1759600001.0)));
+        assert_eq!(parse_gpu_lost(USAGE), Some(("0000:01:00".into(), 1759600002.0)));
         assert_eq!(parse_gpu_lost("-- No entries --"), None);
         assert_eq!(parse_gpu_lost("1 x 10000:01:00 y"), None); // no word boundary
     }
