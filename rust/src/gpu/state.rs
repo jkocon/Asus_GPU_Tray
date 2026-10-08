@@ -33,6 +33,9 @@ pub struct GpuState {
     pub live_backend: bool,
     /// asus-armoury dgpu_disable: the built-in dGPU is powered off on purpose
     pub dgpu_disabled: bool,
+    /// cardwire blocks a discrete GPU and has taken it off the bus (Integrated mode): hidden on
+    /// purpose, not lost
+    pub dgpu_hidden: bool,
 }
 
 impl GpuState {
@@ -101,6 +104,9 @@ impl CwRepair {
 pub fn read_state(paths: &Paths, cardwire: &dyn Cardwire, cmd: &dyn Cmd, repair: &mut CwRepair) -> GpuState {
     let cw = repair.check(paths, cardwire, cmd, cardwire.devices());
     let (cw_mode, cw_modes) = if cw.is_some() { cardwire.mode() } else { Default::default() };
+    let dgpu_hidden = cw.as_ref().is_some_and(|c| {
+        c.iter().any(|(addr, d)| d.blocked && d.discrete && std::fs::symlink_metadata(paths.pci.join(addr)).is_err())
+    });
     let asus_egpu = paths.attr.join("egpu_connected").exists();
     let hw_mode = if !asus_egpu {
         ""
@@ -124,6 +130,7 @@ pub fn read_state(paths: &Paths, cardwire: &dyn Cardwire, cmd: &dyn Cmd, repair:
         reboot_backend: paths.unit_installed(REBOOT_UNIT) && asus_egpu,
         live_backend: paths.unit_installed(LIVE_UNIT) && asus_egpu,
         dgpu_disabled: paths.read_attr("dgpu_disable") == "1",
+        dgpu_hidden,
     }
 }
 
@@ -160,9 +167,16 @@ pub fn xg_unlocked(s: &GpuState) -> bool {
 
 /// Built-in dGPU mode, but the dGPU is not on the bus. What a clean undock leaves behind: with
 /// nothing holding the XG Mobile's GPU, the firmware switches back by itself (as on Windows) but
-/// the root port's link stays disabled. asus-gpu-live@Hybrid brings it back.
+/// the root port's link stays disabled. asus-gpu-live@Hybrid brings it back. Not when cardwire
+/// took it off the bus itself (Integrated): the live switch cannot bring that back and ends in a
+/// needless reboot offer.
 pub fn dgpu_missing(s: &GpuState) -> bool {
-    s.asus_egpu && s.hw_mode == "Hybrid" && s.dgpu().is_none() && !s.dgpu_disabled && s.hw_pending.is_empty()
+    s.asus_egpu
+        && s.hw_mode == "Hybrid"
+        && s.dgpu().is_none()
+        && !s.dgpu_disabled
+        && !s.dgpu_hidden
+        && s.hw_pending.is_empty()
 }
 
 /// XG Mobile mode, but its GPU is no longer on the bus. Unlocking the XG Mobile makes the
@@ -213,6 +227,30 @@ mod tests {
             dgpu_disabled: true,
             ..state()
         }));
+    }
+
+    #[test]
+    fn dgpu_hidden_by_cardwire_is_not_missing() {
+        let tmp = tempfile::tempdir().unwrap();
+        let paths = Paths::under(tmp.path());
+        std::fs::create_dir_all(&paths.pci).unwrap();
+        crate::gpu::testutil::write(&paths.attr.join("egpu_connected/current_value"), "0");
+        let mut blocked = crate::gpu::cardwire::CwDevice { blocked: true, discrete: true, ..Default::default() };
+        let cmd = FakeCmd::new(&[]).cardwire_devices(
+            [("0000:01:00.0".to_string(), blocked.clone())].into(),
+            "integrated",
+            &["integrated", "hybrid"],
+        );
+        let s = read_state(&paths, &cmd, &cmd, &mut CwRepair::default());
+        assert!(s.dgpu_hidden && !dgpu_missing(&s));
+        blocked.blocked = false; // Hybrid, and the dGPU really is gone
+        let cmd = FakeCmd::new(&[]).cardwire_devices(
+            [("0000:01:00.0".to_string(), blocked)].into(),
+            "hybrid",
+            &["integrated", "hybrid"],
+        );
+        let s = read_state(&paths, &cmd, &cmd, &mut CwRepair::default());
+        assert!(!s.dgpu_hidden && dgpu_missing(&s));
     }
 
     #[test]

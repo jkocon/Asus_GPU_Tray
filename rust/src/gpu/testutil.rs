@@ -54,6 +54,7 @@ pub fn state() -> GpuState {
         reboot_backend: true,
         live_backend: true,
         dgpu_disabled: false,
+        dgpu_hidden: false,
     }
 }
 
