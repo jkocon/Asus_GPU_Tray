@@ -22,6 +22,11 @@ zbus = { version = "5.19", default-features = false, features = ["blocking-api",
 tempfile = "3"
 
 [profile.release]
+# Size over speed: the tray mostly waits for events. Most of what is left is slint, winit, text
+# shaping and Unicode data.
+opt-level = "z"
+panic = "abort"
 lto = true
 codegen-units = 1
 strip = true
+
