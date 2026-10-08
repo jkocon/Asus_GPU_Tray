@@ -576,11 +576,17 @@ class SwitchDialogTests(unittest.TestCase):
 class LostGpuTests(unittest.TestCase):
     XID = "1759600000.5 host kernel: NVRM: Xid (PCI:0000:01:00): 79, pid='<unknown>', GPU has fallen off the bus."
     D3 = "1759600001.0 host kernel: nvidia 0000:01:00.0: Unable to change power state from D3cold to D0, device inaccessible"
+    USAGE = "1759600002.0 host kernel: NVRM: Attempting to remove device 0000:01:00.0 with non-zero usage count!"
 
     def test_parse(self) -> None:
         self.assertEqual(t.parse_gpu_lost(self.XID), ("0000:01:00", 1759600000.5))
         self.assertEqual(t.parse_gpu_lost(self.D3), ("0000:01:00", 1759600001.0))
+        self.assertEqual(t.parse_gpu_lost(self.USAGE), ("0000:01:00", 1759600002.0))
         self.assertIsNone(t.parse_gpu_lost("-- No entries --"))
+
+    def test_pattern_matches_every_kind_of_loss(self) -> None:
+        for line in (self.XID, self.D3, self.USAGE):
+            self.assertRegex(line, t.GPU_LOST_RE)
 
     def test_only_errors_newer_than_the_last_switch(self) -> None:
         events = {"0000:01:00": 100.0}
@@ -602,6 +608,17 @@ class LostGpuTests(unittest.TestCase):
             process_events()
         asked.assert_called_once_with((EGPU,))
         self.assertIn("⚠ RTX 3070 fell off the bus – Reboot…", texts(tray))
+
+    def test_unlocked_xg_mobile_leaves_it_to_the_unlock_flow(self) -> None:
+        Tray.current = state(egpu_connected=False)  # unlocked while active: on_xg_unlocked offers the reboot
+        tray = Tray()
+        self.addCleanup(tray.timer.stop)
+        self.addCleanup(tray.hide)
+        with mock.patch.object(tray, "ask_reboot_lost") as asked, mock.patch.object(t, "last_live_switch", return_value=0.0):
+            tray.lost_events["0000:01:00"] = 1759600002.0
+            tray.refresh()
+            process_events()
+        asked.assert_not_called()
 
 
 class LostRebootTests(unittest.TestCase):

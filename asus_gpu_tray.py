@@ -70,7 +70,9 @@ RESTARTABLE_APPS = {"rog-control-center": ["--background"]}
 # Never offered for killing when they hold the card: the desktop session would go down with them.
 SESSION_PROCESSES = {"kwin_wayland", "kwin_x11", "Xwayland", "Xorg", "gnome-shell", "plasmashell", "systemd"}
 # Kernel messages after which a GPU is gone until a reboot: Xid 79 and a failed wake-up from D3cold.
-GPU_LOST_RE = "fallen off the bus|Unable to change power state from D3cold to D0"
+# "non-zero usage count": the GPU went away while the driver still had users (XG Mobile unlocked or
+# its power unplugged while active) - the driver is wedged, also when the card shows up again.
+GPU_LOST_RE = "fallen off the bus|Unable to change power state from D3cold to D0|with non-zero usage count"
 POLL_MS = 3000
 TRAY_WAIT_S = 300  # how long to wait for a system tray host at login
 # After an unlock, how long to wait for the firmware: it removes the GPU within ~1 s and, after a
@@ -698,8 +700,7 @@ XG_GONE_TEXT = tr(
     "The XG Mobile was disconnected while it was the active GPU. Unlocking it disconnects the GPU "
     "at once, and it stays gone until a reboot, also after you connect it again. Apps that were "
     "using it may stop responding.\n\n"
-    "Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile. (Unlocking "
-    "works without a reboot only when nothing at all uses the GPU, system services included.)"
+    "Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile."
 )
 
 
@@ -1024,8 +1025,9 @@ class GpuTray(QSystemTrayIcon):
         if self.live_proc or QApplication.activeModalWidget() is not None:
             return
         new_lost = tuple(g for g in lost if g.addr not in self.lost_asked)
-        if new_lost:
-            self.lost_asked |= {g.addr for g in new_lost}
+        self.lost_asked |= {g.addr for g in new_lost}
+        # An unlocked or vanished XG Mobile has its own flow (on_xg_unlocked), which offers the reboot too.
+        if new_lost and not (xg_unlocked(s) or xg_gone(s)):
             QTimer.singleShot(0, lambda: self.ask_reboot_lost(new_lost))
         elif self.undock_pending:
             self.undock_pending = False
