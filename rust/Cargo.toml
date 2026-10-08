@@ -13,8 +13,8 @@ clap = { version = "4", features = ["derive"] }
 gettext-rs = "0.8.0"
 ksni = { version = "0.3.6", default-features = false, features = ["blocking", "async-io"] }
 libc = "0.2"
-resvg = "0.48"
-slint = "1.18"
+resvg = { version = "0.48", default-features = false, features = ["text", "system-fonts", "memmap-fonts"] }
+slint = { version = "1.18", default-features = false, features = ["std", "compat-1-2", "backend-winit", "renderer-software"] }
 udev = "0.9.3"
 zbus = { version = "5.19", default-features = false, features = ["blocking-api", "async-io"] }
 

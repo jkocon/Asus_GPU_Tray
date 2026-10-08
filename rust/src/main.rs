@@ -46,9 +46,6 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         }
-        None => {
-            eprintln!("The tray is not ported yet (phase 2); use asus_gpu_tray.py.");
-            ExitCode::from(2)
-        }
+        None => asus_gpu_tray::tray::run(),
     }
 }
