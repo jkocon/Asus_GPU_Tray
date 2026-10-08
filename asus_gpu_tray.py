@@ -126,6 +126,7 @@ class GpuState:
     reboot_backend: bool
     live_backend: bool
     dgpu_disabled: bool = False  # asus-armoury dgpu_disable: the built-in dGPU is powered off on purpose
+    dgpu_hidden: bool = False  # cardwire blocks a discrete GPU and took it off the bus (Integrated)
 
     @property
     def igpu(self) -> Gpu | None:
@@ -356,6 +357,8 @@ def read_state() -> GpuState:
         reboot_backend=unit_installed(REBOOT_UNIT) and asus_egpu,
         live_backend=unit_installed(LIVE_UNIT) and asus_egpu,
         dgpu_disabled=read_attr("dgpu_disable") == "1",
+        dgpu_hidden=any(d.get("blocked") and d.get("discrete") and not os.path.lexists(PCI / addr)
+                        for addr, d in (cw or {}).items()),
     )
 
 
@@ -670,8 +673,11 @@ def xg_unlocked(s: GpuState) -> bool:
 def dgpu_missing(s: GpuState) -> bool:
     """Built-in dGPU mode, but the dGPU is not on the bus. What a clean undock leaves behind: with
     nothing holding the XG Mobile's GPU, the firmware switches back by itself (as on Windows) but
-    the root port's link stays disabled. asus-gpu-live@Hybrid brings it back."""
-    return s.asus_egpu and s.hw_mode == "Hybrid" and s.dgpu is None and not s.dgpu_disabled and not s.hw_pending
+    the root port's link stays disabled. asus-gpu-live@Hybrid brings it back. Not when cardwire
+    took it off the bus itself (Integrated): the live switch cannot bring that back and ends in a
+    needless reboot offer."""
+    return (s.asus_egpu and s.hw_mode == "Hybrid" and s.dgpu is None and not s.dgpu_disabled and not s.dgpu_hidden
+            and not s.hw_pending)
 
 
 def xg_gone(s: GpuState) -> bool:

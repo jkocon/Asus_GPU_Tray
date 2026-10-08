@@ -316,6 +316,9 @@ class UndockHintTests(unittest.TestCase):
         self.assertIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
         self.tray.build_menu(state(gpus=(IGPU,), hw_mode="Hybrid", dgpu_disabled=True))
         self.assertNotIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
+        # cardwire Integrated takes the dGPU off the bus on purpose
+        self.tray.build_menu(state(gpus=(IGPU,), hw_mode="Hybrid", dgpu_hidden=True))
+        self.assertNotIn("⚠ Built-in dGPU missing – Bring it back", texts(self.tray))
 
 
 class DockTests(unittest.TestCase):
@@ -490,6 +493,15 @@ class CardwireRepairTests(unittest.TestCase):
 
 
 class DetectTests(unittest.TestCase):
+    def test_dgpu_hidden_by_cardwire(self) -> None:
+        cw = {"0000:01:00.0": {"blocked": True, "discrete": True, "vendor": "Nvidia", "name": "NVIDIA GeForce RTX 3050 Ti"}}
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(t, "PCI", Path(d)), \
+                mock.patch.object(t, "cardwire_devices", return_value=cw), \
+                mock.patch.object(t, "run", return_value=""), mock.patch.object(t, "read_attr", return_value=""):
+            self.assertTrue(t.read_state().dgpu_hidden)
+            cw["0000:01:00.0"]["blocked"] = False
+            self.assertFalse(t.read_state().dgpu_hidden)
+
     def test_removed_gpu_is_not_taken_from_cardwire(self) -> None:
         cw = {"0000:01:00.0": {"blocked": True, "discrete": True, "vendor": "Nvidia", "name": "NVIDIA GeForce RTX 3070"}}
         with tempfile.TemporaryDirectory() as d, mock.patch.object(t, "PCI", Path(d)), \
