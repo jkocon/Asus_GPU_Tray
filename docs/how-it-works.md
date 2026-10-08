@@ -166,7 +166,9 @@ The kernel stacks showed a deadlock: the ACPI eject (`acpiphp_disable_and_eject_
 `nv_pci_remove` → `nv_acpi_methods_uninit`) waited for the ACPI notify queue, whose worker was stuck
 in `nv_acpi_powersource_hotplug_event` waiting for the RM lock held by the remove path (the unlock
 also reports a power source change). Any later PCI remove or rescan blocks behind it, and only a
-SysRq reboot gets out. So a clean unlock cannot be relied on: switch to the built-in dGPU first.
+SysRq reboot gets out. What differed from the successful 2026-10-04 test is not known; one
+candidate is the power source event (the XG Mobile was charging the laptop, with no other charger
+plugged in). So a clean unlock cannot be relied on: switch to the built-in dGPU first.
 (Stacks: `rust/tests/reference/x16/07b-clean-unlock-services-stopped/hung-stacks.txt` on the
 `rust` branch.)
 
