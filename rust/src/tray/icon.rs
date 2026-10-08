@@ -12,9 +12,29 @@ const APP_SVG: &str = include_str!("../../../icons/asus-gpu-tray.svg");
 thread_local! {
     static OPTIONS: usvg::Options<'static> = {
         let mut opt = usvg::Options::default();
-        opt.fontdb_mut().load_system_fonts();
+        let db = opt.fontdb_mut();
+        db.load_system_fonts();
+        if let Some(family) = sans_family(db) {
+            db.set_sans_serif_family(family);
+        }
         opt
     };
+}
+
+/// The desktop's sans-serif font. fontdb maps sans-serif to Arial, which most Linux systems lack,
+/// and text in a missing font is silently left out.
+fn sans_family(db: &usvg::fontdb::Database) -> Option<String> {
+    let installed = |name: &str| db.faces().any(|f| f.families.iter().any(|(n, _)| n == name));
+    let fc = std::process::Command::new("fc-match")
+        .args(["-f", "%{family[0]}", "sans-serif"])
+        .output()
+        .ok()
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .filter(|f| !f.is_empty());
+    fc.into_iter()
+        .chain(["Noto Sans", "DejaVu Sans", "Liberation Sans", "Cantarell"].map(String::from))
+        .find(|f| installed(f))
+        .or_else(|| db.faces().next().and_then(|f| f.families.first().map(|(n, _)| n.clone())))
 }
 
 fn badge(vendor: Option<&str>) -> (&'static str, &'static str) {
@@ -134,6 +154,9 @@ mod tests {
     fn badges_and_dots() {
         let amd = render(Some(&igpu()), false, false);
         assert_eq!(rgb(&amd, 4, 32), (0xed, 0x1c, 0x24)); // red AMD badge
+        let white =
+            (16..48).flat_map(|y| (8..56).map(move |x| (x, y))).filter(|&(x, y)| rgb(&amd, x, y) == (255, 255, 255));
+        assert!(white.count() > 50, "the AMD label is drawn");
         let nvidia = render(Some(&egpu()), true, true);
         assert_eq!(rgb(&nvidia, 4, 32), (0x76, 0xb9, 0x00)); // NVIDIA green
         assert_eq!(rgb(&nvidia, 51, 13), (0x9b, 0x59, 0xb6)); // eGPU dot
