@@ -1,0 +1,1 @@
+Hybrid -> XG Mobile (live), no app on the GPU

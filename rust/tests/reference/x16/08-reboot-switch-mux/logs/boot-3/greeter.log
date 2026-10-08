@@ -1,0 +1,78 @@
+paź 09 01:05:03.687885 cachyos-x8664 systemd[1036]: Queued start job for default target Main User Target.
+paź 09 01:05:03.700333 cachyos-x8664 systemd[1036]: Created slice User Application Slice.
+paź 09 01:05:03.700376 cachyos-x8664 systemd[1036]: Started Run arch-update auto check at boot and then once a day.
+paź 09 01:05:03.700411 cachyos-x8664 systemd[1036]: Reached target Paths.
+paź 09 01:05:03.700477 cachyos-x8664 systemd[1036]: Reached target Timers.
+paź 09 01:05:03.701435 cachyos-x8664 systemd[1036]: Starting D-Bus User Message Bus Socket...
+paź 09 01:05:03.701581 cachyos-x8664 systemd[1036]: Listening on GnuPG network certificate management daemon.
+paź 09 01:05:03.701720 cachyos-x8664 systemd[1036]: Listening on GNOME Keyring daemon.
+paź 09 01:05:03.701814 cachyos-x8664 systemd[1036]: Listening on GnuPG cryptographic agent and passphrase cache (access for web browsers).
+paź 09 01:05:03.701903 cachyos-x8664 systemd[1036]: Listening on GnuPG cryptographic agent and passphrase cache (restricted).
+paź 09 01:05:03.701991 cachyos-x8664 systemd[1036]: Listening on GnuPG cryptographic agent (ssh-agent emulation).
+paź 09 01:05:03.702077 cachyos-x8664 systemd[1036]: Listening on GnuPG cryptographic agent and passphrase cache.
+paź 09 01:05:03.702167 cachyos-x8664 systemd[1036]: Listening on GnuPG public key management service.
+paź 09 01:05:03.702286 cachyos-x8664 systemd[1036]: Listening on p11-kit server.
+paź 09 01:05:03.702407 cachyos-x8664 systemd[1036]: Listening on PipeWire PulseAudio.
+paź 09 01:05:03.702524 cachyos-x8664 systemd[1036]: Listening on PipeWire Multimedia System Sockets.
+paź 09 01:05:03.703394 cachyos-x8664 systemd[1036]: Listening on Query the User Interactively for a Password.
+paź 09 01:05:03.703459 cachyos-x8664 systemd[1036]: Listening on Disk Image Download Service Socket.
+paź 09 01:05:03.703899 cachyos-x8664 systemd[1036]: Listening on Journal Log Access Socket.
+paź 09 01:05:03.703998 cachyos-x8664 systemd[1036]: Listening on Virtual Machine and Container Registration Service Socket.
+paź 09 01:05:03.704537 cachyos-x8664 systemd[1036]: Listening on Simple File System Backed Storage Provider.
+paź 09 01:05:03.710233 cachyos-x8664 systemd[1036]: Listening on D-Bus User Message Bus Socket.
+paź 09 01:05:03.710311 cachyos-x8664 systemd[1036]: Reached target Sockets.
+paź 09 01:05:03.710361 cachyos-x8664 systemd[1036]: Reached target Basic System.
+paź 09 01:05:03.710420 cachyos-x8664 systemd[1036]: Reached target Main User Target.
+paź 09 01:05:03.710461 cachyos-x8664 systemd[1036]: Startup finished in 144ms.
+paź 09 01:05:03.890201 cachyos-x8664 systemd[1036]: Created slice User Core Session Slice.
+paź 09 01:05:03.890834 cachyos-x8664 systemd[1036]: Starting D-Bus User Message Bus...
+paź 09 01:05:03.904938 cachyos-x8664 dbus-broker-launch[1090]: Service file '/usr/share//dbus-1/services/org.kde.dolphin.FileManager1.service' is not named after the D-Bus name 'org.freedesktop.FileManager1'.
+paź 09 01:05:03.905336 cachyos-x8664 dbus-broker-launch[1090]: Service file '/usr/share//dbus-1/services/org.kde.kscreen.service' is not named after the D-Bus name 'org.kde.KScreen'.
+paź 09 01:05:03.905409 cachyos-x8664 dbus-broker-launch[1090]: Service file '/usr/share//dbus-1/services/org.kde.plasma.Notifications.service' is not named after the D-Bus name 'org.freedesktop.Notifications'.
+paź 09 01:05:03.905486 cachyos-x8664 dbus-broker-launch[1090]: Policy to allow eavesdropping in /usr/share/dbus-1/session.conf +31: Eavesdropping is deprecated and ignored
+paź 09 01:05:03.905486 cachyos-x8664 dbus-broker-launch[1090]: Policy to allow eavesdropping in /usr/share/dbus-1/session.conf +33: Eavesdropping is deprecated and ignored
+paź 09 01:05:03.905696 cachyos-x8664 systemd[1036]: Started D-Bus User Message Bus.
+paź 09 01:05:03.907560 cachyos-x8664 dbus-broker-launch[1090]: Ready
+paź 09 01:05:03.913101 cachyos-x8664 systemd[1036]: Created slice User Background Tasks Slice.
+paź 09 01:05:03.913768 cachyos-x8664 systemd[1036]: Starting KDE Window Manager (Login Manager Version)...
+paź 09 01:05:04.107784 cachyos-x8664 kwin_wayland[1108]: eglInitialize failed
+paź 09 01:05:04.107796 cachyos-x8664 kwin_wayland[1108]: Error during eglInitialize  "EGL_NOT_INITIALIZED"
+paź 09 01:05:04.198440 cachyos-x8664 kwin_wayland[1108]: No backend specified, automatically choosing drm
+paź 09 01:05:04.199926 cachyos-x8664 kwin_wayland[1108]: Accepting client connections on sockets: QList("wayland-0")
+paź 09 01:05:04.210698 cachyos-x8664 kwin_wayland[1108]: eglInitialize failed
+paź 09 01:05:04.210706 cachyos-x8664 kwin_wayland[1108]: Error during eglInitialize  "EGL_NOT_INITIALIZED"
+paź 09 01:05:04.395868 cachyos-x8664 systemd[1036]: Started KDE Window Manager (Login Manager Version).
+paź 09 01:05:04.397171 cachyos-x8664 systemd[1036]: Started Plasma Login.
+paź 09 01:05:04.397925 cachyos-x8664 systemd[1036]: Started Plasma Wallpaper on Login screen.
+paź 09 01:05:04.397994 cachyos-x8664 systemd[1036]: Reached target plasma-login-wayland.target.
+paź 09 01:05:04.437847 cachyos-x8664 systemd[1036]: Started PipeWire Multimedia Service.
+paź 09 01:05:04.438613 cachyos-x8664 systemd[1036]: Started Multimedia Service Session Manager.
+paź 09 01:05:04.457453 cachyos-x8664 pipewire[1164]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.457462 cachyos-x8664 pipewire[1164]: mod.rt: RTKit does not give us MaxRealtimePriority, using 1
+paź 09 01:05:04.457506 cachyos-x8664 pipewire[1164]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.457511 cachyos-x8664 pipewire[1164]: mod.rt: RTKit does not give us MinNiceLevel, using 0
+paź 09 01:05:04.457632 cachyos-x8664 pipewire[1164]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.457637 cachyos-x8664 pipewire[1164]: mod.rt: RTKit does not give us RTTimeUSecMax, using -1
+paź 09 01:05:04.460106 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.460113 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit does not give us MaxRealtimePriority, using 1
+paź 09 01:05:04.460145 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.460150 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit does not give us MinNiceLevel, using 0
+paź 09 01:05:04.460178 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.460183 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit does not give us RTTimeUSecMax, using -1
+paź 09 01:05:04.489961 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.489977 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit does not give us MaxRealtimePriority, using 1
+paź 09 01:05:04.490040 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.490051 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit does not give us MinNiceLevel, using 0
+paź 09 01:05:04.490123 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+paź 09 01:05:04.490134 cachyos-x8664 wireplumber[1165]: mod.rt: RTKit does not give us RTTimeUSecMax, using -1
+paź 09 01:05:04.494032 cachyos-x8664 plasma-login-wallpaper[1162]: There are no outputs - creating placeholder screen
+paź 09 01:05:04.494361 cachyos-x8664 plasma-login-greeter[1161]: There are no outputs - creating placeholder screen
+paź 09 01:05:04.495384 cachyos-x8664 plasma-login-greeter[1161]: TRYING SOCKET "/tmp/plasmalogin--sGnbis"
+paź 09 01:05:04.495413 cachyos-x8664 plasma-login-greeter[1161]: Connected to the daemon.
+paź 09 01:05:04.495844 cachyos-x8664 plasma-login-greeter[1161]: Reading session (1) from "/usr/share/wayland-sessions/hyprland-uwsm.desktop"
+paź 09 01:05:04.496053 cachyos-x8664 plasma-login-greeter[1161]: Reading session (1) from "/usr/share/wayland-sessions/hyprland.desktop"
+paź 09 01:05:04.496099 cachyos-x8664 plasma-login-greeter[1161]: Reading session (1) from "/usr/share/wayland-sessions/plasma.desktop"
+paź 09 01:05:04.723850 cachyos-x8664 plasma-login-wallpaper[1162]: Creating a layer shell for placeholder screen. This will be positioned incorrectly
+paź 09 01:05:04.747153 cachyos-x8664 wireplumber[1165]: wp-device: SPA handle 'api.libcamera.enum.manager' could not be loaded; is it installed?
+paź 09 01:05:04.747162 cachyos-x8664 wireplumber[1165]: s-monitors-libcamera: PipeWire's libcamera SPA plugin is missing or broken. Some camera types may not be supported.
+paź 09 01:05:04.814506 cachyos-x8664 plasma-login-greeter[1161]: Creating a layer shell for placeholder screen. This will be positioned incorrectly

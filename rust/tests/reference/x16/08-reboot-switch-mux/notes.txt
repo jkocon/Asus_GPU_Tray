@@ -1,0 +1,6 @@
+Switch to the MUX mode (reboot): finish with --after-boot
+Outcome: the reboot switch worked (gpu_mux_mode=0, boot -3 came up with nvidia-drm as fb0), but
+the screen stayed black: KWIN_DRM_DEVICES pinned the login screen's KWin to the iGPU, which drives
+no outputs in MUX mode ("There are no outputs", logs/boot-3/greeter.log). Two more boots hung the
+same way; the user went back to Hybrid from Windows. Fixed on main in 9d0df2b. logs/this-boot is
+the Hybrid boot after that; after/ is not a MUX snapshot. Re-record 08 and 09.

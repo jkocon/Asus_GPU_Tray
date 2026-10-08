@@ -1,0 +1,26 @@
+paź 09 01:03:31.896626 cachyos-x8664 cardwired[790]: [INFO ] NVIDIA GeForce RTX 3050 Ti Laptop GPU: Power state changed: D3Cold
+paź 09 01:04:11.533453 cachyos-x8664 systemd[1]: Started Schedule GPU mode AsusMuxDgpu and reboot.
+paź 09 01:04:11.767278 cachyos-x8664 asus-gpu-switch-reboot[4278]: Scheduled mode AsusMuxDgpu, rebooting
+paź 09 01:04:11.770153 cachyos-x8664 systemd[1]: asus-gpu-switch@AsusMuxDgpu.service: Deactivated successfully.
+paź 09 01:04:11.859403 cachyos-x8664 plasmalogin[937]: Authentication error: PLASMALOGIN::Auth::ERROR_INTERNAL "Process crashed"
+paź 09 01:04:11.859417 cachyos-x8664 plasmalogin[937]: Auth: plasmalogin-helper (--socket /tmp/plasmalogin-auth-3118d076-7e73-4058-a564-8b6ef3511929 --id 1 --start /usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland --user jkocon) crashed (signal 1)
+paź 09 01:04:11.859422 cachyos-x8664 plasmalogin[937]: Authentication error: PLASMALOGIN::Auth::ERROR_INTERNAL "Process crashed"
+paź 09 01:04:11.859428 cachyos-x8664 plasmalogin[937]: Socket server stopping...
+paź 09 01:04:11.859433 cachyos-x8664 plasmalogin[937]: Socket server stopped.
+paź 09 01:04:11.859484 cachyos-x8664 plasmalogin[937]: Removing display PLASMALOGIN::Display(0x7fc154009040) ...
+paź 09 01:04:11.859512 cachyos-x8664 plasmalogin[937]: Adding new display...
+paź 09 01:04:11.864005 cachyos-x8664 systemd[1]: Stopping Plasma Login Manager...
+paź 09 01:04:11.878855 cachyos-x8664 systemd[1]: Stopping Cardwire Daemon...
+paź 09 01:04:11.899040 cachyos-x8664 plasmalogin[937]: Using VT 1
+paź 09 01:04:11.899142 cachyos-x8664 plasmalogin[937]: Display server started.
+paź 09 01:04:11.899163 cachyos-x8664 plasmalogin[937]: Socket server starting...
+paź 09 01:04:11.899275 cachyos-x8664 plasmalogin[937]: Socket server started.
+paź 09 01:04:11.899442 cachyos-x8664 plasmalogin[937]: Greeter starting...
+paź 09 01:04:11.899804 cachyos-x8664 plasmalogin[937]: Socket server stopping...
+paź 09 01:04:11.899812 cachyos-x8664 plasmalogin[937]: Socket server stopped.
+paź 09 01:04:11.899906 cachyos-x8664 plasmalogin[937]: Auth: plasmalogin-helper (--socket /tmp/plasmalogin-auth-3118d076-7e73-4058-a564-8b6ef3511929 --id 4 --start /usr/bin/startplasma-login-wayland --user plasmalogin --greeter) crashed (signal 15)
+paź 09 01:04:11.901860 cachyos-x8664 systemd[1]: plasmalogin.service: Deactivated successfully.
+paź 09 01:04:11.907643 cachyos-x8664 systemd[1]: Stopped Plasma Login Manager.
+paź 09 01:04:13.873239 cachyos-x8664 systemd[1]: cardwired.service: Deactivated successfully.
+paź 09 01:04:13.873708 cachyos-x8664 systemd[1]: Stopped Cardwire Daemon.
+paź 09 01:04:13.873940 cachyos-x8664 systemd[1]: cardwired.service: Consumed 641ms CPU time over 2min 21.168s wall clock time, 400M memory peak.

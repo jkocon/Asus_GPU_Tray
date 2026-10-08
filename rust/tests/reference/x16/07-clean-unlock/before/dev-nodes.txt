@@ -1,0 +1,19 @@
+crw-rw-rw- 1 root root 195,   0 10-08 21:36 /dev/nvidia0
+crw-rw-rw- 1 root root 195, 255 10-08 21:36 /dev/nvidiactl
+crw-rw-rw- 1 root root 195, 254 10-08 22:13 /dev/nvidia-modeset
+crw-rw-rw- 1 root root 506,   0 10-08 21:36 /dev/nvidia-uvm
+crw-rw-rw- 1 root root 506,   1 10-08 21:36 /dev/nvidia-uvm-tools
+
+/dev/dri:
+total 0
+lrwxrwxrwx  1 root root          5 10-08 21:36 asus-igpu-card -> card1
+drwxr-xr-x  2 root root        120 10-09 00:52 by-path
+crw-rw----+ 1 root video  226,   0 10-09 00:52 card0
+crw-rw----+ 1 root video  226,   1 10-08 22:05 card1
+crw-rw-rw-  1 root render 226, 128 10-08 21:36 renderD128
+crw-rw-rw-  1 root render 226, 129 10-09 00:52 renderD129
+
+/dev/nvidia-caps:
+total 0
+cr-------- 1 root root 234, 1 10-08 21:37 nvidia-cap1
+cr--r--r-- 1 root root 234, 2 10-08 21:37 nvidia-cap2

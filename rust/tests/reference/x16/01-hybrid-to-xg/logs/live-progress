@@ -1,0 +1,12 @@
+00:41:07 Live switch to AsusEgpu: stopping services
+00:41:08 Nobody holds the card; unbinding drivers
+00:41:08 unbind 0000:01:00.0 from nvidia
+00:41:08 unbind 0000:01:00.1 from snd_hda_intel
+00:41:08 secondary bus reset below 0000:00:01.1
+00:41:09 remove 0000:01:00.0
+00:41:09 remove 0000:01:00.1
+00:41:10 link down/up cycle on 0000:00:01.1 (Surprise Down mask not supported)
+00:41:10 egpu_enable -> 1
+00:41:37 enable link on 0000:00:01.1
+00:41:46 Rescanning PCI
+00:41:49 Switched to AsusEgpu without a reboot (0000:01:00.0)

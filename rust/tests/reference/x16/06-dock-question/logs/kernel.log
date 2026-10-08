@@ -1,0 +1,102 @@
+paź 09 00:49:19.380348 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xb9
+paź 09 00:49:19.806535 cachyos-x8664 kernel: usb 6-1: new high-speed USB device number 5 using xhci_hcd
+paź 09 00:49:19.934445 cachyos-x8664 kernel: usb 6-1: New USB device found, idVendor=05e3, idProduct=0610, bcdDevice=69.41
+paź 09 00:49:19.939179 cachyos-x8664 kernel: usb 6-1: Product: USB2.1 Hub
+paź 09 00:49:19.939671 cachyos-x8664 kernel: usb 6-1: Manufacturer: GenesysLogic
+paź 09 00:49:19.977382 cachyos-x8664 kernel: hub 6-1:1.0: USB hub found
+paź 09 00:49:19.978208 cachyos-x8664 kernel: hub 6-1:1.0: 4 ports detected
+paź 09 00:49:20.186359 cachyos-x8664 kernel: usb 7-1: new SuperSpeed Plus Gen 2x1 USB device number 6 using xhci_hcd
+paź 09 00:49:20.199419 cachyos-x8664 kernel: usb 7-1: New USB device found, idVendor=05e3, idProduct=0625, bcdDevice=69.41
+paź 09 00:49:20.202007 cachyos-x8664 kernel: usb 7-1: Product: USB3.2 Hub
+paź 09 00:49:20.202518 cachyos-x8664 kernel: usb 7-1: Manufacturer: GenesysLogic
+paź 09 00:49:20.232384 cachyos-x8664 kernel: hub 7-1:1.0: USB hub found
+paź 09 00:49:20.233231 cachyos-x8664 kernel: hub 7-1:1.0: 4 ports detected
+paź 09 00:49:20.359413 cachyos-x8664 kernel: usb 6-1.1: new high-speed USB device number 6 using xhci_hcd
+paź 09 00:49:20.459526 cachyos-x8664 kernel: usb 6-1.1: New USB device found, idVendor=05e3, idProduct=0610, bcdDevice=69.42
+paź 09 00:49:20.463996 cachyos-x8664 kernel: usb 6-1.1: Product: USB2.1 Hub
+paź 09 00:49:20.464551 cachyos-x8664 kernel: usb 6-1.1: Manufacturer: GenesysLogic
+paź 09 00:49:20.519386 cachyos-x8664 kernel: hub 6-1.1:1.0: USB hub found
+paź 09 00:49:20.520351 cachyos-x8664 kernel: hub 6-1.1:1.0: 4 ports detected
+paź 09 00:49:20.551407 cachyos-x8664 kernel: usb 7-1.1: new SuperSpeed Plus Gen 2x1 USB device number 7 using xhci_hcd
+paź 09 00:49:20.564365 cachyos-x8664 kernel: usb 7-1.1: New USB device found, idVendor=05e3, idProduct=0625, bcdDevice=69.42
+paź 09 00:49:20.566948 cachyos-x8664 kernel: usb 7-1.1: Product: USB3.2 Hub
+paź 09 00:49:20.567515 cachyos-x8664 kernel: usb 7-1.1: Manufacturer: GenesysLogic
+paź 09 00:49:20.615384 cachyos-x8664 kernel: hub 7-1.1:1.0: USB hub found
+paź 09 00:49:20.616255 cachyos-x8664 kernel: hub 7-1.1:1.0: 4 ports detected
+paź 09 00:49:20.647411 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xba
+paź 09 00:49:20.703422 cachyos-x8664 kernel: usb 6-1.3: new full-speed USB device number 7 using xhci_hcd
+paź 09 00:49:20.810500 cachyos-x8664 kernel: usb 6-1.3: New USB device found, idVendor=0b05, idProduct=1970, bcdDevice= 0.03
+paź 09 00:49:20.825125 cachyos-x8664 kernel: usb 6-1.3: Product: ITE Device(8910)
+paź 09 00:49:20.825642 cachyos-x8664 kernel: usb 6-1.3: Manufacturer: ITE Tech. Inc.
+paź 09 00:49:20.871409 cachyos-x8664 kernel: usb 7-1.2: new SuperSpeed USB device number 8 using xhci_hcd
+paź 09 00:49:20.878380 cachyos-x8664 kernel: asus 0003:0B05:1970.000C: hiddev99,hidraw10: USB HID v1.10 Device [ITE Tech. Inc. ITE Device(8910)] on usb-0000:3b:00.3-1.3/input0
+paź 09 00:49:20.882390 cachyos-x8664 kernel: usb 7-1.2: New USB device found, idVendor=0bda, idProduct=8153, bcdDevice=31.00
+paź 09 00:49:20.882670 cachyos-x8664 kernel: usb 7-1.2: Int endpoint with wBytesPerInterval of 8 in config 2 interface 0 altsetting 0 ep 0x83: setting to 16
+paź 09 00:49:20.883494 cachyos-x8664 kernel: usb 7-1.2: Product: USB 10/100/1000 LAN
+paź 09 00:49:20.883973 cachyos-x8664 kernel: usb 7-1.2: Manufacturer: Realtek
+paź 09 00:49:20.990199 cachyos-x8664 kernel: r8152-cfgselector 7-1.2: reset SuperSpeed USB device number 8 using xhci_hcd
+paź 09 00:49:21.134327 cachyos-x8664 kernel: usb 7-1.4: new SuperSpeed USB device number 9 using xhci_hcd
+paź 09 00:49:21.153345 cachyos-x8664 kernel: usb 7-1.4: New USB device found, idVendor=05e3, idProduct=0764, bcdDevice= 0.01
+paź 09 00:49:21.155648 cachyos-x8664 kernel: usb 7-1.4: Product: USB Storage
+paź 09 00:49:21.155851 cachyos-x8664 kernel: usb 7-1.4: Manufacturer: Generic
+paź 09 00:49:21.156288 cachyos-x8664 kernel: usb-storage 7-1.4:1.0: USB Mass Storage device detected
+paź 09 00:49:21.156570 cachyos-x8664 kernel: scsi host0: usb-storage 7-1.4:1.0
+paź 09 00:49:21.212023 cachyos-x8664 kernel: r8152 7-1.2:1.0 enp59s0f3u1u2: renamed from eth0
+paź 09 00:49:22.194350 cachyos-x8664 kernel: scsi 0:0:0:0: Direct-Access     Generic  MassStorageClass 0001 PQ: 0 ANSI: 6
+paź 09 00:49:22.196338 cachyos-x8664 kernel: sd 0:0:0:0: [sda] Media removed, stopped polling
+paź 09 00:49:22.206332 cachyos-x8664 kernel: sd 0:0:0:0: [sda] Attached SCSI removable disk
+paź 09 00:49:24.398672 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Removing device
+paź 09 00:49:24.400345 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Unloading driver
+paź 09 00:49:25.127334 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: GPU sound probed, but not operational: please add a quirk to driver_denylist
+paź 09 00:49:25.343100 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Link Down/Up ignored
+paź 09 00:49:26.524327 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Link Down
+paź 09 00:49:26.524651 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Card present
+paź 09 00:49:27.074327 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbe
+paź 09 00:49:27.175331 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xc2
+paź 09 00:49:27.546346 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): No link
+paź 09 00:49:51.227358 cachyos-x8664 kernel: asus_armoury: Success changing the eGPU status, a reboot is strongly advised
+paź 09 00:49:51.253346 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Card present
+paź 09 00:49:52.277372 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): No link
+paź 09 00:50:01.614350 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Card present
+paź 09 00:50:01.766353 cachyos-x8664 kernel: pci 0000:01:00.0: [10de:249d] type 00 class 0x030000 PCIe Legacy Endpoint
+paź 09 00:50:01.766553 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 0 [mem 0x00000000-0x00ffffff]
+paź 09 00:50:01.766633 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 1 [mem 0x00000000-0x1ffffffff 64bit pref]
+paź 09 00:50:01.766708 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 3 [mem 0x00000000-0x01ffffff 64bit pref]
+paź 09 00:50:01.766776 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 5 [io  0x0000-0x007f]
+paź 09 00:50:01.766847 cachyos-x8664 kernel: pci 0000:01:00.0: ROM [mem 0x00000000-0x0007ffff pref]
+paź 09 00:50:01.766922 cachyos-x8664 kernel: pci 0000:01:00.0: Max Payload Size set to 256 (was 128, max 256)
+paź 09 00:50:01.766989 cachyos-x8664 kernel: pci 0000:01:00.0: PME# supported from D0 D3hot
+paź 09 00:50:01.767071 cachyos-x8664 kernel: pci 0000:01:00.0: 31.504 Gb/s available PCIe bandwidth, limited by 8.0 GT/s PCIe x4 link at 0000:00:01.1 (capable of 252.048 Gb/s with 16.0 GT/s PCIe x16 link)
+paź 09 00:50:01.768345 cachyos-x8664 kernel: pci 0000:01:00.0: Adding to iommu group 14
+paź 09 00:50:01.768607 cachyos-x8664 kernel: pci 0000:01:00.0: vgaarb: bridge control possible
+paź 09 00:50:01.768800 cachyos-x8664 kernel: pci 0000:01:00.0: vgaarb: VGA device added: decodes=io+mem,owns=none,locks=none
+paź 09 00:50:01.768995 cachyos-x8664 kernel: pci 0000:01:00.1: [10de:228b] type 00 class 0x040300 PCIe Endpoint
+paź 09 00:50:01.769209 cachyos-x8664 kernel: pci 0000:01:00.1: BAR 0 [mem 0x00000000-0x00003fff]
+paź 09 00:50:01.769441 cachyos-x8664 kernel: pci 0000:01:00.1: Max Payload Size set to 256 (was 128, max 256)
+paź 09 00:50:01.769623 cachyos-x8664 kernel: pci 0000:01:00.1: Adding to iommu group 14
+paź 09 00:50:01.769803 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 1 [mem 0x7000000000-0x71ffffffff 64bit pref]: assigned
+paź 09 00:50:01.769983 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 3 [mem 0x7200000000-0x7201ffffff 64bit pref]: assigned
+paź 09 00:50:01.770162 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 0 [mem 0xdc000000-0xdcffffff]: assigned
+paź 09 00:50:01.770352 cachyos-x8664 kernel: pci 0000:01:00.0: ROM [mem 0xdd000000-0xdd07ffff pref]: assigned
+paź 09 00:50:01.770537 cachyos-x8664 kernel: pci 0000:01:00.1: BAR 0 [mem 0xdd080000-0xdd083fff]: assigned
+paź 09 00:50:01.770712 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 5 [io  0xf000-0xf07f]: assigned
+paź 09 00:50:01.770882 cachyos-x8664 kernel: pcieport 0000:00:01.1: PCI bridge to [bus 01-05]
+paź 09 00:50:01.771088 cachyos-x8664 kernel: pcieport 0000:00:01.1:   bridge window [io  0xf000-0xffff]
+paź 09 00:50:01.771283 cachyos-x8664 kernel: pcieport 0000:00:01.1:   bridge window [mem 0xdc000000-0xdd0fffff]
+paź 09 00:50:01.771544 cachyos-x8664 kernel: pcieport 0000:00:01.1:   bridge window [mem 0x7000000000-0x7801ffffff 64bit pref]
+paź 09 00:50:01.771733 cachyos-x8664 kernel: pci 0000:01:00.1: extending delay after power-on from D3hot to 20 msec
+paź 09 00:50:01.771914 cachyos-x8664 kernel: pci 0000:01:00.1: D0 power state depends on 0000:01:00.0
+paź 09 00:50:01.772093 cachyos-x8664 kernel: nvidia 0000:01:00.0: enabling device (0000 -> 0003)
+paź 09 00:50:01.772273 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: enabling device (0000 -> 0002)
+paź 09 00:50:01.772463 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: Disabling MSI
+paź 09 00:50:01.772634 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: Handle vga_switcheroo audio client
+paź 09 00:50:01.772809 cachyos-x8664 kernel: nvidia 0000:01:00.0: vgaarb: VGA decodes changed: olddecodes=io+mem,decodes=none:owns=none
+paź 09 00:50:01.781348 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=3 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input66
+paź 09 00:50:01.781384 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=7 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input67
+paź 09 00:50:01.781401 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=8 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input68
+paź 09 00:50:01.781412 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=9 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input69
+paź 09 00:50:03.246334 cachyos-x8664 kernel: NVRM: GPU0 nvAssertOkFailedNoLog: Assertion failed: Invalid data passed [NV_ERR_INVALID_DATA] (0x00000025) returned from PlatformRequestHandler failed to get target temp from SBIOS @ platform_request_handler_ctrl.c:2175
+paź 09 00:50:03.246432 cachyos-x8664 kernel: NVRM: GPU0 nvAssertOkFailedNoLog: Assertion failed: Invalid data passed [NV_ERR_INVALID_DATA] (0x00000025) returned from PlatformRequestHandler failed to get platform power mode from SBIOS @ platform_request_handler_ctrl.c:2118
+paź 09 00:50:03.393357 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Loading driver
+paź 09 00:50:03.461350 cachyos-x8664 kernel: [drm] Initialized nvidia-drm 0.0.0 for 0000:01:00.0 on minor 0
+paź 09 00:50:03.461416 cachyos-x8664 kernel: nvidia 0000:01:00.0: [drm] Cannot find any crtc or sizes

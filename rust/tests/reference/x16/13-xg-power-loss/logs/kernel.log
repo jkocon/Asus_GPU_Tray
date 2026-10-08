@@ -1,0 +1,27 @@
+paź 09 00:59:35.932974 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbb
+paź 09 00:59:35.933111 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbe
+paź 09 00:59:35.980992 cachyos-x8664 kernel: usb 7-1: USB disconnect, device number 2
+paź 09 00:59:35.981439 cachyos-x8664 kernel: usb 7-1.1: USB disconnect, device number 3
+paź 09 00:59:35.997266 cachyos-x8664 kernel: r8152-cfgselector 7-1.2: USB disconnect, device number 4
+paź 09 00:59:35.997654 cachyos-x8664 kernel: r8152 7-1.2:1.0 enp59s0f3u1u2: Stop submitting intr, status -108
+paź 09 00:59:36.028977 cachyos-x8664 kernel: usb 7-1.4: USB disconnect, device number 5
+paź 09 00:59:36.617009 cachyos-x8664 kernel: usb 6-1.2: new high-speed USB device number 5 using xhci_hcd
+paź 09 00:59:36.716008 cachyos-x8664 kernel: usb 6-1.2: New USB device found, idVendor=0bda, idProduct=8153, bcdDevice=31.00
+paź 09 00:59:36.721256 cachyos-x8664 kernel: usb 6-1.2: Product: USB 10/100/1000 LAN
+paź 09 00:59:36.721518 cachyos-x8664 kernel: usb 6-1.2: Manufacturer: Realtek
+paź 09 00:59:36.863986 cachyos-x8664 kernel: r8152-cfgselector 6-1.2: reset high-speed USB device number 5 using xhci_hcd
+paź 09 00:59:36.921435 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: GPU sound probed, but not operational: please add a quirk to driver_denylist
+paź 09 00:59:36.929119 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Removing device
+paź 09 00:59:36.929987 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Unloading driver
+paź 09 00:59:37.115014 cachyos-x8664 kernel: NVRM: Attempting to remove device 0000:01:00.0 with non-zero usage count!
+paź 09 00:59:37.342018 cachyos-x8664 kernel: usb 6-1.4: new high-speed USB device number 6 using xhci_hcd
+paź 09 00:59:37.444123 cachyos-x8664 kernel: usb 6-1.4: New USB device found, idVendor=05e3, idProduct=0764, bcdDevice= 0.01
+paź 09 00:59:37.447624 cachyos-x8664 kernel: usb 6-1.4: Product: USB Storage
+paź 09 00:59:37.448137 cachyos-x8664 kernel: usb 6-1.4: Manufacturer: Generic
+paź 09 00:59:37.449107 cachyos-x8664 kernel: usb-storage 6-1.4:1.0: USB Mass Storage device detected
+paź 09 00:59:37.449712 cachyos-x8664 kernel: scsi host0: usb-storage 6-1.4:1.0
+paź 09 00:59:37.562993 cachyos-x8664 kernel: r8152 6-1.2:1.0 enp59s0f3u1u2: renamed from eth0
+paź 09 00:59:38.476343 cachyos-x8664 kernel: scsi 0:0:0:0: Direct-Access     Generic  MassStorageClass 0001 PQ: 0 ANSI: 6
+paź 09 00:59:38.478999 cachyos-x8664 kernel: sd 0:0:0:0: [sda] Media removed, stopped polling
+paź 09 00:59:38.484997 cachyos-x8664 kernel: sd 0:0:0:0: [sda] Attached SCSI removable disk
+paź 09 00:59:56.180981 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbc

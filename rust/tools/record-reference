@@ -42,7 +42,8 @@ dump_state() {
 
 driver_of() {
     local link
-    link=$(readlink -f "$1/driver" 2>/dev/null) && [[ -n $link ]] && echo "${link##*/}" || echo -
+    # readlink -f would print a path for a missing link too
+    link=$(readlink "$1/driver" 2>/dev/null) && [[ -n $link ]] && echo "${link##*/}" || echo -
 }
 
 # Everything that describes the GPU state, without waking anything.
@@ -75,11 +76,16 @@ snapshot() {
     } > "$dir/system.txt"
 }
 
+# Left out of the logs: cardwired's per-call D-Bus lines, and network lines (addresses).
+NOISE='UFW BLOCK|SerialNumber|[Ss]erial number|dispatch_call|tailscaled|twingate|NetworkManager|wpa_supplicant|wlan0'
+
 logs() {
     local dir=$1 since=$2 boot=${3:-0}
     mkdir -p "$dir"
-    journalctl -b "$boot" --since "@$since" "${UNITS[@]}" -o short-precise --no-pager > "$dir/units.log" 2>&1 || true
-    journalctl -b "$boot" --since "@$since" -k -o short-precise --no-pager > "$dir/kernel.log" 2>&1 || true
+    journalctl -b "$boot" --since "@$since" "${UNITS[@]}" -o short-precise --no-pager 2>&1 |
+        grep -Ev "$NOISE" > "$dir/units.log" || true
+    journalctl -b "$boot" --since "@$since" -k -o short-precise --no-pager 2>&1 |
+        grep -Ev "$NOISE" > "$dir/kernel.log" || true
     cp -f "$STATE/live-progress" "$dir/live-progress" 2>/dev/null || true
     cp -f "$STATE/live-result" "$dir/live-result" 2>/dev/null || true
 }

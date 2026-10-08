@@ -1,0 +1,5 @@
+XG Mobile active, nothing on the GPU: unlock the dock (dGPU should come back live)
+Outcome: NOT clean. cardwired and nvidia-powerd (root) keep the NVIDIA card open, so the driver
+logged "non-zero usage count" at the unlock and egpu_enable stayed 1; the tray ran
+asus-gpu-switch@Hybrid after ~10 s and it rebooted the emergency way (SysRq). The clean path
+needs both services stopped (docs/how-it-works.md). This recording doubles as scenario 12.

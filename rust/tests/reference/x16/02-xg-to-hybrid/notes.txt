@@ -1,0 +1,1 @@
+XG Mobile -> built-in dGPU (live), no app on the GPU

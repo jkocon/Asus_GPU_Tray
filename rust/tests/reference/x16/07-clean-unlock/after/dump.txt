@@ -1,0 +1,12 @@
+0000:01:00.0  dGPU: RTX 3050 Ti – nvidia, suspended, D3cold allowed  [NVIDIA]
+0000:3a:00.0  iGPU: Radeon 680M – amdgpu, active  [AMD]
+cardwire: mode hybrid; available ['integrated', 'hybrid', 'smart']
+XG Mobile: not connected; hardware mode Hybrid
+hardware switch backends: live (asus-gpu-live@), reboot (asus-gpu-switch@)
+rendering: Radeon 680M (iGPU) · RTX 3050 Ti suspended
+  live mode integrated: Integrated – block RTX 3050 Ti
+  live mode hybrid: Hybrid – all GPUs available
+  live mode smart: Smart – RTX 3050 Ti only for approved apps
+  hardware mode Hybrid: Built-in dGPU (RTX 3050 Ti)
+  hardware mode AsusEgpu: XG Mobile
+  hardware mode AsusMuxDgpu: RTX 3050 Ti only (MUX)

@@ -1,0 +1,13 @@
+== live-progress
+21:39:08 Already in Hybrid, but the built-in dGPU is missing - bringing the link on 0000:00:01.1 back
+21:39:08 enable link on 0000:00:01.1
+21:39:28 link on 0000:00:01.1 did not come up
+21:39:29 Rescanning PCI
+21:39:54 The built-in dGPU did not come back - reboot
+
+== live-result
+The built-in dGPU did not come back - reboot
+
+== root-port
+0000:00:01.1
+

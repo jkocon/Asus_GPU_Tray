@@ -1,0 +1,18 @@
+paź 09 00:56:54.733895 cachyos-x8664 cardwired[5534]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D3Hot
+paź 09 00:57:12.268725 cachyos-x8664 cardwired[5534]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 00:57:12.268744 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /sys/class/backlight/nvidia_0: No such file or directory (os error 2)
+paź 09 00:57:12.268744 cachyos-x8664 cardwired[5534]: [ERROR] (ignoring) failed to get inode for backlight nvidia_0: IO Error: No such file or directory (os error 2)
+paź 09 00:57:12.268803 cachyos-x8664 cardwired[5534]: [INFO ] Switched to Integrated
+paź 09 00:57:12.786611 cachyos-x8664 cardwired[5534]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D0
+paź 09 00:57:13.135931 cachyos-x8664 cardwired[5534]: [INFO ] successfully sent stop on nvidia-powerd.service
+paź 09 00:57:14.303539 cachyos-x8664 cardwired[5534]: [INFO ] asus-gpu-tray[1843] tried to access GPU 1 (blocked by cardwire)
+paź 09 00:57:14.565072 cachyos-x8664 cardwired[5534]: [INFO ] rog-control-center[5789] tried to access GPU 1 (blocked by cardwire)
+paź 09 00:57:34.344550 cachyos-x8664 cardwired[5534]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D3Hot
+paź 09 00:57:46.368448 cachyos-x8664 cardwired[5534]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 00:57:46.368493 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /sys/class/backlight/nvidia_0: No such file or directory (os error 2)
+paź 09 00:57:46.368493 cachyos-x8664 cardwired[5534]: [ERROR] (ignoring) failed to get inode for backlight nvidia_0: IO Error: No such file or directory (os error 2)
+paź 09 00:57:46.368521 cachyos-x8664 cardwired[5534]: [INFO ] Switched to Hybrid
+paź 09 00:57:46.375294 cachyos-x8664 cardwired[5534]: [INFO ] successfully sent reset-failed on nvidia-powerd.service
+paź 09 00:57:46.380257 cachyos-x8664 cardwired[5534]: [INFO ] successfully sent start on nvidia-powerd.service
+paź 09 00:57:46.878849 cachyos-x8664 cardwired[5534]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D0
+paź 09 00:58:13.451221 cachyos-x8664 cardwired[5534]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D3Hot

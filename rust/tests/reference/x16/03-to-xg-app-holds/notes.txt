@@ -1,0 +1,2 @@
+Hybrid -> XG Mobile with an app holding the NVIDIA card (answer the kill question)
+glxgears via prime-run holds the card

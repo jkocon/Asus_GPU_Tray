@@ -1,0 +1,2 @@
+On the built-in dGPU: connect and lock the XG Mobile, answer the offer
+answered Yes

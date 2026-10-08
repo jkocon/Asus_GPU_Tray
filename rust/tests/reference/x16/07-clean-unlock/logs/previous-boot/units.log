@@ -1,0 +1,8 @@
+paź 09 00:52:55.776087 cachyos-x8664 cardwired[280916]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D3Hot
+paź 09 00:53:05.304300 cachyos-x8664 cardwired[280916]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D0
+paź 09 00:53:06.375590 cachyos-x8664 cardwired[280916]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:53:06.375590 cachyos-x8664 cardwired[280916]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:53:15.770567 cachyos-x8664 systemd[1]: Started Schedule GPU mode Hybrid and reboot.
+paź 09 00:53:15.776165 cachyos-x8664 cardwired[280916]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:53:15.776165 cachyos-x8664 cardwired[280916]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:53:15.977998 cachyos-x8664 asus-gpu-switch-reboot[281788]: Scheduled mode Hybrid; the NVIDIA driver lost a GPU, so a normal shutdown would hang - emergency reboot

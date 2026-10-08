@@ -1,0 +1,5 @@
+7.2.9-1-cachyos
+NVRM version: NVIDIA UNIX Open Kernel Module for x86_64  615.71.09  Release Build  (notroot@)  Sat Oct  3 18:52:37 UTC 2026
+GCC version:  Selected multilib: .;@m64
+active
+inactive

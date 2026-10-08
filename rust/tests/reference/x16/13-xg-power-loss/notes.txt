@@ -1,0 +1,1 @@
+Unplanned: XG Mobile power unplugged while XG Mobile was active and idle (D3hot), dock locked. Before = state after the event.

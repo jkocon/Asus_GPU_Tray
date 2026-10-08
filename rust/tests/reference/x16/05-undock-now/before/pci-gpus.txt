@@ -1,0 +1,2 @@
+0000:01:00.0 vendor=0x10de device=0x249d driver=nvidia runtime_status=suspending power_state=D0 d3cold_allowed=0
+0000:3a:00.0 vendor=0x1002 device=0x1681 driver=amdgpu runtime_status=active power_state=D0 d3cold_allowed=1

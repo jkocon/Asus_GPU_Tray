@@ -1,0 +1,11 @@
+paź 09 00:59:36.190811 cachyos-x8664 cardwired[5534]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D0
+paź 09 00:59:37.098515 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:59:37.098515 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:59:46.950601 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 00:59:46.951603 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 01:00:03.785979 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 01:00:03.785979 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 01:00:11.336450 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 01:00:11.337679 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 01:00:15.327498 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)
+paź 09 01:00:15.327498 cachyos-x8664 cardwired[5534]: [WARN ] failed to get inode for /dev/dri/card0: No such file or directory (os error 2)

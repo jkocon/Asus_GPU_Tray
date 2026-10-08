@@ -1,0 +1,2 @@
+XG Mobile -> built-in dGPU with an app holding the card
+glxgears via prime-run holds the card
