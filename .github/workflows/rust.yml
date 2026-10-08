@@ -1,0 +1,27 @@
+# Checks of the Rust rewrite in rust/. Builds nothing that gets published.
+name: rust
+
+on:
+  push:
+    paths: ["rust/**", ".github/workflows/rust.yml"]
+  pull_request:
+    paths: ["rust/**", ".github/workflows/rust.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # rustup is preinstalled on the runner; no third-party toolchain action needed.
+      - run: rustup toolchain install stable --profile minimal --component clippy,rustfmt && rustup default stable
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --locked
