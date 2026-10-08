@@ -1,0 +1,1 @@
+cardwired and nvidia-powerd stopped by hand; root holders check: nobody

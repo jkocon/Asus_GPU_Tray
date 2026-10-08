@@ -1,0 +1,9 @@
+0000:01:00.0  eGPU: RTX 3070 – nvidia, suspended, D3cold disabled  [NVIDIA]
+0000:3a:00.0  iGPU: Radeon 680M – amdgpu, active  [AMD]
+cardwire: no
+XG Mobile: connected; hardware mode AsusEgpu
+hardware switch backends: live (asus-gpu-live@), reboot (asus-gpu-switch@)
+rendering: Radeon 680M (iGPU) · RTX 3070 suspended
+  hardware mode Hybrid: Built-in dGPU
+  hardware mode AsusEgpu: XG Mobile (RTX 3070)
+  hardware mode AsusMuxDgpu: Built-in dGPU only (MUX)

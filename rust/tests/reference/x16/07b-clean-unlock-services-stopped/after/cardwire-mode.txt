@@ -1,0 +1,1 @@
+Failed to get property Mode on interface org.opengamingcollective.cardwire.Mode: The name is not activatable

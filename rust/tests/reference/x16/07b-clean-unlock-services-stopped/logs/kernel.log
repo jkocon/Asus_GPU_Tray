@@ -1,0 +1,6 @@
+paź 09 01:27:47.678672 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xba
+paź 09 01:27:47.678762 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbe
+paź 09 01:27:48.647112 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: GPU sound probed, but not operational: please add a quirk to driver_denylist
+paź 09 01:27:48.647297 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Removing device
+paź 09 01:27:48.648668 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Unloading driver
+paź 09 01:28:07.934706 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbc

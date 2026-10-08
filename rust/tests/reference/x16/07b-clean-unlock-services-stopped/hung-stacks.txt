@@ -1,0 +1,46 @@
+pią, 9 paź 2026, 01:31:59 CEST
+== 121 kworker/u64:2-events_unbound etime=      07:30
+[<0>] worker_thread+0x2b4/0x340
+[<0>] kthread+0x119/0x120
+[<0>] ret_from_fork+0xee/0x2b0
+[<0>] ret_from_fork_asm+0x1a/0x30
+== 156 kworker/11:1+kacpi_notify etime=      07:33
+[<0>] os_acquire_rwlock_write+0x39/0x50 [nvidia]
+[<0>] portSyncRwLockAcquireWrite+0x10/0x30 [nvidia]
+[<0>] rmapiLockAcquire+0xcb/0x2f0 [nvidia]
+[<0>] rm_power_source_change_event+0x4f/0x120 [nvidia]
+[<0>] nv_acpi_powersource_hotplug_event+0x7c/0x90 [nvidia]
+[<0>] acpi_ev_notify_dispatch+0x56/0x70
+[<0>] acpi_os_execute_deferred+0x1c/0x30
+[<0>] process_scheduled_works+0x1fa/0x690
+[<0>] worker_thread+0x196/0x340
+[<0>] kthread+0x119/0x120
+[<0>] ret_from_fork+0xee/0x2b0
+[<0>] ret_from_fork_asm+0x1a/0x30
+== 320 kworker/u64:6+kacpi_hotplug etime=      07:31
+[<0>] __flush_workqueue+0x199/0x420
+[<0>] acpi_remove_notify_handler+0x29e/0x370
+[<0>] nv_acpi_methods_uninit+0x58/0x160 [nvidia]
+[<0>] RmShutdownAdapter+0x374/0x440 [nvidia]
+[<0>] rm_shutdown_adapter+0x50/0x90 [nvidia]
+[<0>] nv_shutdown_adapter+0x13c/0x1b0 [nvidia]
+[<0>] nv_stop_device+0x5b/0x1d0 [nvidia]
+[<0>] nv_pci_remove_helper+0x273/0x4c0 [nvidia]
+[<0>] pci_device_remove+0x45/0xb0
+[<0>] device_release_driver_internal+0x1c2/0x320
+[<0>] pci_stop_bus_device+0x67/0x80
+[<0>] acpiphp_disable_and_eject_slot+0xda/0xf0
+[<0>] acpiphp_hotplug_notify+0x184/0x3a0
+[<0>] acpi_device_hotplug+0xaf/0x650
+[<0>] acpi_hotplug_work_fn+0x1e/0x30
+[<0>] process_scheduled_works+0x1fa/0x690
+[<0>] worker_thread+0x196/0x340
+[<0>] kthread+0x119/0x120
+[<0>] ret_from_fork+0xee/0x2b0
+[<0>] ret_from_fork_asm+0x1a/0x30
+== 8339 recover.sh etime=      00:48
+[<0>] remove_store+0x6d/0xc0
+[<0>] kernfs_fop_write_iter+0xe4/0x190
+[<0>] __x64_sys_write+0x24a/0x450
+[<0>] do_syscall_64+0xa6/0x3e0
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e

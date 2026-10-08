@@ -1,0 +1,4 @@
+01:31:14.882 start: egpu_enable=1 egpu_connected=0
+01:31:14.885 link ctl=0c40 sta=3041
+01:31:14.887 driver of 0000:01:00.0: 
+01:31:14.888 remove 0000:01:00.0
