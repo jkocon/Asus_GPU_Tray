@@ -147,7 +147,7 @@ msgstr ""
 msgid ""
 "The XG Mobile was disconnected while it was the active GPU. Unlocking it disconnects the GPU at once, and it stays gone until a reboot, also after you connect it again. Apps that were using it may stop responding.\n"
 "\n"
-"Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile. (Unlocking works without a reboot only when nothing at all uses the GPU, system services included.)"
+"Next time, switch to the built-in dGPU in this menu before unlocking the XG Mobile."
 msgstr ""
 
 #: asus_gpu_tray.py:756 asus_gpu_tray.py:796
