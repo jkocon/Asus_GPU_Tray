@@ -159,6 +159,17 @@ and the still-loaded driver binds to the dGPU. So the firmware's reaction tells 
 apart: switched back by itself means clean (bring the dGPU back live), `egpu_enable` still 1 means
 the driver held on and is wedged (reboot). The tray waits up to 5 s after the unlock to see which.
 
+A repeat on 2026-10-09 (NVIDIA 615.71, cardwired and nvidia-powerd stopped, nothing holding the
+card as root) did not go that way. The driver logged "Removing device" without the usage-count
+warning, but the firmware left `egpu_enable` at 1 and the GPU stayed on the bus without a driver.
+The kernel stacks showed a deadlock: the ACPI eject (`acpiphp_disable_and_eject_slot` →
+`nv_pci_remove` → `nv_acpi_methods_uninit`) waited for the ACPI notify queue, whose worker was stuck
+in `nv_acpi_powersource_hotplug_event` waiting for the RM lock held by the remove path (the unlock
+also reports a power source change). Any later PCI remove or rescan blocks behind it, and only a
+SysRq reboot gets out. So a clean unlock cannot be relied on: switch to the built-in dGPU first.
+(Stacks: `rust/tests/reference/x16/07b-clean-unlock-services-stopped/hung-stacks.txt` on the
+`rust` branch.)
+
 So the tray treats "XG Mobile mode, but no NVIDIA GPU on the bus" (`xg_gone`) as the real signal.
 It checks `/sys/bus/pci/devices/<addr>`, because cardwire keeps listing a blocked GPU after it has
 been removed. On the change into that state it shows a notification and offers the reboot switch to
