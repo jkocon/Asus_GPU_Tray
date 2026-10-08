@@ -25,15 +25,15 @@ slint::slint! {
         in property <string> ok-text;
         callback answered(bool);
         title: root.window-title;
-        min-width: 360px;
-        preferred-width: 460px;
+        // Fixed widths: slint sizes a wrapped Text by its width, so the window gets the full height.
+        width: 480px;
         VerticalLayout {
             padding: 20px;
             spacing: 16px;
             HorizontalLayout {
                 spacing: 16px;
-                Text { text: root.glyph; font-size: 28px; vertical-alignment: top; }
-                Text { text: root.text; wrap: word-wrap; vertical-alignment: top; horizontal-stretch: 1; }
+                Text { text: root.glyph; font-size: 28px; vertical-alignment: top; width: 32px; }
+                Text { text: root.text; wrap: word-wrap; vertical-alignment: top; width: 392px; }
             }
             HorizontalLayout {
                 alignment: end;
@@ -69,8 +69,8 @@ slint::slint! {
             }
             VerticalLayout {
                 spacing: 8px;
-                Text { text: root.heading; font-size: 18px; font-weight: 700; wrap: word-wrap; }
-                Text { text: root.info; wrap: word-wrap; }
+                Text { text: root.heading; font-size: 18px; font-weight: 700; wrap: word-wrap; width: 356px; }
+                Text { text: root.info; wrap: word-wrap; width: 356px; }
                 if !root.done: Text { text: root.stage; }
                 ProgressIndicator { indeterminate: !root.done; progress: root.done ? 1 : 0; }
                 Text { text: root.elapsed; color: #888888; }

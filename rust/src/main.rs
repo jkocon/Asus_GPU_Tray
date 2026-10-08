@@ -23,6 +23,9 @@ enum Command {
     Dump,
     /// List the processes that hold the NVIDIA card; exit status 1 when there are any
     Holders,
+    /// Show a dialog with sample texts (layout check): ask, warning, switch, switched
+    #[command(hide = true)]
+    PreviewDialogs { which: String },
 }
 
 fn main() -> ExitCode {
@@ -46,6 +49,7 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         }
+        Some(Command::PreviewDialogs { which }) => asus_gpu_tray::tray::preview_dialogs(&which),
         None => asus_gpu_tray::tray::run(),
     }
 }

@@ -76,3 +76,45 @@ pub fn run() -> ExitCode {
         }
     }
 }
+
+/// Shows one dialog with long sample texts, to check the layout (hidden `preview-dialogs <which>`):
+/// ask, warning, switch, switched.
+pub fn preview_dialogs(which: &str) -> ExitCode {
+    i18n::init(&locale_dir());
+    if slint::BackendSelector::new().backend_name("winit".into()).renderer_name("software".into()).select().is_err() {
+        return ExitCode::FAILURE;
+    }
+    let which = which.to_string();
+    let _ = slint::spawn_local(async move {
+        match which.as_str() {
+            "ask" => {
+                let text = tr("Switch to the built-in dGPU now, so the XG Mobile can be unplugged?")
+                    + "\n\n"
+                    + &tr("These apps use the XG Mobile and will be closed without asking again; unsaved work \
+                           in them is lost:")
+                    + "\n\n• firefox (PID 1234, 1240)\n• steam (PID 2000)\n\n"
+                    + &tr("ROG Control Center is closed and started again, and the GPU services are stopped \
+                           during the switch. It takes about 35 seconds. Keep the XG Mobile locked until it is done.");
+                dialogs::ask(&tr("Undock now"), &text).await;
+            }
+            "warning" => {
+                dialogs::message(dialogs::Kind::Warning, "XG Mobile", &tr("XG Mobile is not connected and locked."))
+                    .await
+            }
+            "switch" | "switched" => {
+                let win = dialogs::SwitchWin::show("XG Mobile (RTX 3070)", dialogs::BUILTIN, dialogs::XG);
+                if let Some(w) = &win {
+                    w.update_progress("12:00:05 egpu_enable=1");
+                    if which == "switched" {
+                        w.finish(true);
+                    }
+                }
+                std::future::pending::<()>().await; // until the process is stopped
+            }
+            _ => {}
+        }
+        let _ = slint::quit_event_loop();
+    });
+    let _ = slint::run_event_loop_until_quit();
+    ExitCode::SUCCESS
+}
