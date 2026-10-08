@@ -9,8 +9,8 @@ use until the Rust binary replaces them step by step. Plan and phases:
 | Phase | State |
 |---|---|
 | 0. Freeze the behaviour | started: `tests/reference/x16-hybrid-dump.txt` (X16, Hybrid, XG Mobile not connected) |
-| 1. Core library (`src/gpu/`) | in progress: detection, state, labels, cardwire, processes, kernel-log parsing, `dump`, `holders` |
-| 2. Tray | not started (`asus-gpu-tray` without a subcommand only prints a note) |
+| 1. Core library (`src/gpu/`) | done: detection, state, labels, cardwire over D-Bus, processes, kernel-log parsing, `dump`, `holders` |
+| 2. Tray (`src/tray/`) | first cut: icon, menu, dialogs, switch flows; to be tested on the X16 with the XG Mobile |
 | 3. Root helpers | not started |
 | 4. Remove Python and shell | not started |
 
@@ -33,7 +33,7 @@ diff <(python3 ../asus_gpu_tray.py --holders) <(./target/release/asus-gpu-tray h
 ## Layout
 
 ```
-src/main.rs        subcommands: dump, holders (tray, switch-* and egpu-power come later)
+src/main.rs        no subcommand: the tray; dump, holders (switch-* and egpu-power come later)
 src/gpu/           shared core, no UI; mirrors the pure functions of asus_gpu_tray.py
   paths.rs         system paths (tests point them at a fake tree)
   cmd.rs           external commands behind a trait, so tests see every call
@@ -44,7 +44,26 @@ src/gpu/           shared core, no UI; mirrors the pure functions of asus_gpu_tr
   procs.rs         card holders, stopping and restarting processes
   journal.rs       GPU-lost kernel messages
   stats.rs         nvidia-smi numbers (never for a sleeping card)
-  i18n.rs          tr()/fill(); English until gettext is wired up in phase 2
+  i18n.rs          gettext (tr/trf), msgids of the Python tray
+  cardwire_dbus.rs cardwired over D-Bus
+src/tray/          the tray (ksni icon and menu, slint windows, software renderer)
+  app.rs           GpuTray: refresh, watch, switch flows (async on the slint event loop)
+  menu.rs          menu as data (tested) + the ksni model
+  dialogs.rs       message boxes, live-switch progress window
+  icon.rs          tray icon (resvg), as make_icon
+  events.rs        kernel log, cardwired signals, udev PCI events
+  settings.rs, lock.rs, notify.rs
+```
+
+## Trying the tray on the X16
+
+Both trays share the single-instance lock, so only one runs. To use the Rust one at login,
+override the autostart entry; to go back, delete the file:
+
+```sh
+mkdir -p ~/.config/autostart
+sed "s|^Exec=.*|Exec=$PWD/target/release/asus-gpu-tray|" /etc/xdg/autostart/asus-gpu-tray.desktop \
+    > ~/.config/autostart/asus-gpu-tray.desktop
 ```
 
 The module is called `gpu`, not `core` as in the first draft of the plan, so it does not shadow

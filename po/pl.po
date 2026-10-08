@@ -525,3 +525,13 @@ msgstr "{app} już działa"
 #: asus_gpu_tray.py:1516
 msgid "The icon is in the system tray."
 msgstr "Ikona jest w zasobniku systemowym."
+
+#. Dialog buttons of the Rust tray
+msgid "Yes"
+msgstr "Tak"
+
+msgid "No"
+msgstr "Nie"
+
+msgid "OK"
+msgstr "OK"

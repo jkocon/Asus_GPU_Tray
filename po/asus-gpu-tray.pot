@@ -522,3 +522,13 @@ msgstr ""
 #: asus_gpu_tray.py:1516
 msgid "The icon is in the system tray."
 msgstr ""
+
+#. Dialog buttons of the Rust tray
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "OK"
+msgstr ""
