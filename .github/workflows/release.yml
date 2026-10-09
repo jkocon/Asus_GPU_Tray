@@ -1,0 +1,68 @@
+# Builds the release archive when a version tag is pushed: the source tree of the tag plus a
+# prebuilt binary (install.sh uses ./asus-gpu-tray when it is there), and its SHA-256.
+# Built on Ubuntu 22.04 so the binary runs with glibc 2.35 and newer.
+name: release
+
+on:
+  push:
+    tags: ["v[0-9]*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    permissions:
+      contents: write # create the release and upload its assets
+    env:
+      TAG: ${{ github.ref_name }}
+      RUST_TOOLCHAIN: "1.99.0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq --no-install-recommends pkg-config libudev-dev libfontconfig1-dev libxkbcommon-dev gettext
+
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          rustup default "$RUST_TOOLCHAIN"
+
+      - name: Test
+        run: cargo test --locked
+
+      - name: Build
+        run: |
+          cargo build --release --locked
+          version=$(./target/release/asus-gpu-tray --version | cut -d' ' -f2)
+          [[ "v$version" == "$TAG" ]] || { echo "tag $TAG does not match Cargo.toml version $version"; exit 1; }
+          objdump -T target/release/asus-gpu-tray | grep -oE 'GLIBC_[0-9.]+' | sort -Vu | tail -1
+
+      - name: Package
+        run: |
+          name="asus-gpu-tray-${TAG#v}"
+          archive="$name-x86_64.tar.gz"
+          mkdir -p dist
+          git archive --format=tar --prefix="$name/" HEAD | tar -x -C dist
+          install -m755 target/release/asus-gpu-tray "dist/$name/asus-gpu-tray"
+          tar -C dist --owner=0 --group=0 -czf "$archive" "$name"
+          sha256sum "$archive" > "$archive.sha256"
+          cat "$archive.sha256"
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          archive="asus-gpu-tray-${TAG#v}-x86_64.tar.gz"
+          gh release create "$TAG" "$archive" "$archive.sha256" --repo "$GITHUB_REPOSITORY" \
+            --title "Asus GPU Tray ${TAG#v}" --notes-file RELEASE_NOTES.md --verify-tag
