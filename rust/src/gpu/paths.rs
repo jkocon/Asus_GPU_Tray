@@ -17,6 +17,9 @@ pub struct Paths {
     pub live_progress: PathBuf,
     pub power_supply: PathBuf,
     pub dev: PathBuf,
+    /// Held by every hardware switch (root-only; /run/lock is world-writable on some distros).
+    pub switch_lock: PathBuf,
+    pub sysrq: PathBuf,
 }
 
 impl Default for Paths {
@@ -31,6 +34,8 @@ impl Default for Paths {
             live_progress: "/var/lib/asus-gpu-tray/live-progress".into(),
             power_supply: "/sys/class/power_supply".into(),
             dev: "/dev".into(),
+            switch_lock: "/run/asus-gpu-tray.lock".into(),
+            sysrq: "/proc/sysrq-trigger".into(),
         }
     }
 }
@@ -48,11 +53,18 @@ impl Paths {
             live_progress: root.join("state/live-progress"),
             power_supply: root.join("power_supply"),
             dev: root.join("dev"),
+            switch_lock: root.join("run/asus-gpu-tray.lock"),
+            sysrq: root.join("sysrq-trigger"),
         }
     }
 
     pub fn read_attr(&self, name: &str) -> String {
         read(&self.attr.join(name).join("current_value"))
+    }
+
+    /// /var/lib/asus-gpu-tray: pending, live-progress, live-result, root-port.
+    pub fn state_dir(&self) -> PathBuf {
+        self.pending.parent().map(Path::to_path_buf).unwrap_or_default()
     }
 
     pub fn unit_installed(&self, name: &str) -> bool {

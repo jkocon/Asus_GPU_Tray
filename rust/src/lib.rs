@@ -4,4 +4,5 @@
 //! pure functions of asus_gpu_tray.py one to one, so the Python tests double as its spec.
 
 pub mod gpu;
+pub mod helpers;
 pub mod tray;

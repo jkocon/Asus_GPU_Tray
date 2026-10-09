@@ -23,6 +23,10 @@ enum Command {
     Dump,
     /// List the processes that hold the NVIDIA card; exit status 1 when there are any
     Holders,
+    /// Root helper (udev, after a switch): keep the XG Mobile GPU out of D3cold
+    EgpuPower,
+    /// Root helper (asus-gpu-switch@.service): schedule a hardware mode for the next boot and reboot
+    SwitchReboot { mode: String },
     /// Show a dialog with sample texts (layout check): ask, warning, switch, switched
     #[command(hide = true)]
     PreviewDialogs { which: String },
@@ -48,6 +52,15 @@ fn main() -> ExitCode {
                 println!("{}", describe_procs(&procs));
                 ExitCode::FAILURE
             }
+        }
+        Some(Command::EgpuPower) => {
+            for msg in asus_gpu_tray::helpers::egpu_power::run(&paths) {
+                asus_gpu_tray::helpers::log(&msg);
+            }
+            ExitCode::SUCCESS
+        }
+        Some(Command::SwitchReboot { mode }) => {
+            ExitCode::from(asus_gpu_tray::helpers::switch_reboot::run(&mode, &paths, &asus_gpu_tray::helpers::RealOps))
         }
         Some(Command::PreviewDialogs { which }) => asus_gpu_tray::tray::preview_dialogs(&which),
         None => asus_gpu_tray::tray::run(),
