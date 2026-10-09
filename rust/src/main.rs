@@ -29,6 +29,8 @@ enum Command {
     SwitchReboot { mode: String },
     /// Root helper (asus-gpu-switch-apply.service, at boot): apply the mode scheduled by switch-reboot
     SwitchApply,
+    /// Root helper (asus-gpu-live@.service): switch between the built-in dGPU and the XG Mobile without a reboot
+    SwitchLive { mode: String },
     /// Show a dialog with sample texts (layout check): ask, warning, switch, switched
     #[command(hide = true)]
     PreviewDialogs { which: String },
@@ -66,6 +68,10 @@ fn main() -> ExitCode {
         }
         Some(Command::SwitchApply) => {
             ExitCode::from(asus_gpu_tray::helpers::switch_apply::run(&paths, &asus_gpu_tray::helpers::RealOps))
+        }
+        Some(Command::SwitchLive { mode }) => {
+            asus_gpu_tray::helpers::catch_signals();
+            ExitCode::from(asus_gpu_tray::helpers::switch_live::run(&mode, &paths, &asus_gpu_tray::helpers::RealOps))
         }
         Some(Command::PreviewDialogs { which }) => asus_gpu_tray::tray::preview_dialogs(&which),
         None => asus_gpu_tray::tray::run(),

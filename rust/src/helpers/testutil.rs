@@ -30,6 +30,8 @@ pub struct FakeOps {
     pub streamed: (Vec<String>, i32),
     /// What the streamed command does to the (fake) system.
     pub on_stream: Option<Box<dyn Fn()>>,
+    /// Interrupted (as by a TERM) once a line containing this was said.
+    pub interrupt_on: Option<String>,
 }
 
 impl FakeOps {
@@ -80,5 +82,10 @@ impl Ops for FakeOps {
             f();
         }
         self.streamed.1
+    }
+    fn interrupted(&self) -> bool {
+        self.interrupt_on
+            .as_ref()
+            .is_some_and(|m| self.log.borrow().iter().any(|l| l.starts_with("say ") && l.contains(m.as_str())))
     }
 }

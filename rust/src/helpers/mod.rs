@@ -4,6 +4,7 @@
 pub mod egpu_power;
 pub mod pcie;
 pub mod switch_apply;
+pub mod switch_live;
 pub mod switch_reboot;
 #[cfg(test)]
 pub mod testutil;
@@ -14,6 +15,7 @@ use std::os::fd::AsRawFd;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use crate::gpu::cmd::run_with_timeout;
@@ -45,6 +47,21 @@ pub fn try_lock(path: &Path) -> io::Result<Option<File>> {
     Ok(Some(file))
 }
 
+static INTERRUPTED: AtomicBool = AtomicBool::new(false);
+
+extern "C" fn on_signal(_: libc::c_int) {
+    INTERRUPTED.store(true, Ordering::SeqCst);
+}
+
+/// TERM, INT and HUP only set a flag (RealOps::interrupted), so a helper can put the hardware back
+/// before it exits, like the scripts' traps.
+pub fn catch_signals() {
+    for sig in [libc::SIGTERM, libc::SIGINT, libc::SIGHUP] {
+        // SAFETY: the handler only stores to an atomic, which is async-signal-safe.
+        unsafe { libc::signal(sig, on_signal as *const () as libc::sighandler_t) };
+    }
+}
+
 /// What the helpers do to the system beyond sysfs files, behind a trait for the tests.
 pub trait Ops {
     /// A line for the unit's journal (the scripts' `echo`).
@@ -62,6 +79,8 @@ pub trait Ops {
     /// Runs a command and hands each line of its output to `on_line` as it comes; its exit code
     /// (-1 when it could not run or was killed).
     fn stream(&self, args: &[&str], on_line: &mut dyn FnMut(&str)) -> i32;
+    /// A TERM, INT or HUP arrived (catch_signals).
+    fn interrupted(&self) -> bool;
 }
 
 /// Sets the mode in supergfxd's config, when supergfxd is installed (as the scripts' python3).
@@ -130,5 +149,9 @@ impl Ops for RealOps {
             }
         }
         child.wait().ok().and_then(|s| s.code()).unwrap_or(-1)
+    }
+
+    fn interrupted(&self) -> bool {
+        INTERRUPTED.load(Ordering::SeqCst)
     }
 }
