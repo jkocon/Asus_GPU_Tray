@@ -124,7 +124,12 @@ pub fn build(s: &GpuState, cx: &Context) -> Vec<Item> {
         hw_label(mode, s) + &suffix
     };
 
-    if s.cardwire {
+    if s.cardwire && s.hw_mode == "AsusMuxDgpu" {
+        // The panel is wired to the dGPU: cardwire's modes change nothing, and a checked "Hybrid"
+        // read as if the laptop were in Hybrid. Going back is a hardware switch.
+        m.push(Item::Section(tr("GPU access (live, cardwire)")));
+        m.push(Item::Label(tr("Not used in the MUX mode – the dGPU drives the screen")));
+    } else if s.cardwire {
         radio(
             &mut m,
             tr("GPU access (live, cardwire)"),
@@ -318,5 +323,14 @@ mod tests {
         assert!(t.contains(&"XG Mobile – connect and lock the dock".to_string()));
         assert!(t.contains(&"RTX 3050 Ti only (MUX) – reboot".to_string()));
         assert!(t.contains(&"Notify when the dGPU wakes up on battery".to_string()));
+    }
+
+    #[test]
+    fn mux_mode_has_no_cardwire_modes() {
+        let s = GpuState { gpus: vec![dgpu(), igpu()], hw_mode: "AsusMuxDgpu".into(), egpu_connected: false, ..state() };
+        let t = menu(&s, false);
+        assert!(t.contains(&"Not used in the MUX mode – the dGPU drives the screen".to_string()));
+        assert!(!t.iter().any(|l| l.starts_with("Hybrid – ")), "{t:?}");
+        assert!(t.contains(&"Built-in dGPU (RTX 3050 Ti) – reboot".to_string()), "{t:?}");
     }
 }

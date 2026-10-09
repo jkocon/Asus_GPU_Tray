@@ -277,6 +277,9 @@ msgstr " – restart"
 msgid "GPU access (live, cardwire)"
 msgstr "Dostęp do GPU (na żywo, cardwire)"
 
+msgid "Not used in the MUX mode – the dGPU drives the screen"
+msgstr "Nieużywany w trybie MUX – ekran obsługuje dGPU"
+
 #: asus_gpu_tray.py:1097
 msgid "Mode (switch with reboot)"
 msgstr "Tryb (przełączanie z restartem)"

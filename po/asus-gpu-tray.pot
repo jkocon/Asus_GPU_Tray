@@ -276,6 +276,9 @@ msgstr ""
 msgid "GPU access (live, cardwire)"
 msgstr ""
 
+msgid "Not used in the MUX mode – the dGPU drives the screen"
+msgstr ""
+
 #: asus_gpu_tray.py:1097
 msgid "Mode (switch with reboot)"
 msgstr ""
