@@ -2,12 +2,14 @@
 //! is a faithful port of a script in `scripts/`; that script stays the reference.
 
 pub mod egpu_power;
+pub mod pcie;
+pub mod switch_apply;
 pub mod switch_reboot;
 #[cfg(test)]
 pub mod testutil;
 
 use std::fs::{File, OpenOptions};
-use std::io::{self, Write};
+use std::io::{self, BufRead, BufReader, Write};
 use std::os::fd::AsRawFd;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
@@ -54,6 +56,27 @@ pub trait Ops {
     fn sysrq(&self, paths: &Paths, key: char);
     /// `systemctl reboot`; its exit code.
     fn reboot(&self) -> u8;
+    /// Runs a command (setpci, systemctl, udevadm, ...): its output, or None when it failed or is
+    /// missing.
+    fn run(&self, args: &[&str]) -> Option<String>;
+    /// Runs a command and hands each line of its output to `on_line` as it comes; its exit code
+    /// (-1 when it could not run or was killed).
+    fn stream(&self, args: &[&str], on_line: &mut dyn FnMut(&str)) -> i32;
+}
+
+/// Sets the mode in supergfxd's config, when supergfxd is installed (as the scripts' python3).
+pub fn set_supergfxd_mode(paths: &Paths, mode: &str) -> io::Result<bool> {
+    let path = &paths.supergfxd_conf;
+    if !path.exists() {
+        return Ok(false);
+    }
+    let mut cfg: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(path)?)?;
+    let obj = cfg.as_object_mut().ok_or_else(|| io::Error::other("supergfxd.conf is not a JSON object"))?;
+    obj.insert("mode".into(), mode.into());
+    obj.insert("pending_mode".into(), serde_json::Value::Null);
+    obj.insert("pending_action".into(), serde_json::Value::Null);
+    std::fs::write(path, serde_json::to_string_pretty(&cfg)?)?;
+    Ok(true)
 }
 
 pub struct RealOps;
@@ -86,5 +109,26 @@ impl Ops for RealOps {
     fn reboot(&self) -> u8 {
         let status = Command::new("systemctl").arg("reboot").stdin(Stdio::null()).status();
         status.ok().and_then(|s| s.code()).map_or(1, |c| c.clamp(0, 255) as u8)
+    }
+
+    fn run(&self, args: &[&str]) -> Option<String> {
+        let (prog, rest) = args.split_first()?;
+        let out = Command::new(prog).args(rest).stdin(Stdio::null()).stderr(Stdio::null()).output().ok()?;
+        out.status.success().then(|| String::from_utf8_lossy(&out.stdout).trim().to_string())
+    }
+
+    fn stream(&self, args: &[&str], on_line: &mut dyn FnMut(&str)) -> i32 {
+        let Some((prog, rest)) = args.split_first() else { return -1 };
+        let Ok(mut child) = Command::new(prog).args(rest).stdin(Stdio::null()).stdout(Stdio::piped()).spawn() else {
+            return -1;
+        };
+        let stdout = child.stdout.take().expect("stdout is piped");
+        for line in BufReader::new(stdout).lines() {
+            match line {
+                Ok(line) => on_line(&line),
+                Err(_) => break,
+            }
+        }
+        child.wait().ok().and_then(|s| s.code()).unwrap_or(-1)
     }
 }

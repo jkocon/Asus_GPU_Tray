@@ -20,6 +20,13 @@ pub struct Paths {
     /// Held by every hardware switch (root-only; /run/lock is world-writable on some distros).
     pub switch_lock: PathBuf,
     pub sysrq: PathBuf,
+    /// Where the helper scripts (or their Rust wrappers) are installed.
+    pub lib_dir: PathBuf,
+    /// The text console switch-apply writes to while the login screen waits.
+    pub console: PathBuf,
+    /// One-boot NVIDIA blacklist left by older versions of switch-reboot.
+    pub switch_blacklist: PathBuf,
+    pub supergfxd_conf: PathBuf,
 }
 
 impl Default for Paths {
@@ -36,6 +43,10 @@ impl Default for Paths {
             dev: "/dev".into(),
             switch_lock: "/run/asus-gpu-tray.lock".into(),
             sysrq: "/proc/sysrq-trigger".into(),
+            lib_dir: "/usr/local/lib/asus-gpu-tray".into(),
+            console: "/dev/tty1".into(),
+            switch_blacklist: "/etc/modprobe.d/zz-asus-gpu-tray-switch.conf".into(),
+            supergfxd_conf: "/etc/supergfxd.conf".into(),
         }
     }
 }
@@ -55,6 +66,10 @@ impl Paths {
             dev: root.join("dev"),
             switch_lock: root.join("run/asus-gpu-tray.lock"),
             sysrq: root.join("sysrq-trigger"),
+            lib_dir: root.join("lib"),
+            console: root.join("tty1"),
+            switch_blacklist: root.join("modprobe.d/zz-asus-gpu-tray-switch.conf"),
+            supergfxd_conf: root.join("supergfxd.conf"),
         }
     }
 
@@ -65,6 +80,11 @@ impl Paths {
     /// /var/lib/asus-gpu-tray: pending, live-progress, live-result, root-port.
     pub fn state_dir(&self) -> PathBuf {
         self.pending.parent().map(Path::to_path_buf).unwrap_or_default()
+    }
+
+    /// The NVIDIA card's root port, remembered by the switches for boots where no card is visible.
+    pub fn root_port_file(&self) -> PathBuf {
+        self.state_dir().join("root-port")
     }
 
     pub fn unit_installed(&self, name: &str) -> bool {

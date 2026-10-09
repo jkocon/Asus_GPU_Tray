@@ -27,6 +27,8 @@ enum Command {
     EgpuPower,
     /// Root helper (asus-gpu-switch@.service): schedule a hardware mode for the next boot and reboot
     SwitchReboot { mode: String },
+    /// Root helper (asus-gpu-switch-apply.service, at boot): apply the mode scheduled by switch-reboot
+    SwitchApply,
     /// Show a dialog with sample texts (layout check): ask, warning, switch, switched
     #[command(hide = true)]
     PreviewDialogs { which: String },
@@ -61,6 +63,9 @@ fn main() -> ExitCode {
         }
         Some(Command::SwitchReboot { mode }) => {
             ExitCode::from(asus_gpu_tray::helpers::switch_reboot::run(&mode, &paths, &asus_gpu_tray::helpers::RealOps))
+        }
+        Some(Command::SwitchApply) => {
+            ExitCode::from(asus_gpu_tray::helpers::switch_apply::run(&paths, &asus_gpu_tray::helpers::RealOps))
         }
         Some(Command::PreviewDialogs { which }) => asus_gpu_tray::tray::preview_dialogs(&which),
         None => asus_gpu_tray::tray::run(),
