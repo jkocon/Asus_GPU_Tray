@@ -5,9 +5,10 @@ systemd units and the udev rule. No Python, PyQt6 or shell scripts at runtime. V
 tagged `v1-python`.
 
 - **Same behaviour.** The helpers (`switch-live`, `switch-reboot`, `switch-apply`, `egpu-power`) are
-  line-by-line ports of the 1.x scripts. Every switch path was recorded on a ROG Flow X16 GV601RE
-  with the XG Mobile, before and after the port: the steps are identical (`tests/reference/`).
-- **Lighter.** About 18 MB of memory (RSS) instead of 60–100 MB for the Python/Qt tray.
+  line-by-line ports of the 1.x scripts. On a ROG Flow X16 GV601RE with the XG Mobile, the live
+  switch both ways, the reboot switch both ways and the MUX round trip were recorded with the
+  scripts and with the port: the steps are identical (`tests/reference/`).
+- **Lighter.** About 18 MB of memory (RSS) on a GV601RE, with no Python or Qt to load.
 - **MUX mode:** the tray no longer shows cardwire's modes there (they change nothing while the dGPU
   drives the panel); go back with Hardware → Built-in dGPU.
 - **supergfxd fallback dropped.** Without cardwire the tray shows your GPUs and the ASUS hardware
