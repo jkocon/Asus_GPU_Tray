@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Phase 0 of the Rust rewrite: record how the current (shell) switch scripts behave, as the
-# reference the Rust root helpers are compared with. One run per scenario:
+# Records how a GPU switch behaves (state before and after, unit and kernel logs), as the
+# reference later versions are compared with. One run per scenario:
 #
-#   rust/tools/record-reference <scenario> [note]     snapshot, wait while you switch, snapshot + logs
-#   rust/tools/record-reference --after-boot <scenario>
+#   tools/record-reference <scenario> [note]     snapshot, wait while you switch, snapshot + logs
+#   tools/record-reference --after-boot <scenario>
 #                                                     finish a scenario that ended in a reboot
-#   rust/tools/record-reference --list                the scenarios to record
+#   tools/record-reference --list                the scenarios to record
 #
-# Output: rust/tests/reference/x16/<scenario>/ (before/, after/, logs/, notes.txt). Runs as your
+# Output: tests/reference/x16/<scenario>/ (before/, after/, logs/, notes.txt). Runs as your
 # user and changes nothing. It never runs lspci or nvidia-smi and never opens a GPU device: only
 # kernel-cached sysfs files, the journal and D-Bus properties, so it does not wake the dGPU.
 set -euo pipefail
@@ -34,10 +34,10 @@ SCENARIOS="\
 
 die() { echo "record-reference: $*" >&2; exit 1; }
 
-# The Rust build when there is one, else the Python tray.
+# The tray binary from this checkout.
 dump_state() {
     local rust="$HERE/../target/release/asus-gpu-tray"
-    if [[ -x $rust ]]; then "$rust" "$1"; else python3 "$HERE/../../asus_gpu_tray.py" "--$1"; fi
+    if [[ -x $rust ]]; then "$rust" "$1"; else echo "build it first: cargo build --release" >&2; return 1; fi
 }
 
 driver_of() {

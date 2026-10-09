@@ -51,24 +51,39 @@ root port `00:01.1`.
 
 Other ROG laptops with XG Mobile support (Flow Z13, …) should work if the kernel exposes
 the `asus-armoury` firmware attributes. On any Linux laptop the tray shows your GPUs and the
-cardwire modes. Please report your results. The output of `python3 asus_gpu_tray.py --dump` helps
-most.
+cardwire modes. Please report your results. The output of `asus-gpu-tray dump` helps most.
 
 ## Requirements
 
 | Needed for | Requirement |
 |---|---|
-| the tray | Python ≥ 3.10, PyQt6 (`python-pyqt6` / `python3-pyqt6`), `hwdata` (GPU names), a system tray (tested on KDE Plasma) |
+| the tray | x86-64 Linux with systemd, `hwdata` (GPU names), a system tray (StatusNotifierItem; tested on KDE Plasma) |
+| building it | Rust ≥ 1.90 (`cargo`); not needed with the release archive |
 | GPU access modes | [cardwire](https://opengamingcollective.github.io/cardwire/getting-started/installation.html) (needs BPF LSM and Wayland) |
 | hardware switching | a kernel with the `asus-armoury` driver (`/sys/class/firmware-attributes/asus-armoury`), systemd, polkit |
 | switching without a reboot | additionally `setpci` (`pciutils`), and a compositor that does not use the NVIDIA card (see below) |
 | translations | `msgfmt` (`gettext`) at install time; without it the tray is in English |
 | GPU numbers in the menu | `nvidia-smi` (`nvidia-utils`) |
 
-supergfxd is **not** needed. If it is installed and cardwire is not, the tray offers its modes as
-a fallback.
+supergfxd is **not** needed. Version 2.0 dropped the supergfxd fallback: without cardwire the tray
+shows your GPUs and offers the ASUS hardware modes.
 
 ## Installation
+
+Version 2.0 is one Rust binary: the tray and, as subcommands, the root helpers behind the systemd
+units. Version 1.x (Python and PyQt6 with shell scripts) is tagged `v1-python`. Installing 2.0 over
+1.x with the same method replaces it; a running tray is replaced at the next login.
+
+**Release archive (no build):** download `asus-gpu-tray-<version>-x86_64.tar.gz` from
+[Releases](https://github.com/jkocon/Asus_GPU_Tray/releases), check it against the `.sha256` file,
+then:
+
+```bash
+sha256sum -c asus-gpu-tray-*-x86_64.tar.gz.sha256
+tar xf asus-gpu-tray-*-x86_64.tar.gz
+cd asus-gpu-tray-*/
+sudo ./install.sh
+```
 
 **Arch Linux and derivatives:** build the package from `packaging/aur` (the same PKGBUILD as the
 AUR package `asus-gpu-tray-git`):
@@ -83,7 +98,7 @@ It installs into `/usr` (program in `/usr/lib/asus-gpu-tray`) and enables the bo
 you used `install.sh` before, run `sudo ./uninstall.sh` first: both install the autostart entry, so
 pacman refuses to overwrite it.
 
-**Other distributions:**
+**From source, any distribution:**
 
 ```bash
 git clone https://github.com/jkocon/Asus_GPU_Tray.git
@@ -91,9 +106,10 @@ cd Asus_GPU_Tray
 sudo ./install.sh
 ```
 
-The installer warns about missing dependencies. On ASUS laptops it also installs the hardware
-switch backend: root-owned scripts, systemd units and a polkit rule. The tray starts at your next
-login. To start it right away, run `python3 /usr/local/lib/asus-gpu-tray/asus_gpu_tray.py &`.
+`install.sh` builds the binary with `cargo` as the user behind `sudo` (never as root) and installs
+it to `/usr/local/lib/asus-gpu-tray`. It warns about missing dependencies. On ASUS laptops it also
+installs the hardware switch backend: systemd units, a udev rule and a polkit rule. The tray starts
+at your next login. To start it right away, run `/usr/local/lib/asus-gpu-tray/asus-gpu-tray &`.
 
 ### One-time KDE Plasma setup for switching without a reboot
 
@@ -101,7 +117,7 @@ The NVIDIA driver can only let go of the card when no process has it open. The c
 does, so KWin has to be kept on the iGPU. The setup has two parts:
 
 1. **A stable name for the iGPU.** Use your iGPU's PCI address, shown as `iGPU:` in
-   `python3 asus_gpu_tray.py --dump`:
+   `/usr/local/lib/asus-gpu-tray/asus-gpu-tray dump`:
 
    ```bash
    # /etc/udev/rules.d/70-asus-igpu-card.rules
@@ -180,20 +196,18 @@ reboot recovers it.
 When that happens, the tray shows *XG Mobile: disconnected while in use – reboot needed*, adds a
 red dot to the icon and offers an emergency reboot that starts on the built-in dGPU. It never
 tries a live switch then: the firmware can take up to about a second to remove the GPU, and a
-live switch started in that window hung in the kernel. The live switch script refuses to run
+live switch started in that window hung in the kernel. The live switch refuses to run
 while the XG Mobile is unlocked or after a GPU loss in the current boot.
 
 In XG Mobile mode the menu labels the built-in dGPU *– before undocking*, and the window and
 notification after a switch to the XG Mobile remind you to switch back before unlocking.
 
-**Unlocking without a reboot** works when nothing holds the XG Mobile's GPU at that moment. The
-driver then lets it go, the firmware switches back to the built-in dGPU by itself (as on Windows),
-and the tray brings the dGPU back without asking (link up and PCI rescan, a few seconds). To get
-there, close games, browsers and ROG Control Center, stop `cardwired` and `nvidia-powerd`, and
-check with `sudo python3 asus_gpu_tray.py --holders` that it prints *Nobody holds the NVIDIA
-card*. If something still held the GPU, the firmware does not switch back, and after a few seconds
-the tray offers the reboot. Switching to the built-in dGPU from the menu first is still the
-simple way.
+**Unlocking without a reboot** worked once on a GV601RE, with nothing holding the XG Mobile's GPU:
+the driver let it go, the firmware switched back to the built-in dGPU by itself (as on Windows),
+and the tray brought the dGPU back (link up and PCI rescan). Later attempts in the same conditions
+(services stopped, `asus-gpu-tray holders` empty) deadlocked the NVIDIA driver during the eject and
+needed an emergency reboot ([details](docs/how-it-works.md)). Do not rely on it: switch to the
+built-in dGPU first, or use **Undock now**.
 
 ### Lost GPU
 
@@ -224,12 +238,13 @@ GPU). Hover for a summary. Settings are stored in `~/.config/asus-gpu-tray/asus-
 ### Command line
 
 ```bash
-python3 asus_gpu_tray.py --dump                  # detected GPUs, modes and backends; no GUI
-sudo python3 asus_gpu_tray.py --holders         # processes that have the NVIDIA card open
+asus-gpu-tray dump                               # detected GPUs, modes and backends; no GUI
+sudo asus-gpu-tray holders                       # processes that have the NVIDIA card open
 systemctl start asus-gpu-live@AsusEgpu.service   # live switch to the XG Mobile (…@Hybrid: built-in dGPU)
 systemctl start asus-gpu-switch@AsusMuxDgpu.service   # schedule a mode and reboot now
 ```
 
+`asus-gpu-tray` is in `/usr/local/lib/asus-gpu-tray/` (`/usr/lib/asus-gpu-tray/` from the package).
 Local administrators (group `wheel` or `sudo`) can start these units without a password.
 
 ## Troubleshooting
@@ -304,41 +319,42 @@ KDE setup files, which you created yourself.
 ## Development
 
 ```bash
-QT_QPA_PLATFORM=offscreen python3 -m unittest discover -s tests   # no ASUS hardware needed
-ruff check --line-length 120 asus_gpu_tray.py tests/
-shellcheck scripts/* install.sh uninstall.sh
+cargo test                       # no ASUS hardware needed: sysfs, /proc and commands are faked
+cargo clippy --all-targets
+cargo build --release            # target/release/asus-gpu-tray
+shellcheck install.sh uninstall.sh build.sh tools/record-reference
 ```
 
 | Path | Contents |
 |---|---|
-| `asus_gpu_tray.py` | the tray (runs as the user) |
-| `scripts/asus-gpu-switch-live` | live switch (root, `asus-gpu-live@.service`) |
-| `scripts/asus-gpu-switch-reboot` | schedules a mode and reboots (root, `asus-gpu-switch@.service`) |
-| `scripts/asus-gpu-switch-apply` | applies a scheduled mode at boot (root, `asus-gpu-switch-apply.service`) |
+| `src/main.rs` | subcommands: (none) the tray, `dump`, `holders`, and the root helpers |
+| `src/gpu/` | GPU detection, state, cardwire (D-Bus), processes, kernel log; no UI |
+| `src/tray/` | the tray: ksni icon and menu, slint windows (software renderer), switch flows |
+| `src/helpers/` | root helpers: `switch-live` (`asus-gpu-live@.service`), `switch-reboot` (`asus-gpu-switch@.service`), `switch-apply` (`asus-gpu-switch-apply.service`, at boot), `egpu-power` (udev) |
 | `systemd/`, `polkit/`, `desktop/`, `icons/` | units, the polkit rule, launcher and autostart entries, icons |
-| `udev/`, `kde/` | the XG Mobile D3cold rule, the login-screen environment generator |
+| `udev/`, `kde/` | the XG Mobile D3cold rule, the KDE and login-screen setup |
 | `po/` | translations (`asus-gpu-tray.pot` template, `pl.po` Polish) |
 | `packaging/aur/` | PKGBUILD for Arch Linux |
-| `tests/` | unit tests |
+| `tests/reference/` | recordings of every switch path on a GV601RE (`tools/record-reference`): state before and after, unit and kernel logs |
 
 ### Translations
 
 The tray follows the system language (`LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, `LANG`) and falls back
 to English. Polish is included. To add a language, or to refresh the template after changing
-texts:
+texts (gettext ≥ 0.24 for Rust):
 
 ```bash
-xgettext --language=Python --keyword=tr --keyword=N_ --from-code=UTF-8 --no-wrap \
-    -o po/asus-gpu-tray.pot asus_gpu_tray.py
+xgettext --language=Rust --keyword=tr --keyword=trf --from-code=UTF-8 --no-wrap \
+    --package-name="Asus GPU Tray" -o po/asus-gpu-tray.pot $(git ls-files 'src/*.rs' | sort)
 msginit --no-wrap -i po/asus-gpu-tray.pot -l de_DE.UTF-8 -o po/de.po   # new language
 msgmerge --no-wrap -U po/pl.po po/asus-gpu-tray.pot                    # existing one
-LANGUAGE=de python3 asus_gpu_tray.py                                   # after install.sh
 ```
 
-Keep the `{placeholders}` of a text in its translation. The root scripts and their messages
-(switch progress, kernel-level errors) stay in English.
+Keep the `{placeholders}` of a text in its translation. `cargo test` checks that every text has a
+Polish translation. The root helpers and their messages (switch progress, kernel-level errors) stay
+in English.
 
-Bug reports and hardware reports are welcome. Please include `--dump` output, your laptop model and
+Bug reports and hardware reports are welcome. Please include `asus-gpu-tray dump` output, your laptop model and
 `/var/lib/asus-gpu-tray/live-progress` for switch problems. For security issues, see
 [SECURITY.md](SECURITY.md).
 

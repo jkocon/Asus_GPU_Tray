@@ -6,8 +6,8 @@ use resvg::{tiny_skia, usvg};
 use crate::gpu::pci::Gpu;
 
 const SIZE: u32 = 64;
-const NVIDIA_SVG: &str = include_str!("../../../icons/nvidia.svg");
-const APP_SVG: &str = include_str!("../../../icons/asus-gpu-tray.svg");
+const NVIDIA_SVG: &str = include_str!("../../icons/nvidia.svg");
+const APP_SVG: &str = include_str!("../../icons/asus-gpu-tray.svg");
 
 thread_local! {
     static OPTIONS: usvg::Options<'static> = {

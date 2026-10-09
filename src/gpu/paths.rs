@@ -20,7 +20,8 @@ pub struct Paths {
     /// Held by every hardware switch (root-only; /run/lock is world-writable on some distros).
     pub switch_lock: PathBuf,
     pub sysrq: PathBuf,
-    /// Where the helper scripts (or their Rust wrappers) are installed.
+    /// Where the binary is installed: /usr/local/lib/asus-gpu-tray (install.sh) or
+    /// /usr/lib/asus-gpu-tray (package).
     pub lib_dir: PathBuf,
     /// The text console switch-apply writes to while the login screen waits.
     pub console: PathBuf,
@@ -43,7 +44,10 @@ impl Default for Paths {
             dev: "/dev".into(),
             switch_lock: "/run/asus-gpu-tray.lock".into(),
             sysrq: "/proc/sysrq-trigger".into(),
-            lib_dir: "/usr/local/lib/asus-gpu-tray".into(),
+            lib_dir: std::env::current_exe()
+                .ok()
+                .and_then(|exe| exe.parent().map(Path::to_path_buf))
+                .unwrap_or_else(|| "/usr/local/lib/asus-gpu-tray".into()),
             console: "/dev/tty1".into(),
             switch_blacklist: "/etc/modprobe.d/zz-asus-gpu-tray-switch.conf".into(),
             supergfxd_conf: "/etc/supergfxd.conf".into(),

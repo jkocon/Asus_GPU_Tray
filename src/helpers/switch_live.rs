@@ -1,4 +1,4 @@
-//! `switch-live <mode>`, port of scripts/asus-gpu-switch-live. Run as root by
+//! `switch-live <mode>`. Run as root by
 //! asus-gpu-live@<mode>.service.
 //!
 //! Switches between the built-in dGPU (Hybrid) and the XG Mobile (AsusEgpu) without a reboot: stop

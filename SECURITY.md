@@ -4,11 +4,11 @@
 
 | Part | Runs as | Can do |
 |---|---|---|
-| `asus_gpu_tray.py` | the logged-in user | read sysfs, `/proc` and the kernel log, run `cardwire`, start the switch units, stop and restart the user's own ROG Control Center, kill the user's own processes that hold the NVIDIA card (only after the user confirms), reboot (logind) |
-| `asus-gpu-switch-live` | root, `asus-gpu-live@<mode>.service` | stop and start GPU services, change device node permissions for the duration of the switch, unbind/reset/remove PCI devices, write ASUS firmware attributes |
-| `asus-gpu-switch-reboot` | root, `asus-gpu-switch@<mode>.service` | write `gpu_mux_mode`, schedule a mode, reboot (an emergency SysRq reboot when the NVIDIA driver has lost a GPU) |
-| `asus-gpu-switch-apply` | root, at boot | apply the scheduled mode |
-| `asus-gpu-egpu-power` | root, from udev and the live script | set `d3cold_allowed = 0` on NVIDIA functions while `egpu_enable` is 1; takes no input |
+| `asus-gpu-tray` (no subcommand) | the logged-in user | read sysfs, `/proc` and the kernel log, run `cardwire`, start the switch units, stop and restart the user's own ROG Control Center, kill the user's own processes that hold the NVIDIA card (only after the user confirms), reboot (logind) |
+| `asus-gpu-tray switch-live` | root, `asus-gpu-live@<mode>.service` | stop and start GPU services, change device node permissions for the duration of the switch, unbind/reset/remove PCI devices, write ASUS firmware attributes |
+| `asus-gpu-tray switch-reboot` | root, `asus-gpu-switch@<mode>.service` | write `gpu_mux_mode`, schedule a mode, reboot (an emergency SysRq reboot when the NVIDIA driver has lost a GPU) |
+| `asus-gpu-tray switch-apply` | root, at boot | apply the scheduled mode |
+| `asus-gpu-tray egpu-power` | root, from udev (`switch-live` does the same itself) | set `d3cold_allowed = 0` on NVIDIA functions while `egpu_enable` is 1; takes no input |
 
 ## The polkit rule
 
@@ -31,11 +31,16 @@ normal polkit agent.
 
 ## Input handling
 
-- The unit instance (`%i`) is the only input to the root scripts. The polkit rule restricts it to
-  the names above, and each script validates it again. The mode read back from the `pending` file
+- The unit instance (`%i`) is the only input to the root helpers. The polkit rule restricts it to
+  the names above, and each helper validates it again. The mode read back from the `pending` file
   at boot is validated too.
-- The root scripts do not use `eval` and do not build commands from untrusted text. The tray never
-  uses a shell.
+- Nothing uses a shell. The helpers run a fixed set of system programs (`systemctl`, `setpci`,
+  `udevadm`, `modprobe`, `journalctl`, `cardwire`, `plymouth`, `logger`) with fixed arguments, by
+  name from the unit's `PATH`.
+- The tray and the root helpers are the same binary. It is installed root-owned, mode 0755, in a
+  root-owned directory (`/usr/local/lib/asus-gpu-tray` or `/usr/lib/asus-gpu-tray`); `install.sh`
+  builds it as the invoking user and then installs a root-owned copy, so the user who built it
+  cannot change what root runs.
 - The switch lock is `/run/asus-gpu-tray.lock` in the root-only `/run`, not the world-writable
   `/run/lock` of some distributions, so other users cannot plant or hold it.
 - The tray's single-instance lock lives in `$XDG_RUNTIME_DIR`, or falls back to a private

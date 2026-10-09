@@ -1,4 +1,4 @@
-# Asus GPU Tray: keep the XG Mobile GPU out of D3cold (see asus-gpu-egpu-power).
+# Asus GPU Tray: keep the XG Mobile GPU out of D3cold (see src/helpers/egpu_power.rs).
 # Both events are needed: at boot the NVIDIA card and asus-armoury can appear in either order.
-ACTION=="add|bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", RUN+="/usr/local/lib/asus-gpu-tray/asus-gpu-egpu-power"
-ACTION=="add", SUBSYSTEM=="firmware-attributes", KERNEL=="asus-armoury", RUN+="/usr/local/lib/asus-gpu-tray/asus-gpu-egpu-power"
+ACTION=="add|bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", RUN+="/usr/local/lib/asus-gpu-tray/asus-gpu-tray egpu-power"
+ACTION=="add", SUBSYSTEM=="firmware-attributes", KERNEL=="asus-armoury", RUN+="/usr/local/lib/asus-gpu-tray/asus-gpu-tray egpu-power"

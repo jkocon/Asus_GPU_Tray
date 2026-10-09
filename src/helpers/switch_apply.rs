@@ -1,4 +1,4 @@
-//! `switch-apply`, port of scripts/asus-gpu-switch-apply. Run at boot by
+//! `switch-apply`. Run at boot by
 //! asus-gpu-switch-apply.service, before the login screen and the GPU services. Applies the mode
 //! scheduled by switch-reboot: loads the NVIDIA driver on the current card and re-routes the
 //! eGPU/dGPU with switch-live (the same steps as a live switch), and sets the mode in supergfxd's
@@ -149,9 +149,10 @@ fn live_switch(paths: &Paths, ops: &dyn Ops, want_egpu: &str) -> Option<u8> {
         ops.say("The NVIDIA driver did not come up within 60 s - staying in the current mode");
         return Some(1);
     }
-    // Each step of the live switch goes to the journal and to the console.
-    let live = paths.lib_dir.join("asus-gpu-switch-live");
-    let rc = ops.stream(&[&live.to_string_lossy(), live_target], &mut |line| {
+    // Each step of the live switch goes to the journal and to the console. A process of its own,
+    // as from asus-gpu-live@.service: it takes the switch lock and handles its signals.
+    let bin = paths.lib_dir.join("asus-gpu-tray");
+    let rc = ops.stream(&[&bin.to_string_lossy(), "switch-live", live_target], &mut |line| {
         ops.say(line);
         console(paths, &format!("  {line}\n"));
     });
@@ -328,8 +329,8 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(run(&paths, &ops), 0);
-        let live = paths.lib_dir.join("asus-gpu-switch-live");
-        assert!(ops.log().contains(&format!("stream {} AsusEgpu", live.display())));
+        let bin = paths.lib_dir.join("asus-gpu-tray");
+        assert!(ops.log().contains(&format!("stream {} switch-live AsusEgpu", bin.display())));
         assert!(ops.commands().contains(&"modprobe nvidia".to_string()));
         let tty = fs::read_to_string(&paths.console).unwrap();
         assert!(tty.contains("switching graphics to the XG Mobile"));

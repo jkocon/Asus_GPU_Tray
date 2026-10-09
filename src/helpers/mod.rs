@@ -1,5 +1,6 @@
-//! The root helpers behind the systemd units and the udev rule (phase 3 of the rewrite). Each one
-//! is a faithful port of a script in `scripts/`; that script stays the reference.
+//! The root helpers behind the systemd units and the udev rule. Each one is a faithful port of a
+//! shell script of version 1.x (scripts/ in the git history, up to tag v1-python); the recordings in
+//! tests/reference/ show that they take the same steps.
 
 pub mod egpu_power;
 pub mod pcie;

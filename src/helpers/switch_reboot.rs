@@ -1,4 +1,4 @@
-//! `switch-reboot <mode>`, port of scripts/asus-gpu-switch-reboot. Run as root by
+//! `switch-reboot <mode>`. Run as root by
 //! asus-gpu-switch@<mode>.service. Schedules a mode change for the next boot and reboots
 //! immediately. The change itself is done by switch-apply early during boot. Used for the MUX
 //! mode and as the fallback when a live switch cannot run.

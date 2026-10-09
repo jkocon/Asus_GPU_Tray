@@ -4,12 +4,11 @@ _repo=Asus_GPU_Tray
 pkgver=r0
 pkgrel=1
 pkgdesc="Tray icon for ASUS ROG laptops: shows the working GPU, switches built-in dGPU and XG Mobile without a reboot"
-arch=('any')
+arch=('x86_64')
 url="https://github.com/jkocon/Asus_GPU_Tray"
-license=('GPL-3.0-only')
-depends=('python' 'python-pyqt6' 'hwdata' 'pciutils' 'polkit' 'systemd')
-makedepends=('git' 'gettext')
-checkdepends=('python-pyqt6')
+license=('GPL-3.0-or-later')
+depends=('gcc-libs' 'glibc' 'fontconfig' 'freetype2' 'libxkbcommon' 'wayland' 'hwdata' 'pciutils' 'polkit' 'systemd' 'systemd-libs')
+makedepends=('git' 'gettext' 'cargo')
 optdepends=(
     'cardwire: Integrated/Hybrid/Smart GPU access modes'
     'nvidia-utils: GPU numbers in the menu (nvidia-smi)'
@@ -25,19 +24,29 @@ pkgver() {
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
 }
 
+prepare() {
+    cd "$_repo"
+    export RUSTUP_TOOLCHAIN=stable
+    cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+    cd "$_repo"
+    export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
+    cargo build --frozen --release
+}
+
 check() {
     cd "$_repo"
-    QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests
+    export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
+    cargo test --frozen
 }
 
 package() {
     cd "$_repo"
     local lib=/usr/lib/asus-gpu-tray
 
-    install -Dm755 asus_gpu_tray.py "$pkgdir$lib/asus_gpu_tray.py"
-    install -Dm644 -t "$pkgdir$lib" icons/nvidia.svg icons/asus-gpu-tray.svg
-    install -Dm755 -t "$pkgdir$lib" scripts/asus-gpu-switch-reboot scripts/asus-gpu-switch-apply \
-        scripts/asus-gpu-switch-live scripts/asus-gpu-egpu-power
+    install -Dm755 target/release/asus-gpu-tray "$pkgdir$lib/asus-gpu-tray"
     for po in po/*.po; do
         local lang
         lang=$(basename "$po" .po)

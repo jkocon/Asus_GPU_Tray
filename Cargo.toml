@@ -1,9 +1,9 @@
 [package]
 name = "asus-gpu-tray"
-version = "2.0.0-alpha.0"
+version = "2.0.0"
 edition = "2021"
 rust-version = "1.90"
-description = "System tray icon that shows which GPU is rendering and switches GPU modes (Rust rewrite)"
+description = "System tray icon that shows which GPU is rendering and switches GPU modes"
 license = "GPL-3.0-or-later"
 repository = "https://github.com/jkocon/Asus_GPU_Tray"
 publish = false

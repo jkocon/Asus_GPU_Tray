@@ -3,7 +3,7 @@ Description=Apply scheduled GPU hardware mode change (before the login screen)
 DefaultDependencies=no
 After=local-fs.target systemd-udevd.service
 # Everything that may open the NVIDIA card waits, so nothing holds it during the switch
-# (the script stops these services itself when it runs live).
+# (switch-live stops these services itself).
 Before=supergfxd.service cardwired.service nvidia-powerd.service nvidia-persistenced.service
 Before=display-manager.service plasmalogin.service shutdown.target
 Conflicts=shutdown.target
@@ -13,7 +13,7 @@ ConditionPathExists=|/etc/modprobe.d/zz-asus-gpu-tray-switch.conf
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/lib/asus-gpu-tray/asus-gpu-switch-apply
+ExecStart=/usr/local/lib/asus-gpu-tray/asus-gpu-tray switch-apply
 # The firmware call behind egpu_enable takes ~30 s, plus up to 20 s waiting for asus-armoury.
 TimeoutStartSec=180
 

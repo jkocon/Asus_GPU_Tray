@@ -1,15 +1,15 @@
 post_install() {
-    cat <<'EOF'
+    cat <<'MSG'
 Asus GPU Tray starts at your next login. To start it now:
-    python3 /usr/lib/asus-gpu-tray/asus_gpu_tray.py &
+    /usr/lib/asus-gpu-tray/asus-gpu-tray &
 
 Switching the XG Mobile without a reboot also needs the one-time KDE Plasma setup:
     /usr/share/doc/asus-gpu-tray-git/README.md ("One-time KDE Plasma setup")
-EOF
+MSG
     # An existing XG Mobile is active: keep its GPU out of D3cold right away (see the udev rule).
-    /usr/lib/asus-gpu-tray/asus-gpu-egpu-power 2>/dev/null || true
+    /usr/lib/asus-gpu-tray/asus-gpu-tray egpu-power 2>/dev/null || true
 }
 
 post_upgrade() {
-    /usr/lib/asus-gpu-tray/asus-gpu-egpu-power 2>/dev/null || true
+    /usr/lib/asus-gpu-tray/asus-gpu-tray egpu-power 2>/dev/null || true
 }

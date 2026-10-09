@@ -3,4 +3,4 @@ Description=Schedule GPU mode %i and reboot
 
 [Service]
 Type=simple
-ExecStart=/usr/local/lib/asus-gpu-tray/asus-gpu-switch-reboot %i
+ExecStart=/usr/local/lib/asus-gpu-tray/asus-gpu-tray switch-reboot %i

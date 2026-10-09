@@ -1,4 +1,4 @@
-//! `egpu-power`, port of scripts/asus-gpu-egpu-power. Run as root by udev
+//! `egpu-power`. Run as root by udev
 //! (udev/72-asus-gpu-tray-egpu.rules) when an NVIDIA PCI function or the asus-armoury attributes
 //! appear, and after a live switch.
 //!

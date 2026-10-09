@@ -10,15 +10,21 @@ kernel 7.2.
 ```
  user session                        root (systemd units, started via polkit)
 ┌───────────────────────────┐        ┌────────────────────────────────────────────────┐
-│ asus_gpu_tray.py          │ start  │ asus-gpu-live@<mode>.service                   │
-│  - reads sysfs, cardwire  │───────▶│   scripts/asus-gpu-switch-live   (live switch) │
+│ asus-gpu-tray             │ start  │ asus-gpu-live@<mode>.service                   │
+│  - reads sysfs, cardwire  │───────▶│   asus-gpu-tray switch-live    (live switch)   │
 │  - draws icon and menu    │        │ asus-gpu-switch@<mode>.service                 │
-│  - closes/restarts RCC    │───────▶│   scripts/asus-gpu-switch-reboot (schedule +   │
-└─────────────┬─────────────┘        │                                   reboot)      │
-              │ cardwire set         │ asus-gpu-switch-apply.service   (at boot)      │
-              ▼                      │   scripts/asus-gpu-switch-apply                │
-        cardwired (eBPF)             └────────────────────────────────────────────────┘
+│  - closes/restarts RCC    │───────▶│   asus-gpu-tray switch-reboot  (schedule +     │
+└─────────────┬─────────────┘        │                                 reboot)        │
+              │ cardwire set         │ asus-gpu-switch-apply.service  (at boot)       │
+              ▼                      │   asus-gpu-tray switch-apply                   │
+        cardwired (eBPF)             │ udev: asus-gpu-tray egpu-power                 │
+                                     └────────────────────────────────────────────────┘
 ```
+
+One binary does both: without a subcommand it is the tray, and the root helpers are its
+subcommands (`src/helpers/`). Up to version 1.x the tray was Python (PyQt6) and the helpers were
+shell scripts (tag `v1-python`); the Rust helpers are line-by-line ports, and the recordings in
+`tests/reference/` (scripts: `x16/`, Rust: `x16-rust/`) show the same steps.
 
 The tray never needs root. It reads kernel-cached sysfs files and cardwire's device list, and it
 changes state only through `cardwire set` and by starting the switch units. A polkit rule lets
@@ -71,7 +77,7 @@ card disappears from the bus, and the new one appears at the same address (`0000
 
 ## Live switch: built-in dGPU ⇄ XG Mobile
 
-`scripts/asus-gpu-switch-live` does the following. The first three steps change nothing on the
+`asus-gpu-tray switch-live` does the following. The first three steps change nothing on the
 hardware. Every step is appended to `/var/lib/asus-gpu-tray/live-progress` followed by `sync`,
 so after a hard hang the file shows where it stopped.
 
@@ -83,7 +89,7 @@ so after a hard hang the file shows where it stopped.
    becomes visible in sysfs again. cardwired restores its mode when it is started afterwards.
 3. **Find the card and its port.** All NVIDIA functions (GPU and HDMI audio) must sit behind one
    port, and the kernel must be able to reset the bus below it (`reset_subordinate`).
-4. **Keep everyone away.** The script sets `chmod 000` on `/dev/nvidia*`, `/dev/nvidia-caps/*` and
+4. **Keep everyone away.** It sets `chmod 000` on `/dev/nvidia*`, `/dev/nvidia-caps/*` and
    the card's DRM nodes, so nothing new can open them. It then scans `/proc/*/fd` of every process.
    If anything still holds one of the nodes, it aborts and lists the holders. This matters: the
    NVIDIA driver waits **forever** in its PCI remove callback while the card is open, which hangs
@@ -123,7 +129,7 @@ The tray adds a few things around this:
   does not wake the card). It lists them and offers to kill them (SIGTERM, then SIGKILL after
   5 s). If the user declines, or a session process such as `kwin_wayland` holds the card, it offers
   the reboot switch instead.
-- If the script still aborts because of holders (something opened the card in between), the tray
+- If the switch still aborts because of holders (something opened the card in between), the tray
   asks again, up to twice, and then offers the reboot switch.
 - When a GPU is lost (below), it does not attempt a live switch at all and offers only the reboot
   switch: unbinding the driver from a card that no longer answers is untested.
@@ -153,7 +159,7 @@ cardwired and nvidia-powerd stopped) went differently. The driver let the GPU go
 device", no usage-count warning), and the firmware switched `egpu_enable` back to 0 by itself
 within a second (key code 0xc2, as after our own firmware calls). That is the Windows behaviour:
 the OS releases the device, the firmware completes the switch. It left the root port with Link
-Disable set and the built-in dGPU off the bus. `asus-gpu-switch-live Hybrid` handles that case
+Disable set and the built-in dGPU off the bus. `asus-gpu-tray switch-live Hybrid` handles that case
 ("already in Hybrid, but no NVIDIA device"): it clears Link Disable, waits for the link, rescans,
 and the still-loaded driver binds to the dGPU. So the firmware's reaction tells the two cases
 apart: switched back by itself means clean (bring the dGPU back live), `egpu_enable` still 1 means
@@ -178,15 +184,15 @@ been removed. On the change into that state it shows a notification and offers t
 the built-in dGPU, and the menu keeps a *Reboot…* item. It never tries a live switch, also not when the
 GPU is still on the bus right after the lock event: in a second test the firmware took 1.1 s to
 remove it, the tray caught that window and started a live switch, and the kernel's removal of the
-GPU hung inside the NVIDIA driver while holding the PCI rescan lock. The live script then blocked
+GPU hung inside the NVIDIA driver while holding the PCI rescan lock. The live switch then blocked
 for good in `echo 1 > /sys/bus/pci/rescan` (state D), still holding the switch lock. Now the tray
-treats "unlocked while active" like "gone", and the live script itself refuses to run while the
+treats "unlocked while active" like "gone", and the live switch itself refuses to run while the
 XG Mobile is unlocked in XG Mobile mode or when this boot's kernel log shows a GPU loss.
 
 The reboot itself is the next problem. After the loss the NVIDIA driver is wedged: nvidia-modeset
 logs `Error while waiting for GPU progress` every 5 s, closing the device triggers a warning in
 `nvidia_dev_put`, and the processes doing so hang in the kernel. A normal shutdown waited for them
-until the laptop was powered off by hand, twice. So `asus-gpu-switch-reboot` checks whether a GPU
+until the laptop was powered off by hand, twice. So `asus-gpu-tray switch-reboot` checks whether a GPU
 was lost (XG Mobile mode without an NVIDIA device on the bus, or a kernel message from this boot
 matching `(NVRM|nvidia).*(fallen off the bus|with non-zero usage count|D3cold to D0)`). If so, it
 schedules the mode as usual and then reboots through SysRq: `s` (sync), `u` (remount read-only),
@@ -204,11 +210,11 @@ and the root port retraining a "broken device". Vulkan then listed only the iGPU
 
 Two measures:
 
-- **Prevention.** `udev/72-asus-gpu-tray-egpu.rules` runs `scripts/asus-gpu-egpu-power` when an
+- **Prevention.** `udev/72-asus-gpu-tray-egpu.rules` runs `asus-gpu-tray egpu-power` when an
   NVIDIA PCI function is added or bound, and when the asus-armoury attributes appear (at boot the
-  two can come in either order). When `egpu_enable` is 1, the script sets `d3cold_allowed = 0` on
+  two can come in either order). When `egpu_enable` is 1, it sets `d3cold_allowed = 0` on
   every NVIDIA function. The kernel then limits the card to D3hot and keeps its root port powered.
-  The live switch also runs the script directly before restarting cardwired, because cardwired
+  The live switch also does this itself before restarting cardwired, because cardwired
   hides a blocked card's sysfs files from root as well. The built-in dGPU keeps D3cold: its PCI
   functions are created anew on every switch, with the kernel default.
 - **Detection.** The tray follows `journalctl -k -b -f --grep 'fallen off the bus|Unable to change
@@ -232,7 +238,7 @@ was the fix. That was wrong. The GV601RE's root port cannot report Surprise Down
 Surprise-`), and writes to that mask bit have no effect. What changed between the failing and the
 working attempts is the secondary bus reset, and the link down/up cycle that the Link Disable write
 triggers through pciehp. Separating the two would have taken more attempts, each of which resets
-the machine when it fails, so the script does both.
+the machine when it fails, so the switch does both.
 
 The most likely explanation is that the firmware's lane switch must not happen while the GPU is
 still in the state the driver left it in. The boot-time switch works without either step because
@@ -244,16 +250,16 @@ Used for the MUX mode, and as the fallback when a live switch cannot run.
 
 ```
 menu click
-  └─ asus-gpu-switch@<Mode>.service → scripts/asus-gpu-switch-reboot
+  └─ asus-gpu-switch@<Mode>.service → asus-gpu-tray switch-reboot
        ├─ writes gpu_mux_mode if needed (the firmware applies it at the next boot)
        ├─ /var/lib/asus-gpu-tray/pending = <Mode>
        └─ systemctl reboot (SysRq emergency reboot after a GPU loss)
 boot
-  └─ asus-gpu-switch-apply.service → scripts/asus-gpu-switch-apply
+  └─ asus-gpu-switch-apply.service → asus-gpu-tray switch-apply
        ├─ runs before cardwired, nvidia-powerd, nvidia-persistenced, supergfxd and the display
        │  manager
        ├─ egpu_enable already right (MUX only, or the firmware switched back by itself): done
-       ├─ loads the NVIDIA driver on the current card, then runs scripts/asus-gpu-switch-live
+       ├─ loads the NVIDIA driver on the current card, then runs asus-gpu-tray switch-live
        ├─ no NVIDIA card visible: fallback, direct firmware switch (see below)
        └─ updates supergfxd's config if supergfxd is installed
 ```
@@ -266,8 +272,8 @@ the first MUX boot with `KWIN_DRM_DEVICES` pointing at the iGPU showed only a bl
 and the login screen's generator) check `gpu_mux_mode` and stay out of the way when it is 0.
 
 **Current design (2026-10-04, later):** the boot-time switch no longer blacklists NVIDIA. The
-driver comes up on the current card as on any boot, and `asus-gpu-switch-apply` runs
-`asus-gpu-switch-live` before the login screen starts. It stops the boot splash first (it went
+driver comes up on the current card as on any boot, and `switch-apply` runs
+`switch-live` before the login screen starts. It stops the boot splash first (it went
 black while the GPUs changed) and writes what is happening, including each step of the switch, to
 the text console on `/dev/tty1`. The reason for this design: loading the driver fresh right after the firmware switch
 deadlocked inside it on 2 of 3 boots. Kernel stacks showed the GSP init (`kgspInitRm`) and two ACPI
@@ -298,10 +304,10 @@ back to the built-in dGPU and resets by itself before Linux runs this unit. The 
 
 | Path | Written by | Contents |
 |---|---|---|
-| `/var/lib/asus-gpu-tray/pending` | reboot script | mode to apply at the next boot |
-| `/var/lib/asus-gpu-tray/live-progress` | live script | steps of the last live switch |
-| `/var/lib/asus-gpu-tray/live-result` | live script | result message for the tray |
-| `/etc/modprobe.d/zz-asus-gpu-tray-switch.conf` | older versions of the reboot script | one-boot NVIDIA blacklist, removed at boot |
-| `/sys/bus/pci/devices/<NVIDIA>/d3cold_allowed` | `asus-gpu-egpu-power` (udev, live script) | 0 while the XG Mobile is active |
-| `/run/asus-gpu-tray.lock` | live and reboot scripts | serializes switches |
+| `/var/lib/asus-gpu-tray/pending` | `switch-reboot` | mode to apply at the next boot |
+| `/var/lib/asus-gpu-tray/live-progress` | `switch-live` | steps of the last live switch |
+| `/var/lib/asus-gpu-tray/live-result` | `switch-live` | result message for the tray |
+| `/etc/modprobe.d/zz-asus-gpu-tray-switch.conf` | older versions of the reboot switch | one-boot NVIDIA blacklist, removed at boot |
+| `/sys/bus/pci/devices/<NVIDIA>/d3cold_allowed` | `egpu-power` (udev, `switch-live`) | 0 while the XG Mobile is active |
+| `/run/asus-gpu-tray.lock` | `switch-live`, `switch-reboot` | serializes switches |
 | `$XDG_RUNTIME_DIR/asus-gpu-tray.lock` | tray | single instance per session |

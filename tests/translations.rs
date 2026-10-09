@@ -108,7 +108,7 @@ fn sources(dir: &Path, out: &mut Vec<String>) {
 #[test]
 fn every_text_has_a_polish_translation() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let po = po_entries(&fs::read_to_string(root.join("../po/pl.po")).unwrap());
+    let po = po_entries(&fs::read_to_string(root.join("po/pl.po")).unwrap());
     let mut srcs = Vec::new();
     sources(&root.join("src"), &mut srcs);
     let used: Vec<String> = srcs.iter().flat_map(|s| msgids_in(s)).collect();

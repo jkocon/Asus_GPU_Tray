@@ -17,7 +17,7 @@ use ksni::blocking::TrayMethods;
 use crate::gpu::i18n::{self, tr, trf};
 use crate::gpu::paths::Paths;
 
-/// Next to the binary when installed (/usr/local/lib/asus-gpu-tray/locale), as for the Python tray.
+/// Next to the binary when installed (/usr/local/lib/asus-gpu-tray/locale).
 fn locale_dir() -> PathBuf {
     let installed = PathBuf::from("/usr/local/lib/asus-gpu-tray/locale");
     std::env::current_exe()

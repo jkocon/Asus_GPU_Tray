@@ -1,6 +1,10 @@
 # Plan: rewrite in Rust
 
-Status: **phase 0/1 started in [`rust/`](../rust/README.md)**; the Python tray and scripts stay in use. Goal: replace `asus_gpu_tray.py` (PyQt6) and the root shell
+Status: **done, released as 2.0.0 (2026-10-09).** The last Python version is tagged `v1-python`.
+This document is kept as the record of the plan; paths below (`rust/`, `asus_gpu_tray.py`,
+`scripts/`) refer to the tree before phase 4, when the crate moved to the repository root.
+
+Goal: replace `asus_gpu_tray.py` (PyQt6) and the root shell
 scripts with a single Rust binary, without losing any behaviour described in
 [how-it-works.md](how-it-works.md). Python and shell are not used at runtime afterwards.
 

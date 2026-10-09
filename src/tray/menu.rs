@@ -327,7 +327,8 @@ mod tests {
 
     #[test]
     fn mux_mode_has_no_cardwire_modes() {
-        let s = GpuState { gpus: vec![dgpu(), igpu()], hw_mode: "AsusMuxDgpu".into(), egpu_connected: false, ..state() };
+        let s =
+            GpuState { gpus: vec![dgpu(), igpu()], hw_mode: "AsusMuxDgpu".into(), egpu_connected: false, ..state() };
         let t = menu(&s, false);
         assert!(t.contains(&"Not used in the MUX mode – the dGPU drives the screen".to_string()));
         assert!(!t.iter().any(|l| l.starts_with("Hybrid – ")), "{t:?}");
