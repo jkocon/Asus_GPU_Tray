@@ -1,11 +1,12 @@
-# Checks of the Rust rewrite in rust/. Builds nothing that gets published.
+# fmt, clippy and tests on every change to the code. Builds nothing that gets published
+# (release.yml does that for version tags).
 name: rust
 
 on:
   push:
-    paths: ["rust/**", ".github/workflows/rust.yml"]
+    paths: ["src/**", "tests/**", "po/**", "icons/**", "Cargo.toml", "Cargo.lock", ".github/workflows/rust.yml"]
   pull_request:
-    paths: ["rust/**", ".github/workflows/rust.yml"]
+    paths: ["src/**", "tests/**", "po/**", "icons/**", "Cargo.toml", "Cargo.lock", ".github/workflows/rust.yml"]
 
 permissions:
   contents: read
@@ -13,9 +14,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: rust
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
