@@ -1,0 +1,70 @@
+paź 09 08:51:04.267195 cachyos-x8664 cardwired[794]: [INFO ] NVIDIA GeForce RTX 3050 Ti Laptop GPU: Power state changed: D3Cold
+paź 09 08:51:52.405859 cachyos-x8664 cardwired[794]: [INFO ] NVIDIA GeForce RTX 3050 Ti Laptop GPU: Power state changed: D0
+paź 09 08:51:53.606287 cachyos-x8664 systemd[1]: Starting Switch GPU hardware mode AsusEgpu without a reboot...
+paź 09 08:51:53.646248 cachyos-x8664 asus-gpu-switch-live[29968]: Live switch to AsusEgpu: stopping services
+paź 09 08:51:53.759222 cachyos-x8664 systemd[1]: Stopping Cardwire Daemon...
+paź 09 08:51:54.052644 cachyos-x8664 systemd[1]: cardwired.service: Deactivated successfully.
+paź 09 08:51:54.053068 cachyos-x8664 systemd[1]: Stopped Cardwire Daemon.
+paź 09 08:51:54.053282 cachyos-x8664 systemd[1]: cardwired.service: Consumed 2.013s CPU time over 43min 45.793s wall clock time, 332.5M memory peak.
+paź 09 08:51:54.102041 cachyos-x8664 asus-gpu-switch-live[29968]: Nobody holds the card; unbinding drivers
+paź 09 08:51:54.119634 cachyos-x8664 asus-gpu-switch-live[29968]: unbind 0000:01:00.0 from nvidia
+paź 09 08:51:54.453020 cachyos-x8664 asus-gpu-switch-live[29968]: unbind 0000:01:00.1 from snd_hda_intel
+paź 09 08:51:54.587686 cachyos-x8664 asus-gpu-switch-live[29968]: secondary bus reset below 0000:00:01.1
+paź 09 08:51:55.805513 cachyos-x8664 asus-gpu-switch-live[29968]: remove 0000:01:00.0
+paź 09 08:51:55.821447 cachyos-x8664 asus-gpu-switch-live[29968]: remove 0000:01:00.1
+paź 09 08:51:56.002572 cachyos-x8664 asus-gpu-switch-live[29968]: link down/up cycle on 0000:00:01.1 (Surprise Down mask not supported)
+paź 09 08:51:56.511823 cachyos-x8664 asus-gpu-switch-live[29968]: egpu_enable -> 1
+paź 09 08:52:23.920121 cachyos-x8664 asus-gpu-switch-live[29968]: enable link on 0000:00:01.1
+paź 09 08:52:30.332972 cachyos-x8664 asus-gpu-switch-live[29968]: Rescanning PCI
+paź 09 08:52:30.370094 cachyos-x8664 systemd[1]: Starting Cardwire Daemon...
+paź 09 08:52:30.399888 cachyos-x8664 cardwired[30250]: [INFO ] IOMMU detected, reading pci devices using iommu dir
+paź 09 08:52:31.893668 cachyos-x8664 cardwired[30250]: Failed to create /root/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+paź 09 08:52:31.893668 cachyos-x8664 cardwired[30250]: Failed to create /root/.cache/radv_builtin_shaders for shader cache (Read-only file system)---disabling.
+paź 09 08:52:31.897350 cachyos-x8664 cardwired[30250]: [INFO ] Successfully resolved card0 and renderD129 for PCI 0000:01:00.0
+paź 09 08:52:31.908096 cachyos-x8664 cardwired[30250]: [INFO ] Successfully resolved card1 and renderD128 for PCI 0000:3a:00.0
+paź 09 08:52:31.909191 cachyos-x8664 cardwired[30250]: [WARN ] AMD Radeon 680M: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:52:31.909259 cachyos-x8664 cardwired[30250]: [INFO ] gpu NVIDIA GeForce RTX 3070 Laptop GPU id: 0 internal: 0, desktop: 2, connected: 0, total: 2, connected_internal: 0, connected_desktop: 0
+paź 09 08:52:31.909364 cachyos-x8664 cardwired[30250]: [INFO ] gpu AMD Radeon 680M id: 1 internal: 1, desktop: 7, connected: 1, total: 8, connected_internal: 1, connected_desktop: 0
+paź 09 08:52:32.086428 cachyos-x8664 cardwired[30250]: [INFO ] inserting: 30250 into map
+paź 09 08:52:32.086984 cachyos-x8664 cardwired[30250]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:52:32.086984 cachyos-x8664 cardwired[30250]: [WARN ] failed to get inode for /sys/class/backlight/nvidia_0: No such file or directory (os error 2)
+paź 09 08:52:32.086984 cachyos-x8664 cardwired[30250]: [ERROR] (ignoring) failed to get inode for backlight nvidia_0: IO Error: No such file or directory (os error 2)
+paź 09 08:52:32.087076 cachyos-x8664 cardwired[30250]: [INFO ] Switched to Hybrid
+paź 09 08:52:32.087135 cachyos-x8664 cardwired[30250]: [INFO ] write_command; command=Auth(Some(External), Some([48]))
+paź 09 08:52:32.087135 cachyos-x8664 cardwired[30250]: [INFO ] write_commands; commands=[Auth(Some(External), Some([48]))] extra_bytes=None
+paź 09 08:52:32.087135 cachyos-x8664 cardwired[30250]: [INFO ] read_command;
+paź 09 08:52:32.087135 cachyos-x8664 cardwired[30250]: [INFO ] read_commands; n_commands=1
+paź 09 08:52:32.087219 cachyos-x8664 cardwired[30250]: [INFO ] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+paź 09 08:52:32.087219 cachyos-x8664 cardwired[30250]: [INFO ] read_commands; n_commands=1
+paź 09 08:52:32.087269 cachyos-x8664 cardwired[30250]: [INFO ] start_object_server; started_event=Some(Event { listeners_notified: 0, listeners_total: 1 })
+paź 09 08:52:32.087269 cachyos-x8664 cardwired[30250]: [INFO ] obj_server_task;
+paź 09 08:52:32.087490 cachyos-x8664 cardwired[30250]: [INFO ] monitor_name_lost; name=org.opengamingcollective.cardwire
+paź 09 08:52:32.087531 cachyos-x8664 cardwired[30250]: [INFO ] write_command; command=Auth(Some(External), Some([48]))
+paź 09 08:52:32.087531 cachyos-x8664 cardwired[30250]: [INFO ] write_commands; commands=[Auth(Some(External), Some([48]))] extra_bytes=None
+paź 09 08:52:32.087531 cachyos-x8664 cardwired[30250]: [INFO ] read_command;
+paź 09 08:52:32.087531 cachyos-x8664 cardwired[30250]: [INFO ] read_commands; n_commands=1
+paź 09 08:52:32.087580 cachyos-x8664 cardwired[30250]: [INFO ] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 5, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+paź 09 08:52:32.087580 cachyos-x8664 cardwired[30250]: [INFO ] read_commands; n_commands=1
+paź 09 08:52:32.087648 cachyos-x8664 cardwired[30250]: [INFO ] start_object_server; started_event=Some(Event { listeners_notified: 0, listeners_total: 1 })
+paź 09 08:52:32.087648 cachyos-x8664 cardwired[30250]: [INFO ] obj_server_task;
+paź 09 08:52:32.087580 cachyos-x8664 systemd[1]: Started Cardwire Daemon.
+paź 09 08:52:32.087973 cachyos-x8664 cardwired[30250]: [INFO ] monitor_name_lost; name=net.hadess.SwitcherooControl
+paź 09 08:52:32.087973 cachyos-x8664 cardwired[30250]: [INFO ] Switcheroo DBus shim started successfully
+paź 09 08:52:32.088050 cachyos-x8664 cardwired[30250]: [INFO ] Daemon started succesfully
+paź 09 08:52:32.088137 cachyos-x8664 cardwired[30250]: [INFO ] write_command; command=Auth(Some(External), Some([48]))
+paź 09 08:52:32.088137 cachyos-x8664 cardwired[30250]: [INFO ] write_commands; commands=[Auth(Some(External), Some([48]))] extra_bytes=None
+paź 09 08:52:32.088176 cachyos-x8664 cardwired[30250]: [INFO ] read_command;
+paź 09 08:52:32.088176 cachyos-x8664 cardwired[30250]: [INFO ] read_commands; n_commands=1
+paź 09 08:52:32.088201 cachyos-x8664 cardwired[30250]: [INFO ] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 11, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+paź 09 08:52:32.088201 cachyos-x8664 cardwired[30250]: [INFO ] read_commands; n_commands=1
+paź 09 08:52:32.088254 cachyos-x8664 cardwired[30250]: [INFO ] {}; task_name="org.freedesktop.UPower proxy caching"
+paź 09 08:52:32.096448 cachyos-x8664 cardwired[30250]: [INFO ] successfully sent reset-failed on nvidia-powerd.service
+paź 09 08:52:32.101040 cachyos-x8664 cardwired[30250]: [INFO ] successfully sent start on nvidia-powerd.service
+paź 09 08:52:32.588495 cachyos-x8664 cardwired[30250]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D0
+paź 09 08:52:32.588495 cachyos-x8664 cardwired[30250]: [INFO ] AMD Radeon 680M: Power state changed: D0
+paź 09 08:52:33.162630 cachyos-x8664 cardwired[30250]: [INFO ] IOMMU detected, reading pci devices using iommu dir
+paź 09 08:52:33.177694 cachyos-x8664 asus-gpu-switch-live[29968]: Switched to AsusEgpu without a reboot (0000:01:00.0)
+paź 09 08:52:33.193060 cachyos-x8664 systemd[1]: asus-gpu-live@AsusEgpu.service: Deactivated successfully.
+paź 09 08:52:33.193452 cachyos-x8664 systemd[1]: Finished Switch GPU hardware mode AsusEgpu without a reboot.
+paź 09 08:52:33.193640 cachyos-x8664 systemd[1]: asus-gpu-live@AsusEgpu.service: Consumed 2.876s CPU time over 39.586s wall clock time, 7.7M memory peak.
+paź 09 08:52:53.145476 cachyos-x8664 cardwired[30250]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D3Hot

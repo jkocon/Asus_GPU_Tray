@@ -1,0 +1,12 @@
+08:54:12 Live switch to Hybrid: stopping services
+08:54:13 Nobody holds the card; unbinding drivers
+08:54:13 unbind 0000:01:00.0 from nvidia
+08:54:14 unbind 0000:01:00.1 from snd_hda_intel
+08:54:14 secondary bus reset below 0000:00:01.1
+08:54:15 remove 0000:01:00.0
+08:54:15 remove 0000:01:00.1
+08:54:15 link down/up cycle on 0000:00:01.1 (Surprise Down mask not supported)
+08:54:16 egpu_enable -> 0
+08:54:44 enable link on 0000:00:01.1
+08:54:44 Rescanning PCI
+08:54:45 Switched to Hybrid without a reboot (0000:01:00.0)

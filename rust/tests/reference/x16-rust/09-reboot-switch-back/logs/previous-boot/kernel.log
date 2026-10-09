@@ -1,0 +1,10 @@
+paź 09 09:08:06.819703 cachyos-x8664 kernel: netfs: FS-Cache loaded
+paź 09 09:08:06.854699 cachyos-x8664 kernel: RPC: Registered named UNIX socket transport module.
+paź 09 09:08:06.854773 cachyos-x8664 kernel: RPC: Registered udp transport module.
+paź 09 09:08:06.854804 cachyos-x8664 kernel: RPC: Registered tcp transport module.
+paź 09 09:08:06.854819 cachyos-x8664 kernel: RPC: Registered tcp-with-tls transport module.
+paź 09 09:08:06.854832 cachyos-x8664 kernel: RPC: Registered tcp NFSv4.1 backchannel transport module.
+paź 09 09:08:06.906698 cachyos-x8664 kernel: Key type dns_resolver registered
+paź 09 09:08:07.014698 cachyos-x8664 kernel: NFS: Registering the id_resolver key type
+paź 09 09:08:07.014785 cachyos-x8664 kernel: Key type id_resolver registered
+paź 09 09:08:07.014806 cachyos-x8664 kernel: Key type id_legacy registered

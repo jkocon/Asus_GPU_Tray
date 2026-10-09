@@ -1,0 +1,9 @@
+== live-progress
+08:22:37 XG Mobile is not connected and locked
+
+== live-result
+XG Mobile is not connected and locked
+
+== root-port
+0000:00:01.1
+

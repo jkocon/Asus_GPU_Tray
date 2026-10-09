@@ -1,0 +1,7 @@
+paź 09 09:13:09.026390 cachyos-x8664 systemd[1]: Started Schedule GPU mode Hybrid and reboot.
+paź 09 09:13:09.149933 cachyos-x8664 asus-gpu-switch-reboot[8843]: Scheduled mode Hybrid, rebooting
+paź 09 09:13:09.153698 cachyos-x8664 systemd[1]: asus-gpu-switch@Hybrid.service: Deactivated successfully.
+paź 09 09:13:09.292295 cachyos-x8664 systemd[1]: Stopping Cardwire Daemon...
+paź 09 09:13:09.774387 cachyos-x8664 systemd[1]: cardwired.service: Deactivated successfully.
+paź 09 09:13:09.774677 cachyos-x8664 systemd[1]: Stopped Cardwire Daemon.
+paź 09 09:13:09.774857 cachyos-x8664 systemd[1]: cardwired.service: Consumed 594ms CPU time over 8min 49.689s wall clock time, 399.3M memory peak.

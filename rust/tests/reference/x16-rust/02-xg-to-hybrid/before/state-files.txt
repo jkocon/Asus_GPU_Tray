@@ -1,0 +1,20 @@
+== live-progress
+08:51:53 Live switch to AsusEgpu: stopping services
+08:51:54 Nobody holds the card; unbinding drivers
+08:51:54 unbind 0000:01:00.0 from nvidia
+08:51:54 unbind 0000:01:00.1 from snd_hda_intel
+08:51:54 secondary bus reset below 0000:00:01.1
+08:51:55 remove 0000:01:00.0
+08:51:55 remove 0000:01:00.1
+08:51:56 link down/up cycle on 0000:00:01.1 (Surprise Down mask not supported)
+08:51:56 egpu_enable -> 1
+08:52:23 enable link on 0000:00:01.1
+08:52:30 Rescanning PCI
+08:52:33 Switched to AsusEgpu without a reboot (0000:01:00.0)
+
+== live-result
+Switched to AsusEgpu without a reboot (0000:01:00.0)
+
+== root-port
+0000:00:01.1
+

@@ -1,0 +1,135 @@
+paź 09 08:58:32.843169 cachyos-x8664 systemd[1]: Starting Apply scheduled GPU hardware mode change (before the login screen)...
+paź 09 08:58:33.252663 cachyos-x8664 asus-gpu-switch-apply[701]: Loading the NVIDIA driver on the current card
+paź 09 08:58:33.312578 cachyos-x8664 asus-gpu-switch-apply[701]: Live switch to AsusEgpu: stopping services
+paź 09 08:58:33.416580 cachyos-x8664 asus-gpu-switch-apply[701]: Nobody holds the card; unbinding drivers
+paź 09 08:58:33.437186 cachyos-x8664 asus-gpu-switch-apply[701]: unbind 0000:01:00.0 from nvidia
+paź 09 08:58:33.781993 cachyos-x8664 asus-gpu-switch-apply[701]: unbind 0000:01:00.1 from snd_hda_intel
+paź 09 08:58:33.864736 cachyos-x8664 asus-gpu-switch-apply[701]: secondary bus reset below 0000:00:01.1
+paź 09 08:58:35.101661 cachyos-x8664 asus-gpu-switch-apply[701]: remove 0000:01:00.0
+paź 09 08:58:35.133319 cachyos-x8664 asus-gpu-switch-apply[701]: remove 0000:01:00.1
+paź 09 08:58:35.306746 cachyos-x8664 asus-gpu-switch-apply[701]: link down/up cycle on 0000:00:01.1 (Surprise Down mask not supported)
+paź 09 08:58:35.820069 cachyos-x8664 asus-gpu-switch-apply[701]: egpu_enable -> 1
+paź 09 08:59:02.183095 cachyos-x8664 asus-gpu-switch-apply[701]: enable link on 0000:00:01.1
+paź 09 08:59:09.143887 cachyos-x8664 asus-gpu-switch-apply[701]: Rescanning PCI
+paź 09 08:59:09.285797 cachyos-x8664 asus-gpu-switch-apply[701]: Switched to AsusEgpu without a reboot (0000:01:00.0)
+paź 09 08:59:09.325093 cachyos-x8664 asus-gpu-switch-apply[701]: Hardware mode set to AsusEgpu (no supergfxd config)
+paź 09 08:59:09.345451 cachyos-x8664 systemd[1]: asus-gpu-switch-apply.service: Deactivated successfully.
+paź 09 08:59:09.345639 cachyos-x8664 systemd[1]: Finished Apply scheduled GPU hardware mode change (before the login screen).
+paź 09 08:59:09.345728 cachyos-x8664 systemd[1]: asus-gpu-switch-apply.service: Consumed 3.107s CPU time over 36.502s wall clock time, 46.6M memory peak.
+paź 09 08:59:09.346822 cachyos-x8664 systemd[1]: Starting Cardwire Daemon...
+paź 09 08:59:09.386478 cachyos-x8664 cardwired[1090]: [INFO ] IOMMU detected, reading pci devices using iommu dir
+paź 09 08:59:10.823330 cachyos-x8664 cardwired[1090]: Failed to create /root/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+paź 09 08:59:10.823533 cachyos-x8664 cardwired[1090]: Failed to create /root/.cache/radv_builtin_shaders for shader cache (Read-only file system)---disabling.
+paź 09 08:59:10.827003 cachyos-x8664 cardwired[1090]: [INFO ] Successfully resolved card0 and renderD129 for PCI 0000:01:00.0
+paź 09 08:59:10.840536 cachyos-x8664 cardwired[1090]: [WARN ] NVIDIA GeForce RTX 3070 Laptop GPU: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:10.851789 cachyos-x8664 cardwired[1090]: [INFO ] Successfully resolved card1 and renderD128 for PCI 0000:3a:00.0
+paź 09 08:59:10.852449 cachyos-x8664 cardwired[1090]: [WARN ] AMD Radeon 680M: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:10.852492 cachyos-x8664 cardwired[1090]: [INFO ] gpu NVIDIA GeForce RTX 3070 Laptop GPU id: 0 internal: 0, desktop: 2, connected: 0, total: 2, connected_internal: 0, connected_desktop: 0
+paź 09 08:59:10.852614 cachyos-x8664 cardwired[1090]: [INFO ] gpu AMD Radeon 680M id: 1 internal: 1, desktop: 7, connected: 1, total: 8, connected_internal: 1, connected_desktop: 0
+paź 09 08:59:10.935381 cachyos-x8664 cardwired[1090]: [INFO ] inserting: 1090 into map
+paź 09 08:59:10.936067 cachyos-x8664 cardwired[1090]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:10.936067 cachyos-x8664 cardwired[1090]: [WARN ] failed to get inode for /dev/nvidia0: No such file or directory (os error 2)
+paź 09 08:59:10.936067 cachyos-x8664 cardwired[1090]: [ERROR] failed to get inode for nvidia0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:10.936159 cachyos-x8664 cardwired[1090]: [ERROR] failed to apply mode at startup: fdo error: org.freedesktop.DBus.Error.Failed: IO Error: No such file or directory (os error 2), switching to hybrid...
+paź 09 08:59:10.936469 cachyos-x8664 cardwired[1090]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:10.936483 cachyos-x8664 cardwired[1090]: [WARN ] failed to get inode for /dev/nvidia0: No such file or directory (os error 2)
+paź 09 08:59:10.936483 cachyos-x8664 cardwired[1090]: [ERROR] failed to get inode for nvidia0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:10.936737 cachyos-x8664 cardwired[1090]: Error: FdoError(Failed("IO Error: No such file or directory (os error 2)"))
+paź 09 08:59:11.296965 cachyos-x8664 systemd[1]: cardwired.service: Main process exited, code=exited, status=1/FAILURE
+paź 09 08:59:11.297225 cachyos-x8664 systemd[1]: cardwired.service: Failed with result 'exit-code'.
+paź 09 08:59:11.297628 cachyos-x8664 systemd[1]: Failed to start Cardwire Daemon.
+paź 09 08:59:11.297771 cachyos-x8664 systemd[1]: cardwired.service: Consumed 401ms CPU time over 1.950s wall clock time, 350.8M memory peak.
+paź 09 08:59:16.511699 cachyos-x8664 systemd[1]: cardwired.service: Scheduled restart job, restart counter is at 1.
+paź 09 08:59:16.513312 cachyos-x8664 systemd[1]: Starting Cardwire Daemon...
+paź 09 08:59:16.542942 cachyos-x8664 cardwired[1389]: [INFO ] IOMMU detected, reading pci devices using iommu dir
+paź 09 08:59:16.695916 cachyos-x8664 cardwired[1389]: Failed to create /root/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+paź 09 08:59:16.695916 cachyos-x8664 cardwired[1389]: Failed to create /root/.cache/radv_builtin_shaders for shader cache (Read-only file system)---disabling.
+paź 09 08:59:16.698293 cachyos-x8664 cardwired[1389]: [INFO ] Successfully resolved card0 and renderD129 for PCI 0000:01:00.0
+paź 09 08:59:16.709506 cachyos-x8664 cardwired[1389]: [WARN ] NVIDIA GeForce RTX 3070 Laptop GPU: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:16.720085 cachyos-x8664 cardwired[1389]: [INFO ] Successfully resolved card1 and renderD128 for PCI 0000:3a:00.0
+paź 09 08:59:16.721090 cachyos-x8664 cardwired[1389]: [WARN ] AMD Radeon 680M: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:16.721131 cachyos-x8664 cardwired[1389]: [INFO ] gpu NVIDIA GeForce RTX 3070 Laptop GPU id: 0 internal: 0, desktop: 2, connected: 0, total: 2, connected_internal: 0, connected_desktop: 0
+paź 09 08:59:16.721235 cachyos-x8664 cardwired[1389]: [INFO ] gpu AMD Radeon 680M id: 1 internal: 1, desktop: 7, connected: 1, total: 8, connected_internal: 1, connected_desktop: 0
+paź 09 08:59:16.799450 cachyos-x8664 cardwired[1389]: [INFO ] inserting: 1389 into map
+paź 09 08:59:16.800028 cachyos-x8664 cardwired[1389]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:16.800058 cachyos-x8664 cardwired[1389]: [WARN ] failed to get inode for /dev/nvidia0: No such file or directory (os error 2)
+paź 09 08:59:16.800058 cachyos-x8664 cardwired[1389]: [ERROR] failed to get inode for nvidia0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:16.800101 cachyos-x8664 cardwired[1389]: [ERROR] failed to apply mode at startup: fdo error: org.freedesktop.DBus.Error.Failed: IO Error: No such file or directory (os error 2), switching to hybrid...
+paź 09 08:59:16.800453 cachyos-x8664 cardwired[1389]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:16.800475 cachyos-x8664 cardwired[1389]: [WARN ] failed to get inode for /dev/nvidia0: No such file or directory (os error 2)
+paź 09 08:59:16.800475 cachyos-x8664 cardwired[1389]: [ERROR] failed to get inode for nvidia0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:16.800824 cachyos-x8664 cardwired[1389]: Error: FdoError(Failed("IO Error: No such file or directory (os error 2)"))
+paź 09 08:59:17.025738 cachyos-x8664 systemd[1]: cardwired.service: Main process exited, code=exited, status=1/FAILURE
+paź 09 08:59:17.026113 cachyos-x8664 systemd[1]: cardwired.service: Failed with result 'exit-code'.
+paź 09 08:59:17.026645 cachyos-x8664 systemd[1]: Failed to start Cardwire Daemon.
+paź 09 08:59:22.105793 cachyos-x8664 systemd[1]: cardwired.service: Scheduled restart job, restart counter is at 2.
+paź 09 08:59:22.107009 cachyos-x8664 systemd[1]: Starting Cardwire Daemon...
+paź 09 08:59:22.136689 cachyos-x8664 cardwired[1530]: [INFO ] IOMMU detected, reading pci devices using iommu dir
+paź 09 08:59:22.293452 cachyos-x8664 cardwired[1530]: Failed to create /root/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+paź 09 08:59:22.293452 cachyos-x8664 cardwired[1530]: Failed to create /root/.cache/radv_builtin_shaders for shader cache (Read-only file system)---disabling.
+paź 09 08:59:22.295943 cachyos-x8664 cardwired[1530]: [INFO ] Successfully resolved card0 and renderD129 for PCI 0000:01:00.0
+paź 09 08:59:22.307951 cachyos-x8664 cardwired[1530]: [WARN ] NVIDIA GeForce RTX 3070 Laptop GPU: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:22.318790 cachyos-x8664 cardwired[1530]: [INFO ] Successfully resolved card1 and renderD128 for PCI 0000:3a:00.0
+paź 09 08:59:22.319826 cachyos-x8664 cardwired[1530]: [WARN ] AMD Radeon 680M: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:22.319869 cachyos-x8664 cardwired[1530]: [INFO ] gpu NVIDIA GeForce RTX 3070 Laptop GPU id: 0 internal: 0, desktop: 2, connected: 0, total: 2, connected_internal: 0, connected_desktop: 0
+paź 09 08:59:22.319978 cachyos-x8664 cardwired[1530]: [INFO ] gpu AMD Radeon 680M id: 1 internal: 1, desktop: 7, connected: 1, total: 8, connected_internal: 1, connected_desktop: 0
+paź 09 08:59:22.395672 cachyos-x8664 cardwired[1530]: [INFO ] inserting: 1530 into map
+paź 09 08:59:22.396203 cachyos-x8664 cardwired[1530]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:22.396203 cachyos-x8664 cardwired[1530]: [WARN ] failed to get inode for /dev/nvidia0: No such file or directory (os error 2)
+paź 09 08:59:22.396273 cachyos-x8664 cardwired[1530]: [ERROR] failed to get inode for nvidia0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:22.396273 cachyos-x8664 cardwired[1530]: [ERROR] failed to apply mode at startup: fdo error: org.freedesktop.DBus.Error.Failed: IO Error: No such file or directory (os error 2), switching to hybrid...
+paź 09 08:59:22.396573 cachyos-x8664 cardwired[1530]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:22.396573 cachyos-x8664 cardwired[1530]: [WARN ] failed to get inode for /dev/nvidia0: No such file or directory (os error 2)
+paź 09 08:59:22.396612 cachyos-x8664 cardwired[1530]: [ERROR] failed to get inode for nvidia0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:22.396804 cachyos-x8664 cardwired[1530]: Error: FdoError(Failed("IO Error: No such file or directory (os error 2)"))
+paź 09 08:59:22.789798 cachyos-x8664 systemd[1]: cardwired.service: Main process exited, code=exited, status=1/FAILURE
+paź 09 08:59:22.789943 cachyos-x8664 systemd[1]: cardwired.service: Failed with result 'exit-code'.
+paź 09 08:59:22.790251 cachyos-x8664 systemd[1]: Failed to start Cardwire Daemon.
+paź 09 08:59:28.010660 cachyos-x8664 systemd[1]: cardwired.service: Scheduled restart job, restart counter is at 3.
+paź 09 08:59:28.012211 cachyos-x8664 systemd[1]: Starting Cardwire Daemon...
+paź 09 08:59:28.040295 cachyos-x8664 cardwired[2729]: [INFO ] IOMMU detected, reading pci devices using iommu dir
+paź 09 08:59:28.173845 cachyos-x8664 cardwired[2729]: Failed to create /root/.cache/mesa_shader_cache for shader cache (Read-only file system)---disabling.
+paź 09 08:59:28.173845 cachyos-x8664 cardwired[2729]: Failed to create /root/.cache/radv_builtin_shaders for shader cache (Read-only file system)---disabling.
+paź 09 08:59:28.208041 cachyos-x8664 cardwired[2729]: [INFO ] Successfully resolved card0 and renderD129 for PCI 0000:01:00.0
+paź 09 08:59:28.218567 cachyos-x8664 cardwired[2729]: [INFO ] Successfully resolved card1 and renderD128 for PCI 0000:3a:00.0
+paź 09 08:59:28.219677 cachyos-x8664 cardwired[2729]: [WARN ] AMD Radeon 680M: EGL discrete check failed: EGL driver found the device but doesn't support querying GPU type
+paź 09 08:59:28.219726 cachyos-x8664 cardwired[2729]: [INFO ] gpu NVIDIA GeForce RTX 3070 Laptop GPU id: 0 internal: 0, desktop: 2, connected: 0, total: 2, connected_internal: 0, connected_desktop: 0
+paź 09 08:59:28.219823 cachyos-x8664 cardwired[2729]: [INFO ] gpu AMD Radeon 680M id: 1 internal: 1, desktop: 7, connected: 1, total: 8, connected_internal: 1, connected_desktop: 0
+paź 09 08:59:28.308086 cachyos-x8664 cardwired[2729]: [INFO ] inserting: 2729 into map
+paź 09 08:59:28.308511 cachyos-x8664 cardwired[2729]: [ERROR] (ignoring) failed to get inode for hwmon 0000:01:00.0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:28.308533 cachyos-x8664 cardwired[2729]: [WARN ] failed to get inode for /sys/class/backlight/nvidia_0: No such file or directory (os error 2)
+paź 09 08:59:28.308533 cachyos-x8664 cardwired[2729]: [ERROR] (ignoring) failed to get inode for backlight nvidia_0: IO Error: No such file or directory (os error 2)
+paź 09 08:59:28.308578 cachyos-x8664 cardwired[2729]: [INFO ] Switched to Hybrid
+paź 09 08:59:28.308667 cachyos-x8664 cardwired[2729]: [INFO ] write_command; command=Auth(Some(External), Some([48]))
+paź 09 08:59:28.308667 cachyos-x8664 cardwired[2729]: [INFO ] write_commands; commands=[Auth(Some(External), Some([48]))] extra_bytes=None
+paź 09 08:59:28.308693 cachyos-x8664 cardwired[2729]: [INFO ] read_command;
+paź 09 08:59:28.308693 cachyos-x8664 cardwired[2729]: [INFO ] read_commands; n_commands=1
+paź 09 08:59:28.308729 cachyos-x8664 cardwired[2729]: [INFO ] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+paź 09 08:59:28.308729 cachyos-x8664 cardwired[2729]: [INFO ] read_commands; n_commands=1
+paź 09 08:59:28.308791 cachyos-x8664 cardwired[2729]: [INFO ] start_object_server; started_event=Some(Event { listeners_notified: 0, listeners_total: 1 })
+paź 09 08:59:28.308791 cachyos-x8664 cardwired[2729]: [INFO ] obj_server_task;
+paź 09 08:59:28.309024 cachyos-x8664 cardwired[2729]: [INFO ] monitor_name_lost; name=org.opengamingcollective.cardwire
+paź 09 08:59:28.309062 cachyos-x8664 cardwired[2729]: [INFO ] write_command; command=Auth(Some(External), Some([48]))
+paź 09 08:59:28.309062 cachyos-x8664 cardwired[2729]: [INFO ] write_commands; commands=[Auth(Some(External), Some([48]))] extra_bytes=None
+paź 09 08:59:28.309090 cachyos-x8664 cardwired[2729]: [INFO ] read_command;
+paź 09 08:59:28.309090 cachyos-x8664 cardwired[2729]: [INFO ] read_commands; n_commands=1
+paź 09 08:59:28.309114 cachyos-x8664 cardwired[2729]: [INFO ] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 5, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+paź 09 08:59:28.309114 cachyos-x8664 cardwired[2729]: [INFO ] read_commands; n_commands=1
+paź 09 08:59:28.309107 cachyos-x8664 systemd[1]: Started Cardwire Daemon.
+paź 09 08:59:28.309201 cachyos-x8664 cardwired[2729]: [INFO ] start_object_server; started_event=Some(Event { listeners_notified: 0, listeners_total: 1 })
+paź 09 08:59:28.309201 cachyos-x8664 cardwired[2729]: [INFO ] obj_server_task;
+paź 09 08:59:28.309363 cachyos-x8664 cardwired[2729]: [INFO ] monitor_name_lost; name=net.hadess.SwitcherooControl
+paź 09 08:59:28.309363 cachyos-x8664 cardwired[2729]: [INFO ] Switcheroo DBus shim started successfully
+paź 09 08:59:28.309557 cachyos-x8664 cardwired[2729]: [INFO ] Daemon started succesfully
+paź 09 08:59:28.309582 cachyos-x8664 cardwired[2729]: [INFO ] write_command; command=Auth(Some(External), Some([48]))
+paź 09 08:59:28.309582 cachyos-x8664 cardwired[2729]: [INFO ] write_commands; commands=[Auth(Some(External), Some([48]))] extra_bytes=None
+paź 09 08:59:28.309630 cachyos-x8664 cardwired[2729]: [INFO ] read_command;
+paź 09 08:59:28.309630 cachyos-x8664 cardwired[2729]: [INFO ] read_commands; n_commands=1
+paź 09 08:59:28.309630 cachyos-x8664 cardwired[2729]: [INFO ] write_commands; commands=[NegotiateUnixFD, Begin] extra_bytes=Some([108, 1, 0, 1, 0, 0, 0, 0, 11, 0, 0, 0, 109, 0, 0, 0, 1, 1, 111, 0, 21, 0, 0, 0, 47, 111, 114, 103, 47, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 47, 68, 66, 117, 115, 0, 0, 0, 2, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0, 3, 1, 115, 0, 5, 0, 0, 0, 72, 101, 108, 108, 111, 0, 0, 0, 6, 1, 115, 0, 20, 0, 0, 0, 111, 114, 103, 46, 102, 114, 101, 101, 100, 101, 115, 107, 116, 111, 112, 46, 68, 66, 117, 115, 0, 0, 0, 0])
+paź 09 08:59:28.309630 cachyos-x8664 cardwired[2729]: [INFO ] read_commands; n_commands=1
+paź 09 08:59:28.309696 cachyos-x8664 cardwired[2729]: [INFO ] {}; task_name="org.freedesktop.UPower proxy caching"
+paź 09 08:59:28.315024 cachyos-x8664 cardwired[2729]: [INFO ] successfully sent reset-failed on nvidia-powerd.service
+paź 09 08:59:28.320488 cachyos-x8664 cardwired[2729]: [INFO ] successfully sent start on nvidia-powerd.service
+paź 09 08:59:28.810695 cachyos-x8664 cardwired[2729]: [INFO ] AMD Radeon 680M: Power state changed: D0
+paź 09 08:59:28.810695 cachyos-x8664 cardwired[2729]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D0
+paź 09 08:59:41.849344 cachyos-x8664 cardwired[2729]: [INFO ] NVIDIA GeForce RTX 3070 Laptop GPU: Power state changed: D3Hot

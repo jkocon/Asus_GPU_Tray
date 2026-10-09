@@ -1,0 +1,53 @@
+paź 09 08:54:13.939056 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Removing device
+paź 09 08:54:13.940289 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Unloading driver
+paź 09 08:54:14.406289 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: GPU sound probed, but not operational: please add a quirk to driver_denylist
+paź 09 08:54:14.630433 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Link Down/Up ignored
+paź 09 08:54:15.827306 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Link Down
+paź 09 08:54:15.827540 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Card present
+paź 09 08:54:16.355291 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xbe
+paź 09 08:54:16.456325 cachyos-x8664 kernel: asus_wmi: Unknown key code 0xc2
+paź 09 08:54:16.849326 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): No link
+paź 09 08:54:42.017368 cachyos-x8664 kernel: asus_armoury: Success changing the eGPU status, a reboot is strongly advised
+paź 09 08:54:42.044307 cachyos-x8664 kernel: pcieport 0000:00:01.1: pciehp: Slot(0): Card present
+paź 09 08:54:42.374294 cachyos-x8664 kernel: pci 0000:01:00.0: [10de:2523] type 00 class 0x030000 PCIe Legacy Endpoint
+paź 09 08:54:42.374451 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 0 [mem 0x00000000-0x00ffffff]
+paź 09 08:54:42.374538 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 1 [mem 0x00000000-0xffffffff 64bit pref]
+paź 09 08:54:42.374612 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 3 [mem 0x00000000-0x01ffffff 64bit pref]
+paź 09 08:54:42.374685 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 5 [io  0x0000-0x007f]
+paź 09 08:54:42.374754 cachyos-x8664 kernel: pci 0000:01:00.0: ROM [mem 0x00000000-0x0007ffff pref]
+paź 09 08:54:42.374823 cachyos-x8664 kernel: pci 0000:01:00.0: Max Payload Size set to 256 (was 128, max 256)
+paź 09 08:54:42.374887 cachyos-x8664 kernel: pci 0000:01:00.0: PME# supported from D0 D3hot
+paź 09 08:54:42.374962 cachyos-x8664 kernel: pci 0000:01:00.0: 126.024 Gb/s available PCIe bandwidth, limited by 16.0 GT/s PCIe x8 link at 0000:00:01.1 (capable of 252.048 Gb/s with 16.0 GT/s PCIe x16 link)
+paź 09 08:54:42.377291 cachyos-x8664 kernel: pci 0000:01:00.0: Adding to iommu group 14
+paź 09 08:54:42.377533 cachyos-x8664 kernel: pci 0000:01:00.0: vgaarb: bridge control possible
+paź 09 08:54:42.377740 cachyos-x8664 kernel: pci 0000:01:00.0: vgaarb: VGA device added: decodes=io+mem,owns=none,locks=none
+paź 09 08:54:42.377918 cachyos-x8664 kernel: pci 0000:01:00.1: [10de:228e] type 00 class 0x040300 PCIe Endpoint
+paź 09 08:54:42.378114 cachyos-x8664 kernel: pci 0000:01:00.1: BAR 0 [mem 0x00000000-0x00003fff]
+paź 09 08:54:42.378302 cachyos-x8664 kernel: pci 0000:01:00.1: Max Payload Size set to 256 (was 128, max 256)
+paź 09 08:54:42.378444 cachyos-x8664 kernel: pci 0000:01:00.1: Adding to iommu group 14
+paź 09 08:54:42.378559 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 1 [mem 0x7000000000-0x70ffffffff 64bit pref]: assigned
+paź 09 08:54:42.378683 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 3 [mem 0x7100000000-0x7101ffffff 64bit pref]: assigned
+paź 09 08:54:42.378802 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 0 [mem 0xdc000000-0xdcffffff]: assigned
+paź 09 08:54:42.378916 cachyos-x8664 kernel: pci 0000:01:00.0: ROM [mem 0xdd000000-0xdd07ffff pref]: assigned
+paź 09 08:54:42.379032 cachyos-x8664 kernel: pci 0000:01:00.1: BAR 0 [mem 0xdd080000-0xdd083fff]: assigned
+paź 09 08:54:42.379145 cachyos-x8664 kernel: pci 0000:01:00.0: BAR 5 [io  0xf000-0xf07f]: assigned
+paź 09 08:54:42.379257 cachyos-x8664 kernel: pcieport 0000:00:01.1: PCI bridge to [bus 01-05]
+paź 09 08:54:42.379395 cachyos-x8664 kernel: pcieport 0000:00:01.1:   bridge window [io  0xf000-0xffff]
+paź 09 08:54:42.379525 cachyos-x8664 kernel: pcieport 0000:00:01.1:   bridge window [mem 0xdc000000-0xdd0fffff]
+paź 09 08:54:42.379650 cachyos-x8664 kernel: pcieport 0000:00:01.1:   bridge window [mem 0x7000000000-0x7801ffffff 64bit pref]
+paź 09 08:54:42.379773 cachyos-x8664 kernel: pci 0000:01:00.1: extending delay after power-on from D3hot to 20 msec
+paź 09 08:54:42.379890 cachyos-x8664 kernel: pci 0000:01:00.1: D0 power state depends on 0000:01:00.0
+paź 09 08:54:42.380010 cachyos-x8664 kernel: nvidia 0000:01:00.0: enabling device (0000 -> 0003)
+paź 09 08:54:42.380123 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: enabling device (0000 -> 0002)
+paź 09 08:54:42.380235 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: Disabling MSI
+paź 09 08:54:42.380356 cachyos-x8664 kernel: snd_hda_intel 0000:01:00.1: Handle vga_switcheroo audio client
+paź 09 08:54:42.380472 cachyos-x8664 kernel: nvidia 0000:01:00.0: vgaarb: VGA decodes changed: olddecodes=io+mem,decodes=none:owns=none
+paź 09 08:54:42.389291 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=3 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input54
+paź 09 08:54:42.389318 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=7 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input55
+paź 09 08:54:42.389329 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=8 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input56
+paź 09 08:54:42.389336 cachyos-x8664 kernel: input: HDA NVidia HDMI/DP,pcm=9 as /devices/pci0000:00/0000:00:01.1/0000:01:00.1/sound/card0/input57
+paź 09 08:54:44.013305 cachyos-x8664 kernel: NVRM: GPU0 nvAssertOkFailedNoLog: Assertion failed: Invalid data passed [NV_ERR_INVALID_DATA] (0x00000025) returned from PlatformRequestHandler failed to get target temp from SBIOS @ platform_request_handler_ctrl.c:2175
+paź 09 08:54:44.013419 cachyos-x8664 kernel: NVRM: GPU0 nvAssertOkFailedNoLog: Assertion failed: Invalid data passed [NV_ERR_INVALID_DATA] (0x00000025) returned from PlatformRequestHandler failed to get platform power mode from SBIOS @ platform_request_handler_ctrl.c:2118
+paź 09 08:54:44.134312 cachyos-x8664 kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Loading driver
+paź 09 08:54:44.188309 cachyos-x8664 kernel: [drm] Initialized nvidia-drm 0.0.0 for 0000:01:00.0 on minor 0
+paź 09 08:54:44.189310 cachyos-x8664 kernel: nvidia 0000:01:00.0: [drm] Cannot find any crtc or sizes

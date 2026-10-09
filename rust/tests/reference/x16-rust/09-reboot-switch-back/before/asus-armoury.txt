@@ -1,0 +1,5 @@
+egpu_connected=1
+egpu_enable=0
+gpu_mux_mode=0
+dgpu_disable=0
+pending_reboot=-

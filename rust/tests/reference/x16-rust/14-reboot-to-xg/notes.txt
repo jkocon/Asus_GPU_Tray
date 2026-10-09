@@ -1,0 +1,1 @@
+Rust helpers: Hybrid -> AsusEgpu via asus-gpu-switch@AsusEgpu (switch-reboot, then switch-apply live path at boot)
